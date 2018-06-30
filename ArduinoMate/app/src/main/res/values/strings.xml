@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Arduino Mate</string>
+
+    <string name="no_functions">No functions</string>
+    <string name="loading_functions">Loading functions...</string>
+    <string name="loading_devices">Loading devices...</string>
+    <string name="cd_devices_list">Devices list</string>
+    <string name="cd_functions_list">Functions list</string>
+    <string name="cd_device_name">Name of the device</string>
+</resources>

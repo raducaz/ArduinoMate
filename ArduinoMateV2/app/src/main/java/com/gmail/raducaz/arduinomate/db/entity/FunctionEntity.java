@@ -23,10 +23,12 @@ import java.util.Date;
         indices = {@Index(value = "deviceId")
         })
 public class FunctionEntity implements Function {
+
     @PrimaryKey(autoGenerate = true)
     private int id;
     private int deviceId;
-    private String text;
+    private String name;
+    private String description;
     private String log;
     private Date dateSample;
 
@@ -58,12 +60,21 @@ public class FunctionEntity implements Function {
     }
 
     @Override
-    public String getText() {
-        return text;
+    public String getName() {
+        return name;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -78,11 +89,18 @@ public class FunctionEntity implements Function {
     public FunctionEntity() {
     }
 
-    public FunctionEntity(int id, int deviceId, String text, String log, Date dateSample) {
+    public FunctionEntity(int id, int deviceId, String name, String log, Date dateSample) {
         this.id = id;
         this.deviceId = deviceId;
-        this.text = text;
+        this.name = name;
         this.log = log;
         this.dateSample = dateSample;
+    }
+
+    public FunctionEntity(Function function) {
+        this.id = function.getId();
+        this.deviceId = function.getDeviceId();
+        this.name = function.getName();
+        this.description = function.getDescription();
     }
 }

@@ -21,11 +21,17 @@ public interface FunctionDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(FunctionEntity function);
 
-    @Query("SELECT * FROM functions where deviceId = :deviceId")
-    LiveData<List<FunctionEntity>> loadFunctions(int deviceId);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(FunctionEntity function);
+
+    @Query("SELECT * FROM functions")
+    LiveData<List<FunctionEntity>> loadAllFunctions();
 
     @Query("SELECT * FROM functions where deviceId = :deviceId")
-    List<FunctionEntity> loadFunctionsSync(int deviceId);
+    LiveData<List<FunctionEntity>> loadDeviceFunctions(int deviceId);
+
+    @Query("SELECT * FROM functions where deviceId = :deviceId")
+    List<FunctionEntity> loadDeviceFunctionsSync(int deviceId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<FunctionEntity> functions);

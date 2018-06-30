@@ -3,10 +3,13 @@ package com.gmail.raducaz.arduinomate.ui;
 
 import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.gmail.raducaz.arduinomate.databinding.DeviceItemBinding;
 import com.gmail.raducaz.arduinomate.model.Device;
@@ -89,6 +92,15 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         public DeviceViewHolder(DeviceItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+
+            ImageButton shareImageButton = (ImageButton) itemView.findViewById(R.id.share_button);
+            shareImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Snackbar.make(v, "Share " + binding.getDevice().getName(),
+                            Snackbar.LENGTH_LONG).show();
+                }
+            });
         }
     }
 }

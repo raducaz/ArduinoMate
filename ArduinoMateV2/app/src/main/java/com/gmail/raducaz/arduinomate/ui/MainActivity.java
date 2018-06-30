@@ -1,5 +1,7 @@
 package com.gmail.raducaz.arduinomate.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -74,7 +76,11 @@ public class MainActivity extends AppCompatActivity {
                         // Set item in checked state
                         menuItem.setChecked(true);
 
-                        // TODO: handle navigation
+                        if(menuItem.getTitle().equals("Config"))
+                        {
+                            Intent intent = new Intent(getBaseContext(), ConfigMainActivity.class);
+                            startActivity(intent);
+                        }
 
                         // Closing drawer on item click
                         mDrawerLayout.closeDrawers();
@@ -82,61 +88,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        // Adding Floating Action Button to bottom right of main view
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Snackbar.make(v, "Hello Snackbar!",
-                        Snackbar.LENGTH_LONG).show();
-            }
-        });
     }
 
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
-        Adapter adapter = new Adapter(getSupportFragmentManager());
-//        adapter.addFragment(new ListContentFragment(), "List");
-//        adapter.addFragment(new TileContentFragment(), "Tile");
-//        adapter.addFragment(new CardContentFragment(), "Card");
 
-        //V2 - Create custom fragment
-        DeviceListFragment fragment = new DeviceListFragment();
-//        getSupportFragmentManager().beginTransaction()
-//                .add(R.id.fragment_container, fragment, DeviceListFragment.TAG).commit();
-        adapter.addFragment(fragment, "Devices");
-        //V2 - Create custom fragment
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        // All Tab
+        FunctionListFragment fragment = new FunctionListFragment();
+        adapter.addFragment(fragment, "All");
 
         viewPager.setAdapter(adapter);
-    }
-
-    static class Adapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
-
-        public Adapter(FragmentManager manager) {
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
     }
 
     @Override

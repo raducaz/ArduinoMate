@@ -22,15 +22,24 @@ public class DataRepository {
 
     private final AppDatabase mDatabase;
     private MediatorLiveData<List<DeviceEntity>> mObservableDevices;
+    private MediatorLiveData<List<FunctionEntity>> mObservableFunctions;
 
     private DataRepository(final AppDatabase database) {
         mDatabase = database;
         mObservableDevices = new MediatorLiveData<>();
+        mObservableFunctions = new MediatorLiveData<>();
 
         mObservableDevices.addSource(mDatabase.deviceDao().loadAllDevices(),
                 deviceEntities -> {
                     if (mDatabase.getDatabaseCreated().getValue() != null) {
                         mObservableDevices.postValue(deviceEntities);
+                    }
+                });
+
+        mObservableFunctions.addSource(mDatabase.functionDao().loadAllFunctions(),
+                functionEntities -> {
+                    if (mDatabase.getDatabaseCreated().getValue() != null) {
+                        mObservableFunctions.postValue(functionEntities);
                     }
                 });
     }
@@ -52,6 +61,9 @@ public class DataRepository {
     public LiveData<List<DeviceEntity>> getDevices() {
         return mObservableDevices;
     }
+    public LiveData<List<FunctionEntity>> getFunctions() {
+        return mObservableFunctions;
+    }
 
     public LiveData<DeviceEntity> loadDevice(final int deviceId) {
         return mDatabase.deviceDao().loadDevice(deviceId);
@@ -67,11 +79,14 @@ public class DataRepository {
     }
 
     public LiveData<List<FunctionEntity>> loadFunctions(final int deviceId) {
-        return mDatabase.functionDao().loadFunctions(deviceId);
+        return mDatabase.functionDao().loadDeviceFunctions(deviceId);
     }
 
     public LiveData<FunctionEntity> loadFunction(final int functionId) {
         return mDatabase.functionDao().loadFunction(functionId);
+    }
+    public void insertFunction(FunctionEntity function) {
+        mDatabase.functionDao().insert(function);
     }
     public void updateFunction(FunctionEntity function) {
         mDatabase.functionDao().update(function);

@@ -13,8 +13,18 @@ import com.gmail.raducaz.arduinomate.model.Device;
 public class DeviceEntity implements Device {
     @PrimaryKey
     private int id;
+    private String ip;
     private String name;
     private String description;
+
+    @Override
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
 
     @Override
     public int getId() {

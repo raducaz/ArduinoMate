@@ -15,35 +15,23 @@ import java.util.concurrent.TimeUnit;
  */
 public class DataGenerator {
 
-    private static final String[] FIRST = new String[]{
-            "Special edition", "New", "Cheap", "Quality", "Used"};
-    private static final String[] SECOND = new String[]{
-            "Three-headed Monkey", "Rubber Chicken", "Pint of Grog", "Monocle"};
-    private static final String[] DESCRIPTION = new String[]{
-            "is finally here", "is recommended by Stan S. Stanman",
-            "is the best sold product on Mêlée Island", "is \uD83D\uDCAF", "is ❤️", "is fine"};
-    private static final String[] FUNCTIONS = new String[]{
-            "Function 1", "Function 2", "Function 3", "Function 4", "Function 5", "Function 6",
-    };
-
     public static List<DeviceEntity> generateDevices() {
 
         List<DeviceEntity> devices = new ArrayList<>(3);
         DeviceEntity device = new DeviceEntity();
-        device.setName("My Arduino Dev 1");
-        device.setDescription("Desc");
+        device.setIp("192.168.0.7");
+        device.setName("Generator");
+        device.setDescription("Controllerul de pornire/oprire generator si control pompa");
         device.setId(1);
         devices.add(device);
+
         device = new DeviceEntity();
-        device.setName("My Arduino Dev 2");
-        device.setDescription("Desc");
+        device.setIp("192.168.0.8");
+        device.setName("Prize automate (control bolier)");
+        device.setDescription("Controller de pornire/oprire prize");
         device.setId(2);
         devices.add(device);
-        device = new DeviceEntity();
-        device.setName("My Arduino Dev 3");
-        device.setDescription("Desc");
-        device.setId(3);
-        devices.add(device);
+
 
 //        List<ProductEntity> products = new ArrayList<>(FIRST.length * SECOND.length);
 //        Random rnd = new Random();
@@ -62,31 +50,27 @@ public class DataGenerator {
 
     public static List<FunctionEntity> generateFunctionsForDevices(
             final List<DeviceEntity> devices) {
+
         List<FunctionEntity> functions = new ArrayList<>();
 
-        for (Device device : devices) {
-            FunctionEntity function = new FunctionEntity();
-            function.setDeviceId(device.getId());
-            function.setText("StateFct" + device.getId());
-            function.setDateSample(new Date(System.currentTimeMillis()
-                    - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-            functions.add(function);
+        // Device Generator
+        Device device = devices.get(0);
+        FunctionEntity function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("OnOffGenerator");
+        function.setDescription("Start/Stop Generator" + device.getId());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
 
-            function = new FunctionEntity();
-            function.setDeviceId(device.getId());
-            function.setText("ProgressFct" + device.getId());
-            function.setDateSample(new Date(System.currentTimeMillis()
-                    - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-            functions.add(function);
-
-            function = new FunctionEntity();
-            function.setDeviceId(device.getId());
-            function.setText("MonitorFct" + device.getId());
-            function.setDateSample(new Date(System.currentTimeMillis()
-                    - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-            functions.add(function);
-        }
-
+        device = devices.get(1);
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("OnOffPump");
+        function.setDescription("Start/Stop Pompa" + device.getId());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
 
 //        Random rnd = new Random();
 //

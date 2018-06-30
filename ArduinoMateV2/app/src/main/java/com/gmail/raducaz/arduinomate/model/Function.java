@@ -9,7 +9,8 @@ import java.util.Date;
 public interface Function {
     int getId();
     int getDeviceId();
-    String getText();
+    String getName();
+    String getDescription();
     String getLog();
     void setLog(String log);
     Date getDateSample();

@@ -13,28 +13,34 @@ import android.support.annotation.VisibleForTesting;
 
 import com.gmail.raducaz.arduinomate.AppExecutors;
 import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
+import com.gmail.raducaz.arduinomate.db.dao.ExecutionLogDao;
 import com.gmail.raducaz.arduinomate.db.dao.FunctionDao;
 import com.gmail.raducaz.arduinomate.db.dao.DeviceDao;
+import com.gmail.raducaz.arduinomate.db.dao.FunctionExecutionDao;
+import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
+import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
+import com.gmail.raducaz.arduinomate.model.ExecutionLog;
 
 import java.util.List;
 
-@Database(entities = {DeviceEntity.class, FunctionEntity.class}, version = 1)
+@Database(
+        entities =
+                {
+                        DeviceEntity.class,
+                        FunctionEntity.class,
+                        FunctionExecutionEntity.class,
+                        ExecutionLogEntity.class
+                },
+        version = 1
+)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
-
-    private static AppDatabase sInstance;
-
     @VisibleForTesting
     public static final String DATABASE_NAME = "arduino-mate-db";
 
-    public abstract DeviceDao deviceDao();
-
-    public abstract FunctionDao functionDao();
-
-    private final MutableLiveData<Boolean> mIsDatabaseCreated = new MutableLiveData<>();
-
+    private static AppDatabase sInstance;
     public static AppDatabase getInstance(final Context context, final AppExecutors executors) {
         if (sInstance == null) {
             synchronized (AppDatabase.class) {
@@ -46,6 +52,16 @@ public abstract class AppDatabase extends RoomDatabase {
         }
         return sInstance;
     }
+
+    //region Dao's
+    public abstract DeviceDao deviceDao();
+    public abstract FunctionDao functionDao();
+    public abstract FunctionExecutionDao functionExecutionDao();
+    public abstract ExecutionLogDao executionLogDao();
+    //endregion Dao's
+
+    //region Initialize Database
+    private final MutableLiveData<Boolean> mIsDatabaseCreated = new MutableLiveData<>();
 
     /**
      * Build the database. {@link Builder#build()} only sets up the database configuration and
@@ -75,7 +91,6 @@ public abstract class AppDatabase extends RoomDatabase {
                     }
                 }).build();
     }
-
     /**
      * Check whether the database already exists and expose it via {@link #getDatabaseCreated()}
      */
@@ -84,7 +99,6 @@ public abstract class AppDatabase extends RoomDatabase {
             setDatabaseCreated();
         }
     }
-
     private void setDatabaseCreated(){
         mIsDatabaseCreated.postValue(true);
     }
@@ -96,6 +110,7 @@ public abstract class AppDatabase extends RoomDatabase {
             database.functionDao().insertAll(functions);
         });
     }
+    //endregion Initialize Database
 
     private static void addDelay() {
         try {

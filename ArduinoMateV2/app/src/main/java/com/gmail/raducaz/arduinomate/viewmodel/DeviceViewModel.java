@@ -25,7 +25,7 @@ public class DeviceViewModel extends AndroidViewModel {
 
     private final int mDeviceId;
 
-    private final LiveData<List<FunctionEntity>> mObservableFunctions;
+//    private final LiveData<List<FunctionEntity>> mObservableFunctions;
 
     public DeviceViewModel(@NonNull Application application, DataRepository repository,
                            final int deviceId) {
@@ -34,16 +34,16 @@ public class DeviceViewModel extends AndroidViewModel {
 
         mDeviceId = deviceId;
 
-        mObservableFunctions = repository.loadFunctions(mDeviceId);
+//        mObservableFunctions = repository.loadFunctions(mDeviceId);
         mObservableDevice = repository.loadDevice(mDeviceId);
     }
 
     /**
      * Expose the LiveData Functions query so the UI can observe it.
      */
-    public LiveData<List<FunctionEntity>> getFunctions() {
-        return mObservableFunctions;
-    }
+//    public LiveData<List<FunctionEntity>> getFunctions() {
+//        return mObservableFunctions;
+//    }
 
     public LiveData<DeviceEntity> getObservableDevice() {
         return mObservableDevice;
@@ -53,16 +53,17 @@ public class DeviceViewModel extends AndroidViewModel {
         this.device.set(device);
     }
 
-    public void insertDevice()
+    public void testInsertDevice()
     {
         DeviceEntity p = new DeviceEntity();
         p.setId(2);
+
         p.setName("Test inser");
         p.setDescription("Test description");
         dataRepository.insertDevice(p);
     }
 
-    public void updateDevice()
+    public void testUpdateDevice()
     {
         DeviceEntity p = mObservableDevice.getValue();
         p.setDescription("Test update desc");

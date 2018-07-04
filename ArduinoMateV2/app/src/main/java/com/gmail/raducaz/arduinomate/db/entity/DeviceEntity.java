@@ -14,6 +14,7 @@ public class DeviceEntity implements Device {
     @PrimaryKey
     private int id;
     private String ip;
+    private String port;
     private String name;
     private String description;
 
@@ -24,6 +25,15 @@ public class DeviceEntity implements Device {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    @Override
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 
     @Override

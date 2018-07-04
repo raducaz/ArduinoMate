@@ -24,6 +24,8 @@ public class FunctionViewModel extends AndroidViewModel {
     public ObservableField<FunctionEntity> function = new ObservableField<>();
 
     private final int mFunctionId;
+    public int deviceId;
+    public String functionName;
 
 //    private final LiveData<List<FunctionEntity>> mObservableFunctions;
 
@@ -32,6 +34,7 @@ public class FunctionViewModel extends AndroidViewModel {
         super(application);
         mFunctionId = functionId;
         dataRepository = repository;
+
 //        mObservableFunctions = repository.loadFunctions(mDeviceId);
 
         mObservableFunction = repository.loadFunction(mFunctionId);

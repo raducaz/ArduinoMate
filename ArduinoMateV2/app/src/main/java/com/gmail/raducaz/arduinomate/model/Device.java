@@ -8,6 +8,7 @@ package com.gmail.raducaz.arduinomate.model;
 public interface Device {
     int getId();
     String getIp();
+    String getPort();
     String getName();
     String getDescription();
     void setDescription(String description);

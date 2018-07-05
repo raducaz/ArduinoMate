@@ -7,8 +7,8 @@ package com.gmail.raducaz.arduinomate.model;
 import java.util.Date;
 
 public interface Function {
-    int getId();
-    int getDeviceId();
+    long getId();
+    long getDeviceId();
     String getName();
     String getDescription();
     String getLog();

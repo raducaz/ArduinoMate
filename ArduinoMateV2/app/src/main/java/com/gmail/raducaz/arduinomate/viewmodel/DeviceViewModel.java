@@ -23,12 +23,12 @@ public class DeviceViewModel extends AndroidViewModel {
 
     public ObservableField<DeviceEntity> device = new ObservableField<>();
 
-    private final int mDeviceId;
+    private final long mDeviceId;
 
 //    private final LiveData<List<FunctionEntity>> mObservableFunctions;
 
     public DeviceViewModel(@NonNull Application application, DataRepository repository,
-                           final int deviceId) {
+                           final long deviceId) {
         super(application);
         this.dataRepository = repository;
 
@@ -81,11 +81,11 @@ public class DeviceViewModel extends AndroidViewModel {
         @NonNull
         private final Application mApplication;
 
-        private final int mDeviceId;
+        private final long mDeviceId;
 
         private final DataRepository mRepository;
 
-        public Factory(@NonNull Application application, int deviceId) {
+        public Factory(@NonNull Application application, long deviceId) {
             mApplication = application;
             mDeviceId = deviceId;
             mRepository = ((ArduinoMateApp) application).getRepository();

@@ -19,14 +19,16 @@ public class DataGenerator {
 
         List<DeviceEntity> devices = new ArrayList<>(3);
         DeviceEntity device = new DeviceEntity();
-        device.setIp("192.168.0.7");
+        device.setIp("192.168.11.100");
+        device.setPort(8080);
         device.setName("Generator");
         device.setDescription("Controllerul de pornire/oprire generator si control pompa");
         device.setId(1);
         devices.add(device);
 
         device = new DeviceEntity();
-        device.setIp("192.168.0.8");
+        device.setIp("192.168.11.200");
+        device.setPort(8080);
         device.setName("Prize automate (control bolier)");
         device.setDescription("Controller de pornire/oprire prize");
         device.setId(2);
@@ -59,6 +61,22 @@ public class DataGenerator {
         function.setDeviceId(device.getId());
         function.setName("OnOffGenerator");
         function.setDescription("Start/Stop Generator" + device.getId());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("StateFct");
+        function.setDescription("Send exec steps sync" + device.getId());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("MonitorFct");
+        function.setDescription("Begins sending states of pins" + device.getId());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

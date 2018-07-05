@@ -25,28 +25,27 @@ import java.util.Date;
 public class FunctionEntity implements Function {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
-    private int deviceId;
+    private long id;
+    private long deviceId;
     private String name;
     private String description;
     private String log;
     private Date dateSample;
 
     @Override
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
     @Override
-    public int getDeviceId() {
+    public long getDeviceId() {
         return deviceId;
     }
-
-    public void setDeviceId(int deviceId) {
+    public void setDeviceId(long deviceId) {
         this.deviceId = deviceId;
     }
 
@@ -89,7 +88,7 @@ public class FunctionEntity implements Function {
     public FunctionEntity() {
     }
 
-    public FunctionEntity(int id, int deviceId, String name, String log, Date dateSample) {
+    public FunctionEntity(long id, long deviceId, String name, String log, Date dateSample) {
         this.id = id;
         this.deviceId = deviceId;
         this.name = name;

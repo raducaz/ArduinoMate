@@ -30,8 +30,8 @@ public interface DeviceDao {
     void insertAll(List<DeviceEntity> devices);
 
     @Query("select * from devices where id = :deviceId")
-    LiveData<DeviceEntity> loadDevice(int deviceId);
+    LiveData<DeviceEntity> loadDevice(long deviceId);
 
     @Query("select * from devices where id = :deviceId")
-    DeviceEntity loadDeviceSync(int deviceId);
+    DeviceEntity loadDeviceSync(long deviceId);
 }

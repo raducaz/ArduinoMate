@@ -12,9 +12,9 @@ import com.gmail.raducaz.arduinomate.model.Device;
 @Entity(tableName = "devices")
 public class DeviceEntity implements Device {
     @PrimaryKey
-    private int id;
+    private long id;
     private String ip;
-    private String port;
+    private int port;
     private String name;
     private String description;
 
@@ -28,20 +28,19 @@ public class DeviceEntity implements Device {
     }
 
     @Override
-    public String getPort() {
+    public int getPort() {
         return port;
     }
-
-    public void setPort(String port) {
+    public void setPort(int port) {
         this.port = port;
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -66,7 +65,7 @@ public class DeviceEntity implements Device {
     public DeviceEntity() {
     }
 
-    public DeviceEntity(int id, String name, String description) {
+    public DeviceEntity(long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;

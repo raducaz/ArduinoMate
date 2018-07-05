@@ -56,10 +56,10 @@ public class DataRepository {
 
         return mObservableDevices;
     }
-    public LiveData<DeviceEntity> loadDevice(final int deviceId) {
+    public LiveData<DeviceEntity> loadDevice(final long deviceId) {
         return mDatabase.deviceDao().loadDevice(deviceId);
     }
-    public DeviceEntity loadDeviceSync(final int deviceId) {
+    public DeviceEntity loadDeviceSync(final long deviceId) {
         return mDatabase.deviceDao().loadDeviceSync(deviceId);
     }
     public void insertDevice(DeviceEntity device) {
@@ -87,13 +87,13 @@ public class DataRepository {
 
         return mObservableFunctions;
     }
-    public LiveData<List<FunctionEntity>> loadFunctions(final int deviceId) {
+    public LiveData<List<FunctionEntity>> loadFunctions(final long deviceId) {
         return mDatabase.functionDao().loadDeviceFunctions(deviceId);
     }
-    public LiveData<FunctionEntity> loadFunction(final int functionId) {
+    public LiveData<FunctionEntity> loadFunction(final long functionId) {
         return mDatabase.functionDao().loadFunction(functionId);
     }
-    public FunctionEntity loadFunctionSync(final int functionId) {
+    public FunctionEntity loadFunctionSync(final long functionId) {
         return mDatabase.functionDao().loadFunctionSync(functionId);
     }
     public void insertFunction(FunctionEntity function) {
@@ -105,12 +105,12 @@ public class DataRepository {
     //endregion Function
 
     //region FunctionExecution
-    public LiveData<List<FunctionExecutionEntity>> loadFunctionExecutions(final int deviceId, String functionName) {
-        return mDatabase.functionExecutionDao().loadFunctionExecutions(deviceId, functionName);
+    public LiveData<List<FunctionExecutionEntity>> loadFunctionExecutions(final long functionId) {
+        return mDatabase.functionExecutionDao().loadFunctionExecutions(functionId);
     }
 
-    public LiveData<FunctionExecutionEntity> loadLastFunctionExecution(final int deviceId, String functionName) {
-        return mDatabase.functionExecutionDao().loadLastFunctionExecution(deviceId, functionName);
+    public LiveData<FunctionExecutionEntity> loadLastFunctionExecution(final long functionId) {
+        return mDatabase.functionExecutionDao().loadLastFunctionExecution(functionId);
     }
     public long insertFunctionExecution(FunctionExecutionEntity execution) {
         return mDatabase.functionExecutionDao().insert(execution);
@@ -121,7 +121,7 @@ public class DataRepository {
     //endregion FunctionExecution
 
     //region ExecutionLog
-    public LiveData<List<ExecutionLogEntity>> loadExecutionLog(final int executionId) {
+    public LiveData<List<ExecutionLogEntity>> loadExecutionLog(final long executionId) {
         return mDatabase.executionLogDao().loadExecutionLogs(executionId);
     }
     public void insertExecutionLog(ExecutionLogEntity log) {

@@ -8,6 +8,7 @@ import com.gmail.raducaz.arduinomate.service.TcpServerService;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by Radu.Cazacu on 11/27/2017.
@@ -39,7 +40,7 @@ public class ArduinoMateApp extends Application {
     {
         return mAppExecutors.diskIO();
     }
-    public Executor getNetworkExecutor()
+    public ExecutorService getNetworkExecutor()
     {
         return mAppExecutors.networkIO();
     }

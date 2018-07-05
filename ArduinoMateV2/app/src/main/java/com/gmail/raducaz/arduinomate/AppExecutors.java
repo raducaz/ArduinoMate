@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 /**
  * Created by Radu.Cazacu on 11/27/2017.
@@ -21,18 +22,18 @@ public class AppExecutors {
 
     private final Executor mDiskIO;
 
-    private final Executor mNetworkIO;
+    private final ExecutorService mNetworkIO;
 
     private final Executor mMainThread;
 
-    private AppExecutors(Executor diskIO, Executor networkIO, Executor mainThread) {
+    private AppExecutors(Executor diskIO, ExecutorService networkIO, Executor mainThread) {
         this.mDiskIO = diskIO;
         this.mNetworkIO = networkIO;
         this.mMainThread = mainThread;
     }
 
     public AppExecutors() {
-        this(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3),
+        this(Executors.newSingleThreadExecutor(), Executors.newCachedThreadPool(),
                 new MainThreadExecutor());
     }
 
@@ -40,7 +41,7 @@ public class AppExecutors {
         return mDiskIO;
     }
 
-    public Executor networkIO() {
+    public ExecutorService networkIO() {
         return mNetworkIO;
     }
 

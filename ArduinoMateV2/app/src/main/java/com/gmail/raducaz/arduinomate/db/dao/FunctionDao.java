@@ -28,18 +28,18 @@ public interface FunctionDao {
     LiveData<List<FunctionEntity>> loadAllFunctions();
 
     @Query("SELECT * FROM functions where deviceId = :deviceId")
-    LiveData<List<FunctionEntity>> loadDeviceFunctions(int deviceId);
+    LiveData<List<FunctionEntity>> loadDeviceFunctions(long deviceId);
 
     @Query("SELECT * FROM functions where deviceId = :deviceId")
-    List<FunctionEntity> loadDeviceFunctionsSync(int deviceId);
+    List<FunctionEntity> loadDeviceFunctionsSync(long deviceId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<FunctionEntity> functions);
 
     @Query("select * from functions where id = :functionId")
-    LiveData<FunctionEntity> loadFunction(int functionId);
+    LiveData<FunctionEntity> loadFunction(long functionId);
 
     @Query("select * from functions where id = :functionId")
-    FunctionEntity loadFunctionSync(int functionId);
+    FunctionEntity loadFunctionSync(long functionId);
 }
 

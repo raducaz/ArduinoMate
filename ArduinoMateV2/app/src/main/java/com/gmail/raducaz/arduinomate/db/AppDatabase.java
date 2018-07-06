@@ -17,11 +17,14 @@ import com.gmail.raducaz.arduinomate.db.dao.ExecutionLogDao;
 import com.gmail.raducaz.arduinomate.db.dao.FunctionDao;
 import com.gmail.raducaz.arduinomate.db.dao.DeviceDao;
 import com.gmail.raducaz.arduinomate.db.dao.FunctionExecutionDao;
+import com.gmail.raducaz.arduinomate.db.dao.PinStateDao;
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
+import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.ExecutionLog;
+import com.gmail.raducaz.arduinomate.model.FunctionState;
 
 import java.util.List;
 
@@ -31,7 +34,8 @@ import java.util.List;
                         DeviceEntity.class,
                         FunctionEntity.class,
                         FunctionExecutionEntity.class,
-                        ExecutionLogEntity.class
+                        ExecutionLogEntity.class,
+                        PinStateEntity.class
                 },
         version = 1
 )
@@ -58,6 +62,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract FunctionDao functionDao();
     public abstract FunctionExecutionDao functionExecutionDao();
     public abstract ExecutionLogDao executionLogDao();
+    public abstract PinStateDao pinStateDao();
     //endregion Dao's
 
     //region Initialize Database

@@ -12,7 +12,9 @@ import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
+import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.Function;
+import com.gmail.raducaz.arduinomate.model.PinState;
 
 import java.util.List;
 
@@ -131,4 +133,25 @@ public class DataRepository {
         mDatabase.executionLogDao().update(log);
     }
     //endregion ExecutionLog
+
+    //region PinState
+    public LiveData<List<PinStateEntity>> loadDeviceCurrentPinsState(final long deviceId) {
+        return mDatabase.pinStateDao().loadDeviceCurrentPinsState(deviceId);
+    }
+    public LiveData<List<PinStateEntity>> loadDevicePinsStateHistory(final long deviceId) {
+        return mDatabase.pinStateDao().loadDevicePinsStateHistory(deviceId);
+    }
+    public LiveData<List<PinStateEntity>> loadDevicePinsStateHistory(final long deviceId, final String pinName) {
+        return mDatabase.pinStateDao().loadDevicePinStateHistory(deviceId, pinName);
+    }
+    public LiveData<PinStateEntity> loadDeviceCurrentPinState(final long deviceId, final String pinName) {
+        return mDatabase.pinStateDao().loadDeviceCurrentPinState(deviceId, pinName);
+    }
+    public void insertPinState(PinStateEntity pinState) {
+        mDatabase.pinStateDao().insert(pinState);
+    }
+    public void updatePinState(PinStateEntity pinStateEntity) {
+        mDatabase.pinStateDao().update(pinStateEntity);
+    }
+    //endregion PinState
 }

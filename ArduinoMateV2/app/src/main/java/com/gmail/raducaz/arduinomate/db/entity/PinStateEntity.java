@@ -3,6 +3,7 @@ package com.gmail.raducaz.arduinomate.db.entity;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
+import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.FunctionState;
 import com.gmail.raducaz.arduinomate.model.PinState;
@@ -19,11 +20,21 @@ import java.util.Date;
         })
 public class PinStateEntity implements PinState {
 
+    @PrimaryKey(autoGenerate = true)
+    private long id;
     private long deviceId;
     private String name;
     private double state;
     private Date fromDate;
     private Date toDate;
+
+    @Override
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
 
     @Override
     public long getDeviceId() {
@@ -45,6 +56,10 @@ public class PinStateEntity implements PinState {
     public double getState() {
         return state;
     }
+    @Override
+    public String getStateText() {
+        return Double.toString(state);
+    }
     public void setState(double state) {
         this.state = state;
     }
@@ -61,14 +76,15 @@ public class PinStateEntity implements PinState {
     public Date getToDate() {
         return toDate;
     }
-    public void setState(Date toDate) {
+    public void setToDate(Date toDate) {
         this.toDate = toDate;
     }
 
     public PinStateEntity() {
     }
 
-    public PinStateEntity(long deviceId, String name, int state, Date fromDate, Date toDate) {
+    public PinStateEntity(long id, long deviceId, String name, int state, Date fromDate, Date toDate) {
+        this.id = id;
         this.deviceId = deviceId;
         this.name = name;
         this.state = state;
@@ -77,6 +93,7 @@ public class PinStateEntity implements PinState {
     }
 
     public PinStateEntity(FunctionState state) {
+        this.id = state.getId();
         this.deviceId = state.getDeviceId();
         this.name = state.getName();
         this.state = state.getState();

@@ -4,6 +4,7 @@ import java.util.Date;
 
 public interface VariableState {
 
+    long getId();
     long getDeviceId();
     String getName();
     //TODO: This should be enhanced by separating variables by type so formulas can easlybe defined on Android

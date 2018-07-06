@@ -4,6 +4,7 @@ import java.util.Date;
 
 public interface FunctionState {
 
+    long getId();
     long getDeviceId();
     String getName();
     int getState();

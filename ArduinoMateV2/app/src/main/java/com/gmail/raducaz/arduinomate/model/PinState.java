@@ -4,9 +4,11 @@ import java.util.Date;
 
 public interface PinState {
 
+    long getId();
     long getDeviceId();
     String getName();
     double getState();
+    String getStateText();
     Date getFromDate();
     Date getToDate();
 }

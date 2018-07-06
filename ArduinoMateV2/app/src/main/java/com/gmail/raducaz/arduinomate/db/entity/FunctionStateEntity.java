@@ -3,6 +3,7 @@ package com.gmail.raducaz.arduinomate.db.entity;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
+import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.DeviceState;
 import com.gmail.raducaz.arduinomate.model.FunctionState;
@@ -19,11 +20,21 @@ import java.util.Date;
         })
 public class FunctionStateEntity implements FunctionState {
 
+    @PrimaryKey(autoGenerate = true)
+    private long id;
     private long deviceId;
     private String name;
     private int state;
     private Date fromDate;
     private Date toDate;
+
+    @Override
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
 
     @Override
     public long getDeviceId() {
@@ -68,7 +79,8 @@ public class FunctionStateEntity implements FunctionState {
     public FunctionStateEntity() {
     }
 
-    public FunctionStateEntity(long deviceId, String name, int state, Date fromDate, Date toDate) {
+    public FunctionStateEntity(long id, long deviceId, String name, int state, Date fromDate, Date toDate) {
+        this.id = id;
         this.deviceId = deviceId;
         this.name = name;
         this.state = state;
@@ -77,6 +89,7 @@ public class FunctionStateEntity implements FunctionState {
     }
 
     public FunctionStateEntity(FunctionState state) {
+        this.id = state.getId();
         this.deviceId = state.getDeviceId();
         this.name = state.getName();
         this.state = state.getState();

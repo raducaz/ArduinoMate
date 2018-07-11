@@ -15,6 +15,7 @@ import android.arch.persistence.room.Update;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
@@ -22,6 +23,13 @@ public interface PinStateDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(PinStateEntity pinState);
+
+    @Query(
+            "UPDATE pinState SET " +
+                    "toDate = :toDate " +
+                    "WHERE id = :id"
+    )
+    void updateToDate(long id, Date toDate);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(PinStateEntity pinState);

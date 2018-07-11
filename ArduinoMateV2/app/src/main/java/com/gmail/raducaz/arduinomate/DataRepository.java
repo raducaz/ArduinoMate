@@ -8,6 +8,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
+import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
@@ -64,6 +65,13 @@ public class DataRepository {
     public DeviceEntity loadDeviceSync(final long deviceId) {
         return mDatabase.deviceDao().loadDeviceSync(deviceId);
     }
+    public LiveData<DeviceEntity> loadDevice(final String deviceIp) {
+        return mDatabase.deviceDao().loadDevice(deviceIp);
+    }
+    public DeviceEntity loadDeviceSync(final String deviceIp) {
+        return mDatabase.deviceDao().loadDeviceSync(deviceIp);
+    }
+
     public void insertDevice(DeviceEntity device) {
         mDatabase.deviceDao().insert(device);
     }
@@ -138,6 +146,9 @@ public class DataRepository {
     public LiveData<List<PinStateEntity>> loadDeviceCurrentPinsState(final long deviceId) {
         return mDatabase.pinStateDao().loadDeviceCurrentPinsState(deviceId);
     }
+    public List<PinStateEntity> loadDeviceCurrentPinsStateSync(final long deviceId) {
+        return mDatabase.pinStateDao().loadDeviceCurrentPinsStateSync(deviceId);
+    }
     public LiveData<List<PinStateEntity>> loadDevicePinsStateHistory(final long deviceId) {
         return mDatabase.pinStateDao().loadDevicePinsStateHistory(deviceId);
     }
@@ -153,5 +164,10 @@ public class DataRepository {
     public void updatePinState(PinStateEntity pinStateEntity) {
         mDatabase.pinStateDao().update(pinStateEntity);
     }
+    public void updatePinStateToDate(long id)
+    {
+        mDatabase.pinStateDao().updateToDate(id, DateConverter.toDate(System.currentTimeMillis()));
+    }
     //endregion PinState
+
 }

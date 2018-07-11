@@ -34,4 +34,10 @@ public interface DeviceDao {
 
     @Query("select * from devices where id = :deviceId")
     DeviceEntity loadDeviceSync(long deviceId);
+
+    @Query("select * from devices where ip = :deviceIp")
+    LiveData<DeviceEntity> loadDevice(String deviceIp);
+
+    @Query("select * from devices where id = :deviceIp")
+    DeviceEntity loadDeviceSync(String deviceIp);
 }

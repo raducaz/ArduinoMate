@@ -5,9 +5,19 @@ import android.provider.ContactsContract.Data;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
+import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
+import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
+import com.gmail.raducaz.arduinomate.model.PinState;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.lang.reflect.Array;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -90,11 +100,76 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
     public void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
 
         Channel incoming = ctx.channel();
+        String deviceIp = incoming.remoteAddress().toString();
 
         // TODO: Handle the message from the client
-        DeviceEntity deviceEntity = dataRepository.loadDeviceSync(1);
-        deviceEntity.setDescription(msg);
-        dataRepository.updateDevice(deviceEntity);
+//        DeviceEntity deviceEntity = dataRepository.loadDeviceSync(1);
+//        deviceEntity.setDescription(msg);
+//        dataRepository.updateDevice(deviceEntity);
+
+        DeviceEntity deviceEntity = dataRepository.loadDeviceSync(deviceIp);
+        /*
+        Sample object structure
+        {
+            "deviceState": "1",
+            "uptime": "1234567890",
+            "pinStates": [
+                {"p1": "1"},
+                {"p2": "1"},
+                {"p3": "0.2321"}
+                ],
+            "fStates": [
+                {"f1": "1"},
+                {"f2": "1"},
+                {"f3": "0.2321"}
+                ],
+            "indicators": [
+                {"i1": "1"},
+                {"i2": "1"},
+                {"i3": "0.2321"}
+                ]
+        }
+        */
+        JSONObject clientData = new JSONObject(msg);
+        List<PinStateEntity> currentPinsStateList = dataRepository.loadDeviceCurrentPinsStateSync(deviceEntity.getId());
+//        currentPinsState.stream().filter(p->p.getName().equals("p1")).findAny(); - unsupported by API22
+        
+        Map<String,PinStateEntity> currentPinsState = new HashMap<String, PinStateEntity>();
+        for(PinStateEntity p : currentPinsStateList)
+        {
+            currentPinsState.put(p.getName(),p);
+        }
+
+        if(clientData.has("pinStates"))
+        {
+            JSONArray pinStates = clientData.getJSONArray("pinStates");
+            for(int i=0;i< pinStates.length();i++)
+            {
+                JSONObject pinState = pinStates.getJSONObject(i);
+                String pName = pinState.names().getString(0);
+                Double pState = pinState.getDouble(pName);
+                if(currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState()==pState)
+                {
+                   // Do nothing as the state is the same as the current pin State in the History
+                }
+                else
+                {
+                    if(currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState()!=pState)
+                    {
+                        // Update history with the date until the state was unchanged
+                        dataRepository.updatePinStateToDate(currentPinsState.get(pName).getId());
+                    }
+
+                    // Insert a new History for this pin with the initial state
+                    PinStateEntity newPinState = new PinStateEntity();
+                    newPinState.setDeviceId(deviceEntity.getId());
+                    newPinState.setName(pName);
+                    newPinState.setFromDate(DateConverter.toDate(System.currentTimeMillis()));
+                    newPinState.setState(pState);
+                    dataRepository.insertPinState(newPinState);
+                }
+            }
+        }
 
         Log.d(TAG, "ChannelRead0-MSG " + msg + " from " + incoming.remoteAddress());
 

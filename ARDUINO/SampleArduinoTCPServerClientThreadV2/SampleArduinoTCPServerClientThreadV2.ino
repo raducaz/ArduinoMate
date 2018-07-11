@@ -118,8 +118,17 @@ public:boolean SendMsgToServer(String msg)
     // If needed the message from server
     //Serial.println(ReceiveMsgFromServer());
     
-    boolean pinState = digitalRead(7);
-    String msg = "PIN:" + String(pinState);
+StaticJsonBuffer<200> jsonBuffer;
+JsonObject& root = jsonBuffer.createObject();
+JsonArray& pinStates = root.createNestedArray("pinStates");
+JsonObject& obj = pinStates.createNestedObject();
+obj["p7"] = digitalRead(7);
+pinStates.add(obj);
+obj["p8"] = digitalRead(8);
+pinStates.add(obj);
+String msg = "";
+root.printTo(msg);
+    
     Serial.println("MON:" + msg);
     
     if(SendMsgToServer(msg))

@@ -1,5 +1,7 @@
 package com.gmail.raducaz.arduinomate.service;
 
+import android.util.Log;
+
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
@@ -15,6 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 public class ArduinoFunctionCaller {
+
+    private String TAG = "ArduinoFunctionCaller";
 
     private final ArduinoMateApp mApplication;
     private final FunctionEntity function;
@@ -64,6 +68,8 @@ public class ArduinoFunctionCaller {
             }
 
         } catch (Exception exc) {
+
+            Log.e(TAG, exc.getMessage());
 
             functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
             functionExecution.setState(-1); // Error

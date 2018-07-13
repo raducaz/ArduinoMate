@@ -14,9 +14,9 @@ import com.gmail.raducaz.arduinomate.model.Function;
 
 import java.util.Date;
 
-@Entity(tableName = "functions",
+@Entity(tableName = "function",
         foreignKeys = {
-                @ForeignKey(entity = FunctionEntity.class,
+                @ForeignKey(entity = DeviceEntity.class,
                         parentColumns = "id",
                         childColumns = "deviceId",
                         onDelete = ForeignKey.CASCADE)},

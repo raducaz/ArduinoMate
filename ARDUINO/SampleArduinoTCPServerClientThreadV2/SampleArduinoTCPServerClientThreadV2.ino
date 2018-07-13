@@ -14,7 +14,8 @@
 // The IP address will be dependent on your local network:
 byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
 IPAddress ip(192,168,11,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
-byte serverIp[] = { 192, 168, 11, 99 };
+//byte serverIp[] = { 192, 168, 11, 99 };
+IPAddress serverIp = IPAddress(192,168,11,99);
 
 volatile ThreadController threadsController = ThreadController();
 volatile boolean monitorThreadRunning = 0;

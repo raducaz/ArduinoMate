@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gmail.raducaz.arduinomate.R;
+import com.gmail.raducaz.arduinomate.service.TcpServerIntentService;
 
 
 /**
@@ -77,6 +78,10 @@ public class ActivityMain extends AppCompatActivity {
                         return true;
                     }
                 });
+
+//        // Start Service
+//        Intent startServiceIntent = new Intent(this, TcpServerIntentService.class);
+//        startService(startServiceIntent);
 
     }
 

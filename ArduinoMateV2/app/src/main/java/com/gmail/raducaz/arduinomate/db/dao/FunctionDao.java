@@ -24,22 +24,22 @@ public interface FunctionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(FunctionEntity function);
 
-    @Query("SELECT * FROM functions")
+    @Query("SELECT * FROM function")
     LiveData<List<FunctionEntity>> loadAllFunctions();
 
-    @Query("SELECT * FROM functions where deviceId = :deviceId")
+    @Query("SELECT * FROM function where deviceId = :deviceId")
     LiveData<List<FunctionEntity>> loadDeviceFunctions(long deviceId);
 
-    @Query("SELECT * FROM functions where deviceId = :deviceId")
+    @Query("SELECT * FROM function where deviceId = :deviceId")
     List<FunctionEntity> loadDeviceFunctionsSync(long deviceId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<FunctionEntity> functions);
 
-    @Query("select * from functions where id = :functionId")
+    @Query("select * from function where id = :functionId")
     LiveData<FunctionEntity> loadFunction(long functionId);
 
-    @Query("select * from functions where id = :functionId")
+    @Query("select * from function where id = :functionId")
     FunctionEntity loadFunctionSync(long functionId);
 }
 

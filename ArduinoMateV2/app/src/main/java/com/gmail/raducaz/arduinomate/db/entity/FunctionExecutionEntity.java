@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Entity(tableName = "functionExecution",
         foreignKeys = {
-                @ForeignKey(entity = FunctionExecutionEntity.class,
+                @ForeignKey(entity = FunctionEntity.class,
                         parentColumns = "id",
                         childColumns = "functionId",
                         onDelete = ForeignKey.CASCADE)},

@@ -81,6 +81,9 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
     public void onResponseTimeout()
     {
         insertExecutionLog("Response timeout.");
+        functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
+        functionExecution.setState(-1); // Error
+        mRepository.updateFunctionExecution(functionExecution);
     }
 
     @Override

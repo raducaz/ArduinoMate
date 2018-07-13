@@ -10,7 +10,7 @@ import com.gmail.raducaz.arduinomate.model.DeviceState;
 
 @Entity(tableName = "deviceState",
         foreignKeys = {
-                @ForeignKey(entity = DeviceStateEntity.class,
+                @ForeignKey(entity = DeviceEntity.class,
                         parentColumns = "id",
                         childColumns = "deviceId",
                         onDelete = ForeignKey.CASCADE)},

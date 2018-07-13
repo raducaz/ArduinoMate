@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Entity(tableName = "executionLog",
         foreignKeys = {
-                @ForeignKey(entity = ExecutionLogEntity.class,
+                @ForeignKey(entity = FunctionExecutionEntity.class,
                         parentColumns = "id",
                         childColumns = "executionId",
                         onDelete = ForeignKey.CASCADE)},

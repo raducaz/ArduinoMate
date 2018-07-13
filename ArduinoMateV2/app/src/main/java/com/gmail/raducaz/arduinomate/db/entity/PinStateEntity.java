@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Entity(tableName = "pinState",
         foreignKeys = {
-                @ForeignKey(entity = PinStateEntity.class,
+                @ForeignKey(entity = DeviceEntity.class,
                         parentColumns = "id",
                         childColumns = "deviceId",
                         onDelete = ForeignKey.CASCADE)},

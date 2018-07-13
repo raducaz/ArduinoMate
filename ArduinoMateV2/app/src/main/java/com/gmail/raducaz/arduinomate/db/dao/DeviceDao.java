@@ -23,21 +23,21 @@ public interface DeviceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(DeviceEntity device);
 
-    @Query("SELECT * FROM devices")
+    @Query("SELECT * FROM device")
     LiveData<List<DeviceEntity>> loadAllDevices();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<DeviceEntity> devices);
 
-    @Query("select * from devices where id = :deviceId")
+    @Query("select * from device where id = :deviceId")
     LiveData<DeviceEntity> loadDevice(long deviceId);
 
-    @Query("select * from devices where id = :deviceId")
+    @Query("select * from device where id = :deviceId")
     DeviceEntity loadDeviceSync(long deviceId);
 
-    @Query("select * from devices where ip = :deviceIp")
+    @Query("select * from device where ip = :deviceIp")
     LiveData<DeviceEntity> loadDevice(String deviceIp);
 
-    @Query("select * from devices where id = :deviceIp")
+    @Query("select * from device where id = :deviceIp")
     DeviceEntity loadDeviceSync(String deviceIp);
 }

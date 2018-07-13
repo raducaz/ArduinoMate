@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Entity(tableName = "deviceLog",
         foreignKeys = {
-                @ForeignKey(entity = DeviceLogEntity.class,
+                @ForeignKey(entity = DeviceEntity.class,
                         parentColumns = "id",
                         childColumns = "deviceId",
                         onDelete = ForeignKey.CASCADE)},

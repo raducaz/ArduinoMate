@@ -70,6 +70,8 @@ public class ActivityDetail extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         // All Tab
+        FragmentPinStateList pinStateListfragment = new FragmentPinStateList();
+        adapter.addFragment(pinStateListfragment, "Pins");
         FragmentFunctionExecutionList executionListfragment = new FragmentFunctionExecutionList();
         adapter.addFragment(executionListfragment, "Executions");
         FragmentExecutionLogList executionLogListfragment = new FragmentExecutionLogList();

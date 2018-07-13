@@ -9,7 +9,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.Device;
 
-@Entity(tableName = "devices")
+@Entity(tableName = "device")
 public class DeviceEntity implements Device {
     @PrimaryKey
     private long id;

@@ -99,15 +99,16 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
 
-        Channel incoming = ctx.channel();
-        String deviceIp = incoming.remoteAddress().toString();
+        try {
+            Channel incoming = ctx.channel();
+            String deviceIp = incoming.remoteAddress().toString();
 
-        // TODO: Handle the message from the client
+            // TODO: Handle the message from the client
 //        DeviceEntity deviceEntity = dataRepository.loadDeviceSync(1);
 //        deviceEntity.setDescription(msg);
 //        dataRepository.updateDevice(deviceEntity);
 
-        DeviceEntity deviceEntity = dataRepository.loadDeviceSync(deviceIp);
+            DeviceEntity deviceEntity = dataRepository.loadDeviceSync(deviceIp);
         /*
         Sample object structure
         {
@@ -130,56 +131,54 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
                 ]
         }
         */
-        JSONObject clientData = new JSONObject(msg);
-        List<PinStateEntity> currentPinsStateList = dataRepository.loadDeviceCurrentPinsStateSync(deviceEntity.getId());
+            JSONObject clientData = new JSONObject(msg);
+            List<PinStateEntity> currentPinsStateList = dataRepository.loadDeviceCurrentPinsStateSync(deviceEntity.getId());
 //        currentPinsState.stream().filter(p->p.getName().equals("p1")).findAny(); - unsupported by API22
-        
-        Map<String,PinStateEntity> currentPinsState = new HashMap<String, PinStateEntity>();
-        for(PinStateEntity p : currentPinsStateList)
-        {
-            currentPinsState.put(p.getName(),p);
-        }
 
-        if(clientData.has("pinStates"))
-        {
-            JSONArray pinStates = clientData.getJSONArray("pinStates");
-            for(int i=0;i< pinStates.length();i++)
-            {
-                JSONObject pinState = pinStates.getJSONObject(i);
-                String pName = pinState.names().getString(0);
-                Double pState = pinState.getDouble(pName);
-                if(currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState()==pState)
-                {
-                   // Do nothing as the state is the same as the current pin State in the History
-                }
-                else
-                {
-                    if(currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState()!=pState)
-                    {
-                        // Update history with the date until the state was unchanged
-                        dataRepository.updatePinStateToDate(currentPinsState.get(pName).getId());
+            Map<String, PinStateEntity> currentPinsState = new HashMap<String, PinStateEntity>();
+            for (PinStateEntity p : currentPinsStateList) {
+                currentPinsState.put(p.getName(), p);
+            }
+
+            if (clientData.has("pinStates")) {
+                JSONArray pinStates = clientData.getJSONArray("pinStates");
+                for (int i = 0; i < pinStates.length(); i++) {
+                    JSONObject pinState = pinStates.getJSONObject(i);
+                    String pName = pinState.names().getString(0);
+                    Double pState = pinState.getDouble(pName);
+                    if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() == pState) {
+                        // Do nothing as the state is the same as the current pin State in the History
+                    } else {
+                        if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() != pState) {
+                            // Update history with the date until the state was unchanged
+                            dataRepository.updatePinStateToDate(currentPinsState.get(pName).getId());
+                        }
+
+                        // Insert a new History for this pin with the initial state
+                        PinStateEntity newPinState = new PinStateEntity();
+                        newPinState.setDeviceId(deviceEntity.getId());
+                        newPinState.setName(pName);
+                        newPinState.setFromDate(DateConverter.toDate(System.currentTimeMillis()));
+                        newPinState.setState(pState);
+                        dataRepository.insertPinState(newPinState);
                     }
-
-                    // Insert a new History for this pin with the initial state
-                    PinStateEntity newPinState = new PinStateEntity();
-                    newPinState.setDeviceId(deviceEntity.getId());
-                    newPinState.setName(pName);
-                    newPinState.setFromDate(DateConverter.toDate(System.currentTimeMillis()));
-                    newPinState.setState(pState);
-                    dataRepository.insertPinState(newPinState);
                 }
             }
+
+            Log.d(TAG, "ChannelRead0-MSG " + msg + " from " + incoming.remoteAddress());
+
+            // We do not need to write a ChannelBuffer here.
+            // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
+            ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" + msg);
+
+            if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
+                Log.d(TAG, "ChannelRead0-END " + incoming.remoteAddress());
+                future.addListener(ChannelFutureListener.CLOSE);
+            }
         }
-
-        Log.d(TAG, "ChannelRead0-MSG " + msg + " from " + incoming.remoteAddress());
-
-        // We do not need to write a ChannelBuffer here.
-        // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
-        ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" +  msg);
-
-        if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
-            Log.d(TAG, "ChannelRead0-END " + incoming.remoteAddress());
-            future.addListener(ChannelFutureListener.CLOSE);
+        catch (Exception exc)
+        {
+            throw exc;
         }
     }
 

@@ -38,6 +38,6 @@ public interface DeviceDao {
     @Query("select * from device where ip = :deviceIp")
     LiveData<DeviceEntity> loadDevice(String deviceIp);
 
-    @Query("select * from device where id = :deviceIp")
+    @Query("select * from device where ip = :deviceIp")
     DeviceEntity loadDeviceSync(String deviceIp);
 }

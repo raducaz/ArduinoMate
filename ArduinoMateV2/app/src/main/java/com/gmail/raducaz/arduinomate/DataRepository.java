@@ -134,8 +134,8 @@ public class DataRepository {
     public LiveData<List<ExecutionLogEntity>> loadExecutionLog(final long executionId) {
         return mDatabase.executionLogDao().loadExecutionLogs(executionId);
     }
-    public void insertExecutionLog(ExecutionLogEntity log) {
-        mDatabase.executionLogDao().insert(log);
+    public long insertExecutionLog(ExecutionLogEntity log) {
+        return mDatabase.executionLogDao().insert(log);
     }
     public void updateExecutionLog(ExecutionLogEntity log) {
         mDatabase.executionLogDao().update(log);

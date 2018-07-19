@@ -1,9 +1,19 @@
+#include <StaticThreadController.h>
+#include <Thread.h>
+#include <ThreadController.h>
+
 #include <ArduinoJson.h>
-#include <SPI.h>
-#include <Ethernet.h>
-#include "Thread.h"
-#include "ThreadController.h"
+
 #include <TimerOne.h>
+
+#include <Dhcp.h>
+#include <Dns.h>
+#include <Ethernet.h>
+#include <EthernetClient.h>
+#include <EthernetServer.h>
+#include <EthernetUdp.h>
+
+#include <SPI.h>
 
 // Satisfy IDE, which only needs to see the include statment in the ino.
 #ifdef dobogusinclude
@@ -209,13 +219,12 @@ class MyTcpServerThread: public Thread
     EthernetClient client = server.available();
     char endChar = '\n';
     char receivedText[] = ""; //safe to change despite char* receivedText="";
-    
+
+    Serial.println("Server started...listening...");
     if (client) {
       while (client.connected()) {
         if (client.available()) {
-
-          Serial.println("Server started...listening...");
-          
+    
           char receivedChar = client.read();
           
           Serial.print(receivedChar);
@@ -310,6 +319,7 @@ class MyTcpServerThread: public Thread
     else
     {
       // No client, server not available()
+      Serial.println("No client, server stopped.");
     }  
 
     runned();

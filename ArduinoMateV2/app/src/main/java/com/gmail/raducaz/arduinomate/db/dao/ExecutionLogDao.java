@@ -22,7 +22,7 @@ public interface ExecutionLogDao {
     void update(ExecutionLogEntity function);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(ExecutionLogEntity function);
+    long insert(ExecutionLogEntity function);
 
     @Query("SELECT * FROM executionLog " +
             "where executionId = :executionId")

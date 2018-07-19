@@ -44,9 +44,13 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
         log.setExecutionId(functionExecution.getId());
         log.setLog(msg);
         log.setDate(DateConverter.toDate(System.currentTimeMillis()));
-        long logId = mRepository.insertFunctionExecution(functionExecution);
-
-        mRepository.insertExecutionLog(log);
+        long logId = mRepository.insertExecutionLog(log);
+    }
+    private void updateFunctionExecution(int state)
+    {
+        functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
+        functionExecution.setState(state);
+        mRepository.updateFunctionExecution(functionExecution);
     }
 
     @Override
@@ -62,7 +66,14 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
     @Override
     public void channelRead(ChannelHandlerContext ctx, String msg) {
 
-        insertExecutionLog(msg);
+        if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
+            insertExecutionLog("Execution end.");
+            updateFunctionExecution(1); // Success
+        }
+        else
+        {
+            insertExecutionLog(msg);
+        }
 
         // Don't want to confirm to server that client received the message
         //ctx.write(msg);
@@ -74,22 +85,19 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
     public void channelReadComplete(ChannelHandlerContext ctx) {
 
         super.channelReadComplete(ctx);
-
-        insertExecutionLog("Execution end.");
     }
 
     public void onResponseTimeout()
     {
         insertExecutionLog("Response timeout.");
-        functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
-        functionExecution.setState(-1); // Error
-        mRepository.updateFunctionExecution(functionExecution);
+        updateFunctionExecution(-1); // Error
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 
         insertExecutionLog(cause.getStackTrace().toString());
+        updateFunctionExecution(-1); // Error
 
         super.exceptionCaught(ctx, cause);
     }

@@ -1,4 +1,3 @@
-#include <StaticThreadController.h>
 #include <Thread.h>
 #include <ThreadController.h>
 
@@ -6,7 +5,6 @@
 
 #include <TimerOne.h>
 
-#include <Dhcp.h>
 #include <Dns.h>
 #include <Ethernet.h>
 #include <EthernetClient.h>
@@ -21,14 +19,11 @@
 #endif
 
 // Enter a MAC address and IP address for your controller below.
-// The IP address will be dependent on your local network:
 byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
 IPAddress ip(192,168,11,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
 byte serverIp[] = { 192, 168, 11, 99 };
-//IPAddress serverIp = IPAddress(192,168,11,99);
 
 ThreadController threadsController = ThreadController();
-//volatile boolean monitorThreadRunning = 0;
 
 void startThreadsController()
 {
@@ -40,51 +35,9 @@ void startThreadsController()
   Timer1.start();
 }
 
-class JsonBuilder
-{
-    StaticJsonBuffer<100> _buffer;
-    JsonObject& _root;
-
-public:
-    JsonBuilder()
-        : _root(_buffer.createObject())
-    {
-    }
-
-    void addPinStates()
-    {
-      JsonArray& pinStates = _root.createNestedArray("pinStates");
-
-      for(byte i=7;i<=8;i++)
-      {
-        addPin(pinStates, i);
-      }
-      
-    }
-    void addPin(JsonArray& pinStates, byte i)
-    {
-        JsonObject& pinState = pinStates.createNestedObject();
-        pinState[getPinName(i)] = digitalRead(i);
-    }
-
-    void dumpTo(Print &destination) const
-    {
-        _root.printTo(destination);
-    }
-
-private:
-    const char* getPinName(byte i)
-    {
-        char* key = (char*)_buffer.alloc(3);
-        sprintf(key, "P%d", i);
-        return key;
-    }
-};
-
 class MyMonitorTcpClientThread: public Thread
 {
   EthernetClient arduinoClient;
-  //IPAddress serverIp = IPAddress(192,168,11,99); //<<< ENTER DEFAULT REMOTE SERVER IP ADDRESS HERE!!!
   
   String ReceiveMsgFromServer()
   {
@@ -113,7 +66,7 @@ class MyMonitorTcpClientThread: public Thread
        }
     }
   
-     return receivedText;
+    return receivedText;
   }
   public:boolean ConnectToServer()
   {
@@ -132,33 +85,36 @@ class MyMonitorTcpClientThread: public Thread
     Serial.println("MON: Client dinn't connect.");
     return false;
   }
+  private: JsonObject& constructJSON()
+  {
+    StaticJsonBuffer<100> _buffer;
+    JsonObject& _root = _buffer.createObject();
+    _root["ip"] = "192.168.11.100";
+    JsonArray& pinStates = _root.createNestedArray("pinStates");
+    for(byte i=7;i<=8;i++)
+    {
+      JsonObject& pinState = pinStates.createNestedObject();
+      char* key = (char*)_buffer.alloc(3);
+      sprintf(key, "p%d", i);
+      pinState[key] = digitalRead(i);
+    }
+
+    return _root;
+  }
   public:boolean SendMsgToServer()
   {
-
-//JsonBuilder* jBuilder = new JsonBuilder();
-//jBuilder->addPinStates();
-StaticJsonBuffer<100> _buffer;
-JsonObject& _root = _buffer.createObject();
-JsonArray& pinStates = _root.createNestedArray("pinStates");
-for(byte i=7;i<=8;i++)
-{
-  JsonObject& pinState = pinStates.createNestedObject();
-  char* key = (char*)_buffer.alloc(3);
-  sprintf(key, "P%d", i);
-  pinState[key] = digitalRead(i);
-}
+    JsonObject& _root = constructJSON();
     
     Serial.print("MON: Send ");
     _root.printTo(Serial);Serial.println("");
- //   jBuilder->dumpTo(Serial);Serial.println("");
-    
+     
     if(arduinoClient.connected())
      {
         Serial.println("MON: Client is connected, send ");
-//        jBuilder->dumpTo(arduinoClient);
-//         arduinoClient.println(msg);
-         // Success
-         return true;
+        _root.printTo(arduinoClient);
+        arduinoClient.println("END");
+        // Success
+        return true;
      }
      else
      {
@@ -167,8 +123,8 @@ for(byte i=7;i<=8;i++)
         if(ConnectToServer())
         {
           Serial.println("MON: Client connected on retry");
-//          jBuilder->dumpTo(arduinoClient);
-//          arduinoClient.println(msg);
+          _root.printTo(arduinoClient);
+          arduinoClient.println("END");
           // Success
           return true;
         }
@@ -179,9 +135,6 @@ for(byte i=7;i<=8;i++)
           return false;
         }
      }
-
-//     delete jBuilder;
-
   }
     
   // Function executed on thread execution
@@ -209,25 +162,26 @@ for(byte i=7;i<=8;i++)
 
 class MyTcpServerThread: public Thread
 {
-  EthernetServer server = EthernetServer(8080);
- 
-  // Function executed on thread execution
-  void run(){
+    EthernetServer server = EthernetServer(8080);
+   
+    // Function executed on thread execution
+    void run(){
 
     server.begin();
   
     EthernetClient client = server.available();
     char endChar = '\n';
-    char receivedText[] = ""; //safe to change despite char* receivedText="";
-
+    const byte SIZE = 50;
+    char receivedText[SIZE] = ""; //safe to change char text[] = "" despite char* receivedText="";
+    
     Serial.println("Server started...listening...");
     if (client) {
       while (client.connected()) {
         if (client.available()) {
-    
+          
           char receivedChar = client.read();
           
-          Serial.print(receivedChar);
+          Serial.println(receivedChar);
   
           if (receivedChar==endChar)
           {
@@ -255,57 +209,25 @@ class MyTcpServerThread: public Thread
   
             if(strcmp(receivedText,"MonitorFct")==0)
             {
-//              //noInterrupts();
-//              MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
-//              if(!monitorThreadRunning)
-//              {
-//                client.println("Try connect to server");
-//                if(monitorTcpClientThread.ConnectToServer())
-//                {
-//                  client.println("Connection to server success.");
-//                }
-//                else
-//                {
-//                  client.println("Connection to server failed.");
-//                }
-//  
-//                  client.println("Starting monitor thread.");
-//                  
-//                  // Set the interval the thread should run in loop
-//                  monitorTcpClientThread.setInterval(1000); // in ms
-//
-//                  // Add thread to controller, this will fire the thread automatically
-//                  threadsController.add(&monitorTcpClientThread); 
-//                  // Mark monitor started
-//                  monitorThreadRunning = 1;
-//                  
-//                  //startThreadsController();
-//    
-//                  client.println("Monitor started");
-//                  Serial.println("Monitor started.");
-//                  
-//                //interrupts();
-//              }
-//              else
-//              {
-//                client.println("Monitor is running");
-//              }
-              
+              // DO nothing ... 
+                
               client.println("END");
             }
             
-            strcpy(receivedText, "");
+            strcpy(receivedText, "\0");
           }
           else
           {
             size_t len = strlen(receivedText);
-            char* newReceived = new char[len+2];
-            strcpy(newReceived,receivedText);
-            newReceived[len]=receivedChar;
-            newReceived[len]='\0';
-            //delete receivedText;
-            *receivedText = *newReceived;
-            
+            if (len < SIZE)
+            {
+              receivedText[len] = receivedChar;
+              receivedText[len + 1] = '\0';
+            }
+            else
+            {
+              Serial.println("Max received message len riched.");
+            }
           } 
         } 
       }
@@ -314,6 +236,8 @@ class MyTcpServerThread: public Thread
       Serial.println("CLOSE CONNECTION"); 
       client.stop();
       Serial.println("END LOOP");
+
+      delete[] receivedText;
   
     }
     else
@@ -352,13 +276,9 @@ void setup() {
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip);
   delay(1000);
-
-  delay(1000);
+  
   setupTcpServerThread();
   startThreadsController();
-
-  
-
 }
 
 void loop() {

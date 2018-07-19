@@ -22,11 +22,11 @@ import com.gmail.raducaz.arduinomate.viewmodel.FunctionListViewModel;
 
 import java.util.List;
 
-public class FragmentFunctionList extends Fragment {
+public class FragmentConfigFunctionList extends Fragment {
 
     public static final String TAG = "FunctionListViewModel";
 
-    private AdapterFunctionList mFunctionAdapter;
+    private AdapterConfigFunctionList mFunctionAdapter;
 
     private RecyclerViewBinding mBinding;
 
@@ -36,7 +36,7 @@ public class FragmentFunctionList extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.recycler_view, container, false);
 
-        mFunctionAdapter = new AdapterFunctionList(mFunctionClickCallback);
+        mFunctionAdapter = new AdapterConfigFunctionList(mFunctionClickCallback);
         mBinding.myRecyclerView.setAdapter(mFunctionAdapter);
 
         return mBinding.getRoot();
@@ -71,13 +71,17 @@ public class FragmentFunctionList extends Fragment {
 
     private final ClickCallbackFunction mFunctionClickCallback = new ClickCallbackFunction() {
         @Override
-        public void onClick(View v,Function function) {
+        public void onClick(View v, Function function) {
 
-            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-                Context context = getContext();
-                Intent intent = new Intent(context, ActivityDetail.class);
-                intent.putExtra(ActivityDetail.EXTRA_ID, function.getId());
-                context.startActivity(intent);
+            if(v.getTag().equals("DELETE"))
+            {}
+            else if (v.getTag()==null) {
+                if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                    Context context = getContext();
+                    Intent intent = new Intent(context, ActivityDetail.class);
+                    intent.putExtra(ActivityDetail.EXTRA_ID, function.getId());
+                    context.startActivity(intent);
+                }
             }
         }
     };

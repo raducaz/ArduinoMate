@@ -39,7 +39,9 @@
                 android:text="@{function.description}"/>
 
             <ImageButton
-                android:id="@+id/execute_button"
+                android:id="@+id/delete_button"
+                android:tag="DELETE"
+                android:onClick="@{(v) ->  callback.onClick(v,function)}"
                 android:layout_width="@dimen/cards_button_width"
                 android:layout_height="@dimen/cards_button_height"
                 android:layout_marginRight="@dimen/md_keylines"

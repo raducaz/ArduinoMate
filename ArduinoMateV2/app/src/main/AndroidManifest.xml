@@ -37,6 +37,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.ActivityMain" />
         </activity>
+        <activity
+            android:name=".ui.ActivityConfigDetail"
+            android:parentActivityName=".ui.ActivityConfigMain">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.ActivityConfigMain" />
+        </activity>
+        <activity
+            android:name=".ui.ActivityConfigItem"
+            android:parentActivityName=".ui.ActivityConfigMain">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.ActivityConfigMain" />
+        </activity>
 
         <service
             android:name=".service.TcpServerIntentService"

@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/device_item_min_height"
-        android:onClick="@{() ->  callback.onClick(device)}"
+        android:onClick="@{(v) ->  callback.onClick(v,device)}"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/item_horizontal_margin"
         android:layout_marginEnd="@dimen/item_horizontal_margin"
@@ -38,16 +38,16 @@
                 android:layout_below="@id/name"
                 android:text="@{device.description}"/>
 
-            <ImageButton
-                android:id="@+id/share_button"
-                android:layout_width="@dimen/cards_button_width"
-                android:layout_height="@dimen/cards_button_height"
-                android:layout_marginRight="@dimen/md_keylines"
-                app:srcCompat="@drawable/ic_share"
+            <Button
+                android:id="@+id/details_button"
+                android:tag="DETAILS"
+                android:onClick="@{(v) ->  callback.onClick(v,device)}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/description"
-                android:layout_alignParentRight="true"
                 style="?android:attr/borderlessButtonStyle"
-                android:tint="@color/button_grey" />
+                android:textColor="?attr/colorPrimary"
+                android:text="Details" />
 
         </RelativeLayout>
 

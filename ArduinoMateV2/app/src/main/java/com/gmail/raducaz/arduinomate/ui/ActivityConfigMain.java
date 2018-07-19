@@ -40,10 +40,6 @@ public class ActivityConfigMain extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
-//        // Set Tabs inside Toolbar
-//        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
-//        tabs.setupWithViewPager(viewPager);
-
         // Create Navigation drawer and inlfate layout
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
@@ -81,7 +77,7 @@ public class ActivityConfigMain extends AppCompatActivity {
                 });
 
         // Adding Floating Action Button to bottom right of main view
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,16 +90,8 @@ public class ActivityConfigMain extends AppCompatActivity {
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-//        adapter.addFragment(new ListContentFragment(), "List");
-//        adapter.addFragment(new TileContentFragment(), "Tile");
-//        adapter.addFragment(new CardContentFragment(), "Card");
-
-        //V2 - Create custom fragment
         FragmentDeviceList fragment = new FragmentDeviceList();
-//        getSupportFragmentManager().beginTransaction()
-//                .add(R.id.fragment_container, fragment, FragmentDeviceList.TAG).commit();
         adapter.addFragment(fragment, "Devices");
-        //V2 - Create custom fragment
 
         viewPager.setAdapter(adapter);
     }

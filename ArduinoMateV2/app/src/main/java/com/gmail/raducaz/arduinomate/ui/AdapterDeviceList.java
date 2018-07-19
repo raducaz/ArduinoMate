@@ -93,14 +93,14 @@ public class AdapterDeviceList extends RecyclerView.Adapter<AdapterDeviceList.De
             super(binding.getRoot());
             this.binding = binding;
 
-            ImageButton shareImageButton = (ImageButton) itemView.findViewById(R.id.share_button);
-            shareImageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Snackbar.make(v, "Share " + binding.getDevice().getName(),
-                            Snackbar.LENGTH_LONG).show();
-                }
-            });
+//            ImageButton shareImageButton = (ImageButton) itemView.findViewById(R.id.share_button);
+//            shareImageButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Snackbar.make(v, "Share " + binding.getDevice().getName(),
+//                            Snackbar.LENGTH_LONG).show();
+//                }
+//            });
         }
     }
 }

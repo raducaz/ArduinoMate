@@ -1,8 +1,11 @@
 package com.gmail.raducaz.arduinomate.ui;
 
 
+import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -68,11 +71,27 @@ public class FragmentDeviceList extends Fragment {
 
     private final ClickCallbackDevice mDeviceClickCallback = new ClickCallbackDevice() {
         @Override
-        public void onClick(Device device) {
+        public void onClick(View v,Device device) {
 
-//            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-//                ((ActivityMain) getActivity()).show(device);
-//            }
+            if(v.getTag() ==null)
+            {
+                if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                    Context context = getContext();
+                    Intent intent = new Intent(context, ActivityConfigItem.class);
+                    intent.putExtra(ActivityConfigItem.EXTRA_ID, device.getId());
+                    context.startActivity(intent);
+                }
+            }
+            else if(v.getTag().equals("DETAILS"))
+            {
+                if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                    Context context = getContext();
+                    Intent intent = new Intent(context, ActivityConfigDetail.class);
+                    intent.putExtra(ActivityConfigDetail.EXTRA_ID, device.getId());
+                    context.startActivity(intent);
+                }
+            }
+
         }
     };
 }

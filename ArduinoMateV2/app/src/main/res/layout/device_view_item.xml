@@ -2,17 +2,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable name="function"
-            type="com.gmail.raducaz.arduinomate.model.Function"/>
-        <variable name="callback"
-            type="com.gmail.raducaz.arduinomate.ui.ClickCallbackFunction"/>
+        <variable name="deviceViewModel"
+            type="com.gmail.raducaz.arduinomate.viewmodel.DeviceViewModel"/>
     </data>
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/device_item_min_height"
-        android:onClick="@{(v) ->  callback.onClick(v,function)}"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/item_horizontal_margin"
         android:layout_marginEnd="@dimen/item_horizontal_margin"
@@ -28,15 +25,20 @@
                 android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/cd_function_name"
-                android:text="@{function.name}"/>
-
+                android:contentDescription="@string/cd_device_name"
+                android:text="@{deviceViewModel.device.name}"/>
             <TextView
-                android:id="@+id/card_text"
+                android:id="@+id/ip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/name"
-                android:text="@{function.description}"/>
+                android:text="@{deviceViewModel.device.ip}"/>
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ip"
+                android:text="@{deviceViewModel.device.description}"/>
 
             <ImageButton
                 android:id="@+id/execute_button"

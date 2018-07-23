@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/name"
-                android:text="@{deviceViewModel.device.ip}"/>
+                android:text="@={deviceViewModel.device.ip}"/>
 
             <Button
                 android:id="@+id/save_button"

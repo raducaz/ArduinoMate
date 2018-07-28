@@ -1,0 +1,25 @@
+// Pereche ca sa trimita semnal trebuie sa fie unul 1 si altul 0
+const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
+	- default = 1
+	- forward = 1
+	- backward = 0
+const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
+	- default = 1
+	- forward = 0
+	- backward = 1
+
+const int ContactGenerator = 2; // controleaza releul pentru contact generator (default CUPLAT - trebuie DECUPLAT pentru functionare)
+	- default = 1
+	- on = 0
+	- off = 1
+
+const int ContactDemaror12V = 5; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE 
+	- default = 0
+	- pornire = 1
+	- oprire = 0
+
+const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
+	- default = 1
+	- on = 0
+	- off = 1
+

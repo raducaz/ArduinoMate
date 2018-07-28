@@ -35,7 +35,7 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
     public FunctionChannelClientInboundHandler(FunctionEntity function,
                                                FunctionExecutionEntity functionExecution,
                                                DataRepository repository) {
-        this(function, functionExecution, repository, (long) 10);
+        this(function, functionExecution, repository, (long) 30);
     }
 
     private void insertExecutionLog(String msg)

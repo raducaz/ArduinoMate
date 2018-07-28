@@ -175,13 +175,114 @@ class MyMonitorTcpClientThread: public Thread
   
 };
 
-class MyTcpServerThread: public Thread
+  
+void pornire(EthernetClient& client)
 {
-    EthernetServer server = EthernetServer(8080);
-   
-    // Function executed on thread execution
-    void run(){
+  if(!generatorPornit)
+  {
+    // Tras soc
+    digitalWrite(ActuatorNormal, LOW); // Cuplare
+    digitalWrite(ActuatorInversat, HIGH); // DECUPLARE
+    client.println("Actuator - PORNIRE INAINTE");
+    delay(500);
+    digitalWrite(ActuatorNormal, HIGH);// DECUPLARE
+    digitalWrite(ActuatorInversat, HIGH);// DECUPLARE
+    client.println("Actuator - OPRIT");
+    delay(2000);
 
+    // Punere contact
+    digitalWrite(ContactGenerator, LOW); //CUPLARE releu = intrerupere circuit contact pentru pornire generator
+    client.println("Contact - ON");
+    delay(2000);
+
+    // Contact motor
+    digitalWrite(ContactDemaror12V, HIGH); // CUPLARE
+    client.println("ContactDemaror12V - PORNIRE");
+    delay(2000);
+    digitalWrite(ContactDemaror12V, LOW); // DECUPLARE
+    client.println("ContactDemaror12V - OPRIRE");
+    delay(2000);
+
+    // Scoatere soc
+    digitalWrite(ActuatorNormal, HIGH); // DECUPLARE
+    digitalWrite(ActuatorInversat, LOW); // CUPLARE 
+    client.println("Actuator - PORNIRE INAPOI");
+    delay(500);
+    digitalWrite(ActuatorNormal, HIGH); // DECUPLARE
+    digitalWrite(ActuatorInversat, HIGH); // DECUPLARE
+    client.println("Actuator - OPRIT");
+
+    //TODO: Testare prezenta curent 220 - trebuie consumator pe priza
+    // In cazul in care nu este curent se initiaza procedura de inchidere generator
+
+    // Cuplare priza 220V iesire
+    delay(2000);
+    digitalWrite(ContactRetea220V, LOW); // CUPLARE
+    client.println("ContactRetea220V - PORNIRE");    
+  }
+
+  generatorPornit = true;
+  client.println("GENERATOR - PORNIT !!!");
+}
+
+void oprire(EthernetClient& client)
+{
+    digitalWrite(ContactRetea220V, HIGH); //DECUPLARE
+    client.println("ContactRetea220V - OPRIT");
+    delay(2000);
+    
+    // Punere contact
+    digitalWrite(ContactGenerator, HIGH); //DECUPLARE releu = inchidere circuit contact pentru oprire generator
+    client.println("Contact - OFF");
+    delay(2000);
+    client.println("ContactGenerator - OPRIT");
+
+    generatorPornit = false;
+    client.println("GENERATOR - OPRIT !!!");
+
+}
+
+void starterTimerCallback(){
+  threadsController.run();
+  //Timer1.stop();
+}
+
+void setupTcpServerThread()
+{
+  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
+  monitorTcpClientThread.setInterval(1000); // in ms
+  threadsController.add(&monitorTcpClientThread);
+}
+
+void setup() {
+  Serial.begin(9600);
+
+  // OUTPUT PINS
+  pinMode(ContactGenerator, OUTPUT);
+  pinMode(ActuatorNormal, OUTPUT);
+  pinMode(ActuatorInversat, OUTPUT);
+  pinMode(ContactRetea220V, OUTPUT);
+  pinMode(ContactDemaror12V, OUTPUT);
+  
+  digitalWrite(ContactGenerator, HIGH); // Cuplat = contact OFF
+  digitalWrite(ActuatorNormal, HIGH); // Decuplat 
+  digitalWrite(ActuatorInversat, HIGH); // Decuplat
+  digitalWrite(ContactRetea220V, HIGH); // Decuplat
+  digitalWrite(ContactDemaror12V, LOW); // Decuplat
+  
+  // start the Ethernet connection and the server:
+  Ethernet.begin(mac, ip);
+  
+  delay(1000);
+  
+  setupTcpServerThread();
+  startThreadsController();
+}
+
+void loop() {
+EthernetServer server = EthernetServer(8080);
+  
+    delay(200);
     server.begin();
   
     EthernetClient client = server.available();
@@ -255,129 +356,6 @@ class MyTcpServerThread: public Thread
       // No client, server not available()
       Serial.println("No client, server stopped.");
     }  
-
-    runned();
-
-  }
-
-void wait(int msInterval)
-{
-  //noInterrupts();
-    volatile unsigned long waitStart = millis();
-    //Serial.print("wait");Serial.println(msInterval);Serial.println(waitStart);
-    while((millis() - waitStart)< msInterval) {}; // wait until 
-    //Serial.print("done wait");Serial.println(millis());
-  //interrupts(); 
-}  
-void pornire(EthernetClient& client)
-{
-  if(!generatorPornit)
-  {
-    // Tras soc
-    digitalWrite(ActuatorNormal, LOW); // Cuplare
-    digitalWrite(ActuatorInversat, HIGH); // DECUPLARE
-    client.println("Actuator - PORNIRE INAINTE");
-    wait(500);
-    digitalWrite(ActuatorNormal, HIGH);// DECUPLARE
-    digitalWrite(ActuatorInversat, HIGH);// DECUPLARE
-    client.println("Actuator - OPRIT");
-    wait(2000);
-
-    // Punere contact
-    digitalWrite(ContactGenerator, LOW); //CUPLARE releu = intrerupere circuit contact pentru pornire generator
-    client.println("Contact - ON");
-    wait(2000);
-
-    // Contact motor
-    digitalWrite(ContactDemaror12V, HIGH); // CUPLARE
-    client.println("ContactDemaror12V - PORNIRE");
-    wait(2000);
-    digitalWrite(ContactDemaror12V, LOW); // DECUPLARE
-    client.println("ContactDemaror12V - OPRIRE");
-    wait(2000);
-
-    // Scoatere soc
-    digitalWrite(ActuatorNormal, HIGH); // DECUPLARE
-    digitalWrite(ActuatorInversat, LOW); // CUPLARE 
-    client.println("Actuator - PORNIRE INAPOI");
-    wait(500);
-    digitalWrite(ActuatorNormal, HIGH); // DECUPLARE
-    digitalWrite(ActuatorInversat, HIGH); // DECUPLARE
-    client.println("Actuator - OPRIT");
-
-    //TODO: Testare prezenta curent 220 - trebuie consumator pe priza
-    // In cazul in care nu este curent se initiaza procedura de inchidere generator
-
-    // Cuplare priza 220V iesire
-    wait(2000);
-    digitalWrite(ContactRetea220V, LOW); // CUPLARE
-    client.println("ContactRetea220V - PORNIRE");    
-  }
-
-  generatorPornit = true;
-  client.println("GENERATOR - PORNIT !!!");
-}
-
-void oprire(EthernetClient& client)
-{
-    digitalWrite(ContactRetea220V, HIGH); //DECUPLARE
-    client.println("ContactRetea220V - OPRIT");
-    wait(2000);
     
-    // Punere contact
-    digitalWrite(ContactGenerator, HIGH); //DECUPLARE releu = inchidere circuit contact pentru oprire generator
-    client.println("Contact - OFF");
-    wait(2000);
-    client.println("ContactGenerator - OPRIT");
-
-    generatorPornit = false;
-    client.println("GENERATOR - OPRIT !!!");
-
-}
-};
-
-void starterTimerCallback(){
-  threadsController.run();
-  //Timer1.stop();
-}
-
-void setupTcpServerThread()
-{
-  MyTcpServerThread tcpServerThread = MyTcpServerThread();
-  // Set the interval the thread should run in loop
-  tcpServerThread.setInterval(500); // in ms
-  threadsController.add(&tcpServerThread);
-
-  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
-  monitorTcpClientThread.setInterval(1000); // in ms
-  threadsController.add(&monitorTcpClientThread);
-}
-
-void setup() {
-  Serial.begin(9600);
-
-  // OUTPUT PINS
-  pinMode(ContactGenerator, OUTPUT);
-  pinMode(ActuatorNormal, OUTPUT);
-  pinMode(ActuatorInversat, OUTPUT);
-  pinMode(ContactRetea220V, OUTPUT);
-  pinMode(ContactDemaror12V, OUTPUT);
-  
-  digitalWrite(ContactGenerator, HIGH); // Cuplat = contact OFF
-  digitalWrite(ActuatorNormal, HIGH); // Decuplat 
-  digitalWrite(ActuatorInversat, HIGH); // Decuplat
-  digitalWrite(ContactRetea220V, HIGH); // Decuplat
-  digitalWrite(ContactDemaror12V, LOW); // Decuplat
-  
-  // start the Ethernet connection and the server:
-  Ethernet.begin(mac, ip);
-  delay(1000);
-  
-  setupTcpServerThread();
-  startThreadsController();
-}
-
-void loop() {
-  
 }
 

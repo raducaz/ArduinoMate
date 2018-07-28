@@ -105,7 +105,7 @@ public class TcpClientService implements Callable<Void> {
                         .channel(NioSocketChannel.class)
                         //.option(ChannelOption.TCP_NODELAY, true) // incompatible with autoread option
                         .option(ChannelOption.AUTO_READ, true)
-                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000)
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             public void initChannel(SocketChannel ch) throws Exception {

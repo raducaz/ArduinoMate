@@ -3,8 +3,6 @@
 
 #include <ArduinoJson.h>
 
-#include <TimerOne.h>
-
 #include <Dns.h>
 #include <Ethernet.h>
 #include <EthernetClient.h>
@@ -36,16 +34,6 @@ bool cycleDone = true;
 bool generatorPornit = false;
 
 ThreadController threadsController = ThreadController();
-
-void startThreadsController()
-{
-  // Is best practice to start the threadController from a Timer interrupt so we avoid blocking the main thread
-  Timer1.stop();
-
-  Timer1.initialize(500); // in micro second (us)
-  Timer1.attachInterrupt(starterTimerCallback);
-  Timer1.start();
-}
 
 class MyMonitorTcpClientThread: public Thread
 {
@@ -262,12 +250,17 @@ class MyTcpServerThread: public Thread
 
 void wait(int msInterval)
 {
-  //noInterrupts();
-    volatile unsigned long waitStart = millis();
-    //Serial.print("wait");Serial.println(msInterval);Serial.println(waitStart);
-    while((millis() - waitStart)< msInterval) {}; // wait until 
-    //Serial.print("done wait");Serial.println(millis());
-  //interrupts(); 
+    unsigned long waitStart = millis();
+    Serial.print("wait");Serial.println(msInterval);Serial.println(waitStart);
+
+    unsigned long current = millis();
+    while((current - waitStart)< msInterval) 
+    {
+      current = millis();
+      Serial.print("Current:");Serial.println(current);
+    }; // wait until 
+    
+    Serial.print("done wait");Serial.println(millis());
 }  
 void pornire(EthernetClient& client)
 {
@@ -369,15 +362,19 @@ void setup() {
   digitalWrite(ContactRetea220V, HIGH); // Decuplat
   digitalWrite(ContactDemaror12V, LOW); // Decuplat
   
-  // start the Ethernet connection and the server:
+  // start the Ethernet connecti  on and the server:
   Ethernet.begin(mac, ip);
   delay(1000);
   
   setupTcpServerThread();
-  startThreadsController();
+  // Do not start with Timer - it breaks the millis function
+  //startThreadsController();
 }
 
 void loop() {
-  
+  delay(500);
+  //Start the Thread in loop
+  threadsController.run();
+  delay(500);
 }
 

@@ -15,6 +15,7 @@ void setup() {
   pinMode(2, OUTPUT);
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
   pinMode(6, OUTPUT);
   pinMode(7, OUTPUT);
   pinMode(8, OUTPUT);
@@ -24,7 +25,7 @@ void setup() {
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
 
-  Serial.println("2=1 to set pin 2 to 1; ls to list all pins"); //Prompt User for input
+  Serial.println("2=1 to set pin 2 to 1; ls to list all pins; use 2/1 to set pin 2 to 1 for 500ms"); //Prompt User for input
 }
 
 char cmdChar = '\0';
@@ -57,6 +58,21 @@ void loop() {
             
               digitalWrite(pin,value);
             }
+            else if(cmdChar == '/')
+            {
+              value = atoi(receivedText);
+            
+              byte v = digitalRead(pin);
+              
+              Serial.print("set pin:");Serial.print(pin);
+              Serial.print(" to value (for 500ms):");Serial.println(value);
+              digitalWrite(pin,value);
+              delay(500);
+              Serial.print("revert pin:");Serial.print(pin);
+              Serial.print(" to value:");Serial.println(v);
+              digitalWrite(pin,v);
+            
+            }
             else if(cmdChar == '?')
             {
               Serial.print("pin:");Serial.print(pin);
@@ -73,7 +89,7 @@ void loop() {
           }
           else
           {
-            if(receivedChar=='=' || receivedChar=='?')
+            if(receivedChar=='=' || receivedChar=='?' || receivedChar=='/')
             {
               cmdChar = receivedChar;
               

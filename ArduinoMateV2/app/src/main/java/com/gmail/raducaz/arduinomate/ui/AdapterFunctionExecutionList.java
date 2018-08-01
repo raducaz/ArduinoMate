@@ -58,7 +58,8 @@ public class AdapterFunctionExecutionList extends RecyclerView.Adapter<AdapterFu
                     FunctionExecution oldFunctionExecution = mFunctionExecutionList != null ? mFunctionExecutionList.get(oldItemPosition):null;
                     return newFunctionExecution.getId() == oldFunctionExecution.getId() &&
                             newFunctionExecution.getEndDate() == oldFunctionExecution.getEndDate() &&
-                            newFunctionExecution.getState() == oldFunctionExecution.getState();
+                            newFunctionExecution.getCallState() == oldFunctionExecution.getCallState() &&
+                            newFunctionExecution.getResultState() == oldFunctionExecution.getResultState();
                 }
             });
             mFunctionExecutionList = functionExecutionList;

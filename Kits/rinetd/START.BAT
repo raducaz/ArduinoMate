@@ -1,5 +1,5 @@
 @echo off
 F:
-cd F:\ArduinoMate\Kits\rinetd
-start F:\ArduinoMate\Kits\rinetd\rinetd.exe -c F:\ArduinoMate\Kits\rinetd\rinetd.conf
+cd D:\ArduinoMate\Kits\rinetd
+start D:\ArduinoMate\Kits\rinetd\rinetd.exe -c D:\ArduinoMate\Kits\rinetd\rinetd.conf
 Exit

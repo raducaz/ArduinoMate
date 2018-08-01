@@ -29,22 +29,32 @@
                 android:text="@{functionViewModel.function.name}"/>
 
             <TextView
-                android:id="@+id/card_text"
+                android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/name"
                 android:text="@{functionViewModel.function.description}"/>
 
-            <ImageButton
+            <Button
                 android:id="@+id/execute_button"
-                android:layout_width="@dimen/cards_button_width"
-                android:layout_height="@dimen/cards_button_height"
-                android:layout_marginRight="@dimen/md_keylines"
-                app:srcCompat="@drawable/ic_share"
-                android:layout_below="@+id/card_text"
-                android:layout_alignParentRight="true"
+                android:tag="EXECUTE"
+                android:enabled="@{functionViewModel.functionExecution.callState!=1}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/description"
                 style="?android:attr/borderlessButtonStyle"
-                android:tint="@color/button_grey" />
+                android:textColor="?attr/colorPrimary"
+                android:text="EXECUTE" />
+            <Button
+                android:id="@+id/reset_button"
+                android:tag="RESET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/description"
+                style="?android:attr/borderlessButtonStyle"
+                android:textColor="?attr/colorPrimary"
+                android:layout_alignParentRight="true"
+                android:text="RESET" />
 
         </RelativeLayout>
 

@@ -19,7 +19,7 @@ public class DataGenerator {
 
         List<DeviceEntity> devices = new ArrayList<>(3);
         DeviceEntity device = new DeviceEntity();
-        device.setIp("192.168.11.100");
+        device.setIp("192.168.1.100");
         device.setPort(8080);
         device.setName("Generator");
         device.setDescription("Controllerul de pornire/oprire generator si control pompa");
@@ -27,7 +27,7 @@ public class DataGenerator {
         devices.add(device);
 
         device = new DeviceEntity();
-        device.setIp("192.168.11.200");
+        device.setIp("192.168.1.200");
         device.setPort(8080);
         device.setName("Prize automate (control bolier)");
         device.setDescription("Controller de pornire/oprire prize");
@@ -77,6 +77,14 @@ public class DataGenerator {
         function.setDeviceId(device.getId());
         function.setName("MonitorFct");
         function.setDescription("Begins sending states of pins" + device.getId());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("TestWaitFct");
+        function.setDescription("Tests the wait and request timeout problem" + device.getId());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

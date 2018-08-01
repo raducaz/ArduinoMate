@@ -80,7 +80,7 @@ public abstract class TcpClientInboundHandler extends ChannelInboundHandlerAdapt
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         //ByteBuf in = (ByteBuf) msg;
         //final String sMsg = in.toString(io.netty.util.CharsetUtil.US_ASCII);
@@ -89,7 +89,7 @@ public abstract class TcpClientInboundHandler extends ChannelInboundHandlerAdapt
         channelRead(ctx, (String)msg);
     }
 
-    protected void channelRead(ChannelHandlerContext ctx, String msg)
+    protected void channelRead(ChannelHandlerContext ctx, String msg) throws Exception
     {
         if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
             isENDReceived = true;

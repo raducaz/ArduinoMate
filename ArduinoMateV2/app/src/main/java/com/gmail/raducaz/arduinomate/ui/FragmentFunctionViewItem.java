@@ -1,6 +1,5 @@
 package com.gmail.raducaz.arduinomate.ui;
 
-import android.app.Application;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
@@ -12,20 +11,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.Button;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
-import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.databinding.FunctionViewItemBinding;
-import com.gmail.raducaz.arduinomate.service.ArduinoFunctionCaller;
-import com.gmail.raducaz.arduinomate.service.FunctionChannelClientInboundHandler;
-import com.gmail.raducaz.arduinomate.service.TcpClientService;
+import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
+import com.gmail.raducaz.arduinomate.service.TaskFunctionCaller;
+import com.gmail.raducaz.arduinomate.service.TaskFunctionReset;
 import com.gmail.raducaz.arduinomate.viewmodel.FunctionViewModel;
-
-import java.io.IOException;
-import java.util.concurrent.Executor;
 
 public class FragmentFunctionViewItem extends Fragment {
 
@@ -57,27 +52,26 @@ public class FragmentFunctionViewItem extends Fragment {
 
         subscribeToModel(model);
 
-        ImageButton button = (ImageButton) mBinding.getRoot().findViewById(R.id.execute_button);
-        button.setOnClickListener(new OnClickListener() {
+        Button buttonExecute = (Button) mBinding.getRoot().findViewById(R.id.execute_button);
+        buttonExecute.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 
                 ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                ArduinoFunctionCaller functionCaller = new ArduinoFunctionCaller(application, model.function.get());
-                new FunctionCaller().execute(functionCaller);
+                TaskFunctionCaller functionCaller = new TaskFunctionCaller(application, model.function.get());
+                new TaskExecutor().execute(functionCaller);
             }
         });
 
-    }
+        Button buttonReset = (Button) mBinding.getRoot().findViewById(R.id.reset_button);
+        buttonReset.setOnClickListener(new OnClickListener() {
+            public void onClick(View b) {
 
-    private class FunctionCaller extends AsyncTask<ArduinoFunctionCaller, Void, String>
-    {
-        protected String doInBackground(ArduinoFunctionCaller...caller)
-        {
-            // Start sending command to Arduino
-            caller[0].execute();
+                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+                TaskFunctionReset functionReset = new TaskFunctionReset(application, model.function.get());
+                new TaskExecutor().execute(functionReset);
+            }
+        });
 
-            return "";
-        }
     }
 
     private void subscribeToModel(final FunctionViewModel model) {
@@ -87,6 +81,13 @@ public class FragmentFunctionViewItem extends Fragment {
             @Override
             public void onChanged(@Nullable FunctionEntity functionEntity) {
                 model.setFunction(functionEntity);
+            }
+        });
+        // Observe function execution data
+        model.getObservableFunctionExecution().observe(this, new Observer<FunctionExecutionEntity>() {
+            @Override
+            public void onChanged(@Nullable FunctionExecutionEntity functionExecutionEntity) {
+                model.setFunctionExecution(functionExecutionEntity);
             }
         });
     }

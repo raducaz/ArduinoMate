@@ -54,16 +54,16 @@ public class FragmentDeviceViewItem extends Fragment {
             public void onClick(View b) {
 
 //                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-//                ArduinoFunctionCaller functionCaller = new ArduinoFunctionCaller(application, model.device.get());
+//                TaskFunctionCaller functionCaller = new TaskFunctionCaller(application, model.device.get());
 //                new FunctionCaller().execute(functionCaller);
             }
         });
 
     }
 
-//    private class FunctionCaller extends AsyncTask<ArduinoFunctionCaller, Void, String>
+//    private class FunctionCaller extends AsyncTask<TaskFunctionCaller, Void, String>
 //    {
-//        protected String doInBackground(ArduinoFunctionCaller...caller)
+//        protected String doInBackground(TaskFunctionCaller...caller)
 //        {
 //            // Start sending command to Arduino
 //            caller[0].execute();

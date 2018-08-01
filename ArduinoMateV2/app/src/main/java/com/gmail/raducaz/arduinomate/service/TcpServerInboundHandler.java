@@ -69,6 +69,7 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
         final ChannelFuture f = incoming.writeAndFlush("[Server] - " + incoming.remoteAddress() + " has joined!\r\n");
 
 //        final ChannelFuture f = incoming.writeAndFlush("\r\n");
+
         f.addListener(new ChannelFutureListener() {
             public void operationComplete(ChannelFuture future) {
                 Log.d(TAG, "Complete");
@@ -106,101 +107,24 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
             // This is an ip like 10.2.2.10 is virtual cannot be used...
             //String deviceIp = incoming.remoteAddress().toString();
 
-            // TODO: Handle the message from the client
-//        DeviceEntity deviceEntity = dataRepository.loadDeviceSync(1);
-//        deviceEntity.setDescription(msg);
-//        dataRepository.updateDevice(deviceEntity);
+            DeviceStateUpdater deviceStateUpdater = new DeviceStateUpdater(dataRepository, msg);
+            deviceStateUpdater.updatePinStates();
 
+            Log.d(TAG, "ChannelRead0-MSG " + msg + " from " + incoming.remoteAddress());
 
-        /*
-        Sample object structure
-        {
-            "ip": "192.168.11.100",
-            "state": 1,
-            "p": [
-                {"p1": 1},
-                {"p2": 1},
-                {"p3": 0.2321}
-                ]
-        }
-        {
-            "ip": "192.168.11.100",
-            "state": 1,
-            "f": [
-                {"f1": 1},
-                {"f2": 1},
-                {"f3": 0.2321}
-                ]
-        }
-        {
-            "ip": "192.168.11.100",
-            "state": 1,
-            "i": [
-                {"i1": 1},
-                {"i2": 1},
-                {"i3": 0.2321}
-                ]
-        }
-        */
-            JSONObject clientData = new JSONObject(msg);
+            // We do not need to write a ChannelBuffer here.
+            // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
+            ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" + msg);
 
-            if(clientData.has("ip")) {
-                String deviceIp = clientData.getString("ip");
-                DeviceEntity deviceEntity = dataRepository.loadDeviceSync(deviceIp);
-
-                if(deviceEntity == null)
-                    throw  new OperationCanceledException("Device with ip" + deviceIp + " not registered. ");
-
-                //region Pin States
-                List<PinStateEntity> currentPinsStateList = dataRepository.loadDeviceCurrentPinsStateSync(deviceEntity.getId());
-//        currentPinsState.stream().filter(p->p.getName().equals("p1")).findAny(); - unsupported by API22
-
-                Map<String, PinStateEntity> currentPinsState = new HashMap<String, PinStateEntity>();
-                    for (PinStateEntity p : currentPinsStateList) {
-                        currentPinsState.put(p.getName(), p);
-                }
-
-                if (clientData.has("pinStates")) {
-                    JSONArray pinStates = clientData.getJSONArray("pinStates");
-                    for (int i = 0; i < pinStates.length(); i++) {
-                        JSONObject pinState = pinStates.getJSONObject(i);
-                        String pName = pinState.names().getString(0);
-                        Double pState = pinState.getDouble(pName);
-                        if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() == pState) {
-                            // Do nothing as the state is the same as the current pin State in the History
-                        } else {
-                            if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() != pState) {
-                                // Update history with the date until the state was unchanged
-                                dataRepository.updatePinStateToDate(currentPinsState.get(pName).getId());
-                            }
-
-                            // Insert a new History for this pin with the initial state
-                            PinStateEntity newPinState = new PinStateEntity();
-                            newPinState.setDeviceId(deviceEntity.getId());
-                            newPinState.setName(pName);
-                            newPinState.setFromDate(DateConverter.toDate(System.currentTimeMillis()));
-                            newPinState.setState(pState);
-                            dataRepository.insertPinState(newPinState);
-                        }
-                    }
-                }
-                //endregion Pin States
-
-                Log.d(TAG, "ChannelRead0-MSG " + msg + " from " + incoming.remoteAddress());
-
-                // We do not need to write a ChannelBuffer here.
-                // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
-                ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" + msg);
-
-                if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
-                    Log.d(TAG, "ChannelRead0-END " + incoming.remoteAddress());
-                    future.addListener(ChannelFutureListener.CLOSE);
-                }
+            if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
+                Log.d(TAG, "ChannelRead0-END " + incoming.remoteAddress());
+                future.addListener(ChannelFutureListener.CLOSE);
             }
         }
         catch (Exception exc)
         {
             // TODO: handle exceptions by logging them at application level log
+            Log.e(TAG, "ChannelRead0-ERROR " + exc.getMessage());
             throw exc;
         }
     }

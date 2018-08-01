@@ -45,5 +45,9 @@ public interface FunctionExecutionDao {
             "ORDER BY startDate DESC")
     List<FunctionExecutionEntity> loadFunctionExecutionsSync(long functionId);
 
+    @Query("DELETE FROM functionExecution " +
+            "where functionId = :functionId ")
+    void deleteFunctionExecution(long functionId);
+
 }
 

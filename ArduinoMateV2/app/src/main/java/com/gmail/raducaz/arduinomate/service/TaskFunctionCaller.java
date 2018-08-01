@@ -16,9 +16,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-public class ArduinoFunctionCaller {
+public class TaskFunctionCaller implements TaskInterface {
 
-    private String TAG = "ArduinoFunctionCaller";
+    private String TAG = "TaskFunctionCaller";
 
     private final ArduinoMateApp mApplication;
     private final FunctionEntity function;
@@ -26,7 +26,7 @@ public class ArduinoFunctionCaller {
     private FunctionExecutionEntity functionExecution;
     private final DataRepository mRepository;
     private final ExecutorService mExecutor;
-    public ArduinoFunctionCaller(final ArduinoMateApp app, FunctionEntity function) {
+    public TaskFunctionCaller(final ArduinoMateApp app, FunctionEntity function) {
         mApplication = app;
         this.function = function;
 
@@ -35,14 +35,16 @@ public class ArduinoFunctionCaller {
     }
 
     public void execute() {
-        try {
 
-            functionExecution = new FunctionExecutionEntity();
-            functionExecution.setFunctionId(function.getId());
-            functionExecution.setName(function.getName());
-            functionExecution.setStartDate(DateConverter.toDate(System.currentTimeMillis()));
-            executionId = mRepository.insertFunctionExecution(functionExecution);
-            functionExecution.setId(executionId);
+        functionExecution = new FunctionExecutionEntity();
+        functionExecution.setFunctionId(function.getId());
+        functionExecution.setName(function.getName());
+
+        FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(mRepository, "Command sent to device ...",functionExecution);
+
+        try {
+            // Automatically insert the log as well = Execution started...
+            functionStateUpdater.startFunctionExecution();
 
             DeviceEntity device = mRepository.loadDeviceSync(function.getDeviceId());
 
@@ -71,9 +73,7 @@ public class ArduinoFunctionCaller {
 
             Log.e(TAG, exc.getMessage());
 
-            functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
-            functionExecution.setState(-1); // Error
-            mRepository.updateFunctionExecution(functionExecution);
+            functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.ERROR);
         }
     }
 

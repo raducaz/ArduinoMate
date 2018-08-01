@@ -9,5 +9,6 @@ public interface FunctionExecution {
     String getName();
     Date getStartDate();
     Date getEndDate();
-    int getState();
+    int getCallState();
+    int getResultState();
 }

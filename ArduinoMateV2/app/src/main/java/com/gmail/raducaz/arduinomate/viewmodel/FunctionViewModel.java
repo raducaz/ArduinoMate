@@ -12,7 +12,9 @@ import android.support.annotation.NonNull;
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
+import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.model.Function;
+import com.gmail.raducaz.arduinomate.model.FunctionExecution;
 
 import java.util.List;
 
@@ -20,8 +22,11 @@ public class FunctionViewModel extends AndroidViewModel {
 
     private DataRepository dataRepository;
     private final LiveData<FunctionEntity> mObservableFunction;
+    private final LiveData<FunctionExecutionEntity> mObservableFunctionExecution;
 
     public ObservableField<FunctionEntity> function = new ObservableField<>();
+    public ObservableField<FunctionExecutionEntity> functionExecution = new ObservableField<>();
+
 
     private final long mFunctionId;
     public long deviceId;
@@ -36,7 +41,7 @@ public class FunctionViewModel extends AndroidViewModel {
         dataRepository = repository;
 
 //        mObservableFunctions = repository.loadFunctions(mDeviceId);
-
+        mObservableFunctionExecution = repository.loadLastFunctionExecution(mFunctionId);
         mObservableFunction = repository.loadFunction(mFunctionId);
     }
 
@@ -50,9 +55,15 @@ public class FunctionViewModel extends AndroidViewModel {
     public LiveData<FunctionEntity> getObservableFunction() {
         return mObservableFunction;
     }
+    public LiveData<FunctionExecutionEntity> getObservableFunctionExecution() {
+        return mObservableFunctionExecution;
+    }
 
     public void setFunction(FunctionEntity function) {
         this.function.set(function);
+    }
+    public void setFunctionExecution(FunctionExecutionEntity functionExecution) {
+        this.functionExecution.set(functionExecution);
     }
 
     public void updateFunction(FunctionEntity function)

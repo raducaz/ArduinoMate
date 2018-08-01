@@ -30,8 +30,8 @@ const int ContactDemaror12V = 5; // controleaza releul de 12V pentru contact dem
 const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
 const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
 
-bool cycleDone = true;
-bool generatorPornit = false;
+byte OnOffGeneratorState = 0; // 0=OFF,1=ON,2=Error
+byte deviceState = 0;
 
 ThreadController threadsController = ThreadController();
 
@@ -90,13 +90,10 @@ class MyMonitorTcpClientThread: public Thread
     StaticJsonBuffer<200> _buffer;
     JsonObject& _root = _buffer.createObject();
     _root["ip"] = "192.168.1.100";
+    _root["state"] = deviceState;
     JsonArray& pinStates = _root.createNestedArray("pinStates");
     for(byte i=0;i<=13;i++)
     {
-      //JsonObject& pinState = pinStates.createNestedObject();
-      //char* key = (char*)_buffer.alloc(3);
-      //sprintf(key, "p%d", i);
-      //pinState[key] = digitalRead(i);
       pinStates.add(digitalRead(i));
     }
 
@@ -191,13 +188,16 @@ class MyTcpServerThread: public Thread
             
             if(strcmp(receivedText,"OnOffGenerator")==0)
             {
-              if(generatorPornit == false)
+              if(OnOffGeneratorState == 0)
               {
-                pornire(client);
+                generatorON(client);
               }
-              else
+              else if(OnOffGeneratorState == 1)
               {
-                oprire(client);
+                generatorOFF(client);
+              }
+              else // if error state
+              { //TODO: reset device state
               }
             }
             else if(strcmp(receivedText,"MonitorFct")==0)
@@ -235,8 +235,6 @@ class MyTcpServerThread: public Thread
       client.stop();
       Serial.println("END LOOP");
 
-      //delete[] receivedText;
-  
     }
     else
     {
@@ -245,127 +243,158 @@ class MyTcpServerThread: public Thread
     }  
 
     runned();
-
   }
 
-void wait(unsigned int msInterval)
-{
-    unsigned long waitStart = millis();
-    Serial.print("wait");Serial.println(msInterval);Serial.println(waitStart);
-
-    unsigned long current = millis();
-    while((current - waitStart)< msInterval) 
-    {
-      current = millis();
-      //Serial.print("Current:");Serial.println(current);
-    }; // wait until 
-    
-    Serial.print("done wait");Serial.println(millis());
-}  
-private: JsonObject& constructJSON(const char* msg)
+  void wait(unsigned int msInterval)
   {
-    StaticJsonBuffer<200> _buffer;
+      unsigned long waitStart = millis();
+      Serial.print("wait");Serial.println(msInterval);Serial.println(waitStart);
+  
+      unsigned long current = millis();
+      while((current - waitStart)< msInterval) 
+      {
+        current = millis();
+        //Serial.print("Current:");Serial.println(current);
+      }; // wait until 
+      
+      Serial.print("done wait");Serial.println(millis());
+  }  
+  private: JsonObject& constructPinStatesJSON(const char* msg)
+  {
+    StaticJsonBuffer<400> _buffer;
     JsonObject& _root = _buffer.createObject();
-    _root["ip"] = "192.168.1.100";
     _root["msg"] = msg;
     JsonArray& pinStates = _root.createNestedArray("pinStates");
-    for(byte i=2;i<=7;i++)
+    for(byte i=0;i<=13;i++)
     {
-      //if(i==4) continue;
-      
-      //JsonObject& pinState = pinStates.createNestedObject();
-      //char* key = (char*)_buffer.alloc(3);
-      //sprintf(key, "p%d", i);
-      //pinState[key] = digitalRead(i);
-      //delete[] key;
       pinStates.add(digitalRead(i));
     }
     
     return _root;
   }
-void testWait(EthernetClient& client)
-{
-  client.println("Start");
-  wait(40000);
-  client.println("Stop");
-}
-void pornire(EthernetClient& client)
-{
-  if(!generatorPornit)
+  private: JsonObject& constructPinStateJSON(byte pin, const char* msg)
   {
-    // Tras soc
-    digitalWrite(ActuatorNormal, LOW); // Cuplare
-    digitalWrite(ActuatorInversat, HIGH); // DECUPLARE
-    //client.println("Actuator - PORNIRE INAINTE");
+    StaticJsonBuffer<200> _buffer;
+    JsonObject& _root = _buffer.createObject();
+    _root["msg"] = msg;
+    _root["pin"] = pin;
+    _root["value"] = digitalRead(pin);
     
-    constructJSON("Actuator - PORNIRE INAINTE").printTo(client);
-    wait(500);
-    digitalWrite(ActuatorNormal, HIGH);// DECUPLARE
-    digitalWrite(ActuatorInversat, HIGH);// DECUPLARE
-   
-    constructJSON("Actuator - OPRIT").printTo(client);
-    //client.println("Actuator - OPRIT");
-    wait(2000);
-
-    // Punere contact
-    digitalWrite(ContactGenerator, LOW); //CUPLARE releu = intrerupere circuit contact pentru pornire generator
-    
-    constructJSON("Contact - ON").printTo(client);
-    //client.println("Contact - ON");
-    wait(2000);
-
-    // Contact motor
-    digitalWrite(ContactDemaror12V, HIGH); // CUPLARE
-    //client.println("ContactDemaror12V - PORNIRE");
-    wait(4000);
-    digitalWrite(ContactDemaror12V, LOW); // DECUPLARE
-    //client.println("ContactDemaror12V - OPRIRE");
-    wait(2000);
-
-    // Scoatere soc
-    digitalWrite(ActuatorNormal, HIGH); // DECUPLARE
-    digitalWrite(ActuatorInversat, LOW); // CUPLARE 
-    //client.println("Actuator - PORNIRE INAPOI");
-    wait(500);
-    digitalWrite(ActuatorNormal, HIGH); // DECUPLARE
-    digitalWrite(ActuatorInversat, HIGH); // DECUPLARE
-    //client.println("Actuator - OPRIT");
-
-    //TODO: Testare prezenta curent 220 - trebuie consumator pe priza
-    // In cazul in care nu este curent se initiaza procedura de inchidere generator
-
-    // Cuplare priza 220V iesire
-    wait(2000);
-    digitalWrite(ContactRetea220V, LOW); // CUPLARE
-    //client.println("ContactRetea220V - PORNIRE");    
+    return _root;
   }
-
-  generatorPornit = true;
-  client.println("GENERATOR - PORNIT !!!");
-}
-
-void oprire(EthernetClient& client)
-{
-    digitalWrite(ContactRetea220V, HIGH); //DECUPLARE
-    client.println("ContactRetea220V - OPRIT");
-    wait(2000);
+  private: JsonObject& constructPinStateJSON(byte pin)
+  {
+    StaticJsonBuffer<200> _buffer;
+    JsonObject& _root = _buffer.createObject();
+    _root["pin"] = pin;
+    _root["value"] = digitalRead(pin);
     
-    // Punere contact
-    digitalWrite(ContactGenerator, HIGH); //DECUPLARE releu = inchidere circuit contact pentru oprire generator
-    client.println("Contact - OFF");
-    wait(2000);
-    client.println("ContactGenerator - OPRIT");
+    return _root;
+  }
+  private: JsonObject& constructFctStateJSON(byte state, const char* msg)
+  {
+    StaticJsonBuffer<200> _buffer;
+    JsonObject& _root = _buffer.createObject();
+    _root["msg"] = msg;
+    _root["fctState"] = state;
+    
+    return _root;
+  }
+  void sendToServer(JsonObject& json, EthernetClient& client)
+  {
+    json.printTo(client);
+    client.println();
 
-    generatorPornit = false;
-    client.println("GENERATOR - OPRIT !!!");
+    json.printTo(Serial);
+    Serial.println();
+  }
+  private: void setPin(byte pin, byte state, EthernetClient& client)
+  {
+    digitalWrite(pin, state);
+    if(client.connected())
+    {
+      sendToServer(constructPinStateJSON(pin), client);
+    }
+  }
+  private: void setPinTemp(byte pin, byte state, unsigned int interval, EthernetClient& client)
+  {
+    if(client.connected())
+    {
+      sendToServer(constructPinStateJSON(pin), client);
+    }
+    
+    byte state1 = digitalRead(pin);
+    digitalWrite(pin, state);
+    wait(interval);
+    digitalWrite(pin, state1);
+    
+    if(client.connected())
+    {
+      sendToServer(constructPinStateJSON(pin), client);
+    }
+  }
+  void testWait(EthernetClient& client)
+  {
+    client.println("Start");
+    wait(40000);
+    client.println("Stop");
+  }
+  void generatorON(EthernetClient& client)
+  {
+    if(OnOffGeneratorState==0) //Only if it's OFF
+    {
+      // Tras soc
+      sendToServer(constructPinStatesJSON("Soc->ON"),client);
+      setPinTemp(ActuatorNormal, LOW, 500, client);
+      sendToServer(constructPinStatesJSON("Soc=ON"),client);
+      wait(1000);
+  
+        // Punere contact
+        sendToServer(constructPinStatesJSON("Contact->ON,Starter->ONOFF,Soc->OFF"),client);
+        setPin(ContactGenerator, LOW, client);//CUPLARE releu = intrerupere circuit contact pentru pornire generator
+        sendToServer(constructPinStatesJSON("Contact=ON"),client);
+        
+        wait(1000);
+    
+        // Contact motor - for 2 seconds
+        setPinTemp(ContactDemaror12V, HIGH, 2000, client);
+        
+      // Scoatere soc
+      setPinTemp(ActuatorInversat, LOW, 500, client);
+      sendToServer(constructPinStatesJSON("Starter=OFF"),client);
+      sendToServer(constructPinStatesJSON("Soc=OFF"),client);
+  
+      //TODO: Testare prezenta curent 220 - trebuie consumator pe priza
+      // In cazul in care nu este curent se initiaza procedura de inchidere generator
+  
+      // Cuplare priza 220V iesire
+      wait(2000);
+      sendToServer(constructPinStatesJSON("220->ON"),client);   
+      setPin(ContactRetea220V, LOW, client); // CUPLARE
+      sendToServer(constructPinStatesJSON("220=ON"),client);    
 
-}
+      OnOffGeneratorState = 1;
+      sendToServer(constructFctStateJSON(OnOffGeneratorState, "Generator=ON"),client);
+    }
+  
+  }
+  
+  void generatorOFF(EthernetClient& client)
+  {
+      sendToServer(constructPinStatesJSON("220->OFF"),client);
+      setPin(ContactRetea220V, HIGH, client);//DECUPLARE
+      sendToServer(constructPinStatesJSON("220=OFF"),client);  
+      wait(2000);
+      
+      // Oprire contact
+      sendToServer(constructPinStatesJSON("Contact->OFF"),client);
+      setPin(ContactGenerator, HIGH, client);//DECUPLARE releu = inchidere circuit contact pentru oprire generator
+      sendToServer(constructPinStatesJSON("Contact=OFF"),client);
+      
+      OnOffGeneratorState = 0;
+      sendToServer(constructFctStateJSON(OnOffGeneratorState, "Generator=OFF"),client);
+  }
 };
-
-void starterTimerCallback(){
-  threadsController.run();
-  //Timer1.stop();
-}
 
 void setupTcpServerThread()
 {
@@ -374,9 +403,9 @@ void setupTcpServerThread()
   tcpServerThread.setInterval(1000); // in ms
   threadsController.add(&tcpServerThread);
 
-  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
-  monitorTcpClientThread.setInterval(500); // in ms
-  threadsController.add(&monitorTcpClientThread);
+//  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
+//  monitorTcpClientThread.setInterval(500); // in ms
+//  threadsController.add(&monitorTcpClientThread);
 }
 
 void setup() {
@@ -400,17 +429,12 @@ void setup() {
   delay(1000);
   
   setupTcpServerThread();
-  // Do not start with Timer - it breaks the millis function
-  //startThreadsController();
+  
 }
-boolean threadsStarted=0;
+
 void loop() {
-  if(!threadsStarted)
-  {
-    
-    threadsStarted = 1;
-  }
-  delay(500);
+  
+    delay(500);
     //Start the Thread in loop
     threadsController.run();
     delay(500);

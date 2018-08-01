@@ -1,8 +1,8 @@
 package com.gmail.raducaz.arduinomate.service;
 
+import android.util.Log;
+
 import com.gmail.raducaz.arduinomate.DataRepository;
-import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
-import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 
@@ -14,6 +14,8 @@ import io.netty.channel.ChannelHandlerContext;
  * the server.
  */
 public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler {
+
+    private String TAG = "FunctionChannelClientInboundHandler";
 
     private DataRepository mRepository;
 
@@ -38,47 +40,45 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
         this(function, functionExecution, repository, (long) 30);
     }
 
-    private void insertExecutionLog(String msg)
-    {
-        ExecutionLogEntity log = new ExecutionLogEntity();
-        log.setExecutionId(functionExecution.getId());
-        log.setLog(msg);
-        log.setDate(DateConverter.toDate(System.currentTimeMillis()));
-        long logId = mRepository.insertExecutionLog(log);
-    }
-    private void updateFunctionExecution(int state)
-    {
-        functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
-        functionExecution.setState(state);
-        mRepository.updateFunctionExecution(functionExecution);
-    }
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
 
         String functionText = function.getName();
         channelActive(ctx, functionText);
-        insertExecutionLog("Execution start...");
+
+        FunctionStateUpdater fu = new FunctionStateUpdater(mRepository, functionExecution);
+        fu.insertExecutionLog("Command received by device");
 
         super.channelActive(ctx);
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, String msg) {
+    public void channelRead(ChannelHandlerContext ctx, String msg) throws Exception {
 
-        if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
-            insertExecutionLog("Execution end.");
-            updateFunctionExecution(1); // Success
+        try {
+            FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(mRepository, msg, functionExecution);
+
+            if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
+                // This will automatically set the Execution Log as well
+                functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // Success
+            } else {
+                DeviceStateUpdater deviceStateUpdater = new DeviceStateUpdater(mRepository, msg, function.getDeviceId());
+                deviceStateUpdater.updatePinStates();
+
+                functionStateUpdater.insertExecutionLog();
+            }
+
+            // Don't want to confirm to server that client received the message
+            //ctx.write(msg);
+
+            super.channelRead(ctx, msg);
         }
-        else
+        catch (Exception exc)
         {
-            insertExecutionLog(msg);
+            // TODO: handle exceptions by logging them at application level log
+            Log.e(TAG, exc.getMessage());
+            throw exc;
         }
-
-        // Don't want to confirm to server that client received the message
-        //ctx.write(msg);
-
-        super.channelRead(ctx, msg);
     }
 
     @Override
@@ -89,15 +89,17 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
 
     public void onResponseTimeout()
     {
-        insertExecutionLog("Response timeout.");
-        updateFunctionExecution(-1); // Error
+        FunctionStateUpdater fu = new FunctionStateUpdater(mRepository, functionExecution);
+        fu.insertExecutionLog("Response timeout");
+        fu.updateFunctionExecution(FunctionCallStateEnum.ERROR); // Error
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 
-        insertExecutionLog(cause.getStackTrace().toString());
-        updateFunctionExecution(-1); // Error
+        FunctionStateUpdater fu = new FunctionStateUpdater(mRepository, functionExecution);
+        fu.insertExecutionLog(cause.getStackTrace().toString());
+        fu.updateFunctionExecution(FunctionCallStateEnum.ERROR); // Error
 
         super.exceptionCaught(ctx, cause);
     }

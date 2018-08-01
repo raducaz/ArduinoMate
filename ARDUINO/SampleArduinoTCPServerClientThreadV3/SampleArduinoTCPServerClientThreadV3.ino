@@ -237,7 +237,7 @@ class MyTcpServerThread: public Thread
       client.stop();
       Serial.println("END LOOP");
 
-      delete[] receivedText;
+      //delete[] receivedText;
   
     }
     else

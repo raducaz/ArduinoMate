@@ -122,6 +122,10 @@ public class DataRepository {
     public LiveData<FunctionExecutionEntity> loadLastFunctionExecution(final long functionId) {
         return mDatabase.functionExecutionDao().loadLastFunctionExecution(functionId);
     }
+
+    public void deleteFunctionExecutions(final long functionId) {
+        mDatabase.functionExecutionDao().deleteFunctionExecution(functionId);
+    }
     public long insertFunctionExecution(FunctionExecutionEntity execution) {
         return mDatabase.functionExecutionDao().insert(execution);
     }
@@ -139,6 +143,9 @@ public class DataRepository {
     }
     public void updateExecutionLog(ExecutionLogEntity log) {
         mDatabase.executionLogDao().update(log);
+    }
+    public void deleteExecutionLogs(final long functionId) {
+        mDatabase.executionLogDao().deleteFunctionExecutionLogs(functionId);
     }
     //endregion ExecutionLog
 

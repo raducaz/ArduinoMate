@@ -30,5 +30,12 @@ public interface ExecutionLogDao {
 
     @Query("SELECT * FROM executionLog where executionId = :executionId")
     List<ExecutionLogEntity> loadExecutionLogsSync(long executionId);
+
+    @Query("DELETE FROM executionLog " +
+            "WHERE executionId IN (" +
+            "SELECT executionId FROM functionExecution " +
+            "WHERE functionId = :functionId" +
+            ")")
+    void deleteFunctionExecutionLogs(long functionId);
 }
 

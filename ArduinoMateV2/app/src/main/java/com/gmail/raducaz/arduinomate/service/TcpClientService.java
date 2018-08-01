@@ -110,7 +110,7 @@ public class TcpClientService implements Callable<Void> {
                             @Override
                             public void initChannel(SocketChannel ch) throws Exception {
                                 ChannelPipeline p = ch.pipeline();
-                                p.addLast( new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
+                                p.addLast( new DelimiterBasedFrameDecoder(65536, Delimiters.lineDelimiter()));
                                 p.addLast(DECODER);
                                 p.addLast(ENCODER);
                                 p.addLast(tcpInboundHandler);

@@ -23,7 +23,8 @@ public class FunctionExecutionEntity implements FunctionExecution {
     private long id;
     private long functionId;
     private String name;
-    private int state;
+    private int callState;
+    private int resultState;
     private Date startDate;
     private Date endDate;
 
@@ -52,11 +53,19 @@ public class FunctionExecutionEntity implements FunctionExecution {
     }
 
     @Override
-    public int getState() {
-        return state;
+    public int getCallState() {
+        return callState;
     }
-    public void setState(int state) {
-        this.state = state;
+    public void setCallState(int callState) {
+        this.callState = callState;
+    }
+
+    @Override
+    public int getResultState() {
+        return callState;
+    }
+    public void setResultState(int resultState) {
+        this.resultState = resultState;
     }
 
     @Override
@@ -78,11 +87,12 @@ public class FunctionExecutionEntity implements FunctionExecution {
     public FunctionExecutionEntity() {
     }
 
-    public FunctionExecutionEntity(long id, long functionId, String name, int state, Date startDate, Date endDate) {
+    public FunctionExecutionEntity(long id, long functionId, String name, int callState, int resultState, Date startDate, Date endDate) {
         this.id = id;
         this.functionId = functionId;
         this.name = name;
-        this.state = state;
+        this.callState = callState;
+        this.resultState = resultState;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -91,7 +101,8 @@ public class FunctionExecutionEntity implements FunctionExecution {
         this.id = execution.getId();
         this.functionId = execution.getFunctionId();
         this.name = execution.getName();
-        this.state = execution.getState();
+        this.callState = execution.getCallState();
+        this.resultState = execution.getResultState();
         this.startDate = execution.getStartDate();
         this.endDate = execution.getEndDate();
     }

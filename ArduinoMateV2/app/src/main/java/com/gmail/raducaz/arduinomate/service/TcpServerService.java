@@ -38,7 +38,7 @@ public class TcpServerService implements Runnable {
     private DataRepository dataRepository;
 
     static final boolean SSL = System.getProperty("ssl") != null;
-    static final String HOST = System.getProperty("host", "192.168.11.99");
+    static final String HOST = System.getProperty("host", "192.168.11.99");//Not used
     static final int PORT = Integer.parseInt(System.getProperty("port", "9090"));
     static final int SIZE = Integer.parseInt(System.getProperty("size", "256"));
     // Configure SSL.

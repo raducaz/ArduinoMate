@@ -21,9 +21,10 @@
             android:fitsSystemWindows="true"
             android:theme="@style/ThemeOverlay.AppCompat.Dark"
             app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginEnd="@dimen/article_keylines"
-            app:expandedTitleMarginStart="@dimen/md_keylines"
+
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            <!--app:expandedTitleMarginEnd="@dimen/article_keylines"-->
+            <!--app:expandedTitleMarginStart="@dimen/md_keylines"-->
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -39,6 +40,15 @@
                 android:orientation="vertical">
             </FrameLayout>
 
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/addButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|top"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginRight="@dimen/md_keylines"
+                app:srcCompat="@drawable/ic_check_mark"
+                android:tint="@color/white"/>
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>

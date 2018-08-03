@@ -10,5 +10,7 @@ public interface FunctionExecution {
     Date getStartDate();
     Date getEndDate();
     int getCallState();
+    String getCallStateText();
     int getResultState();
+    String getResultStateText();
 }

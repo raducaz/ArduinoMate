@@ -27,7 +27,6 @@ public class FunctionViewModel extends AndroidViewModel {
     public ObservableField<FunctionEntity> function = new ObservableField<>();
     public ObservableField<FunctionExecutionEntity> functionExecution = new ObservableField<>();
 
-
     private final long mFunctionId;
     public long deviceId;
     public String functionName;

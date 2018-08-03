@@ -28,7 +28,7 @@ public class FragmentFunctionList extends Fragment {
 
     private AdapterFunctionList mFunctionAdapter;
 
-    private RecyclerViewBinding mBinding;
+    public RecyclerViewBinding mBinding;
 
     @Nullable
     @Override
@@ -77,6 +77,7 @@ public class FragmentFunctionList extends Fragment {
                 Context context = getContext();
                 Intent intent = new Intent(context, ActivityDetail.class);
                 intent.putExtra(ActivityDetail.EXTRA_ID, function.getId());
+                intent.putExtra(ActivityDetail.EXTRA_NAME, function.getName());
                 context.startActivity(intent);
             }
         }

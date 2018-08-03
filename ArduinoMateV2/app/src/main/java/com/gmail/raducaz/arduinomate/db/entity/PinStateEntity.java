@@ -4,7 +4,9 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.icu.util.TimeUnit;
 
+import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
 import com.gmail.raducaz.arduinomate.model.FunctionState;
 import com.gmail.raducaz.arduinomate.model.PinState;
 
@@ -27,6 +29,7 @@ public class PinStateEntity implements PinState {
     private double state;
     private Date fromDate;
     private Date toDate;
+    private Date lastUpdate;
 
     @Override
     public long getId() {
@@ -78,6 +81,26 @@ public class PinStateEntity implements PinState {
     }
     public void setToDate(Date toDate) {
         this.toDate = toDate;
+    }
+
+    @Override
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    @Override
+    public int getSecondsFromLastUpdate() {
+        Date now = DateConverter.toDate(System.currentTimeMillis());
+        long diffInMillies = now.getTime() - lastUpdate.getTime();
+        return Math.round(diffInMillies/1000);
+    }
+    @Override
+    public String getSecondsFromLastUpdateText() {
+        long s = getSecondsFromLastUpdate();
+        return String.valueOf(s>100?">100":s);
     }
 
     public PinStateEntity() {

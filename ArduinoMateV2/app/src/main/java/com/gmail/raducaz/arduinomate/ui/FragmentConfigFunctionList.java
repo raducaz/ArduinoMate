@@ -80,6 +80,7 @@ public class FragmentConfigFunctionList extends Fragment {
                     Context context = getContext();
                     Intent intent = new Intent(context, ActivityDetail.class);
                     intent.putExtra(ActivityDetail.EXTRA_ID, function.getId());
+                    intent.putExtra(ActivityDetail.EXTRA_NAME, function.getName());
                     context.startActivity(intent);
                 }
             }

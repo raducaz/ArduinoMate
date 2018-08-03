@@ -11,4 +11,7 @@ public interface PinState {
     String getStateText();
     Date getFromDate();
     Date getToDate();
+    Date getLastUpdate();
+    int getSecondsFromLastUpdate();
+    String getSecondsFromLastUpdateText();
 }

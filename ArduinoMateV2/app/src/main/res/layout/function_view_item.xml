@@ -14,50 +14,75 @@
             android:orientation="horizontal"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginTop="48dp"
+            android:layout_marginTop="64dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
-                android:layout_marginStart="48dp"
-                android:layout_marginEnd="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <Button
+                    android:id="@+id/execute_button"
+                    android:tag="EXECUTE"
+                    android:enabled="@{functionViewModel.functionExecution.callState!=1}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:textColor="?attr/colorPrimary"
+                    android:text="EXECUTE" />
+                <Button
+                    android:id="@+id/reset_button"
+                    android:tag="RESET"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:textColor="?attr/colorPrimary"
+                    android:layout_alignParentRight="true"
+                    android:text="RESET" />
 
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/cd_function_name"
-                android:text="@{functionViewModel.function.name}"/>
+                <TextView
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/execute_button"
+                    android:text="@{functionViewModel.function.description}"/>
 
-            <TextView
-                android:id="@+id/description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/name"
-                android:text="@{functionViewModel.function.description}"/>
-
-            <Button
-                android:id="@+id/execute_button"
-                android:tag="EXECUTE"
-                android:enabled="@{functionViewModel.functionExecution.callState!=1}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/description"
-                style="?android:attr/borderlessButtonStyle"
-                android:textColor="?attr/colorPrimary"
-                android:text="EXECUTE" />
-            <Button
-                android:id="@+id/reset_button"
-                android:tag="RESET"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/description"
-                style="?android:attr/borderlessButtonStyle"
-                android:textColor="?attr/colorPrimary"
-                android:layout_alignParentRight="true"
-                android:text="RESET" />
+                <LinearLayout
+                    android:id="@+id/groupCallState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/description">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:text="Call State:"
+                        />
+                    <TextView
+                        android:id="@+id/callState"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{functionViewModel.functionExecution.callStateText}"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/groupResultState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/groupCallState">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:text="Result State:"
+                        />
+                    <TextView
+                        android:id="@+id/state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{functionViewModel.functionExecution.resultStateText}"/>
+                </LinearLayout>
 
     </RelativeLayout>
 

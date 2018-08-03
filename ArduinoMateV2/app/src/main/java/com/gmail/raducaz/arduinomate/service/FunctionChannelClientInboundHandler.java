@@ -66,6 +66,7 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
                 deviceStateUpdater.updatePinStates();
 
                 functionStateUpdater.insertExecutionLog();
+                functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.EXECUTING); // Success
             }
 
             // Don't want to confirm to server that client received the message
@@ -98,7 +99,7 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 
         FunctionStateUpdater fu = new FunctionStateUpdater(mRepository, functionExecution);
-        fu.insertExecutionLog(cause.getStackTrace().toString());
+        fu.insertExecutionLog(cause);
         fu.updateFunctionExecution(FunctionCallStateEnum.ERROR); // Error
 
         super.exceptionCaught(ctx, cause);

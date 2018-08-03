@@ -53,7 +53,8 @@ public class AdapterPinStateList extends RecyclerView.Adapter<AdapterPinStateLis
                     PinState oldPinState = mPinStateList != null ? mPinStateList.get(oldItemPosition):null;
                     return newPinState.getId() == oldPinState.getId() &&
                             newPinState.getState() == oldPinState.getState() &&
-                            newPinState.getFromDate() == oldPinState.getFromDate();
+                            newPinState.getFromDate() == oldPinState.getFromDate() &&
+                            newPinState.getSecondsFromLastUpdate() == oldPinState.getSecondsFromLastUpdate();
                 }
             });
             mPinStateList = pinStateList;

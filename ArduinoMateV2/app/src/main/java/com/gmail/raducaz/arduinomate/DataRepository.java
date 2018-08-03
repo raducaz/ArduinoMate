@@ -175,6 +175,14 @@ public class DataRepository {
     {
         mDatabase.pinStateDao().updateToDate(id, DateConverter.toDate(System.currentTimeMillis()));
     }
+    public void updatePinStateLastUpdate(long id)
+    {
+        mDatabase.pinStateDao().updateLastUpdate(id, DateConverter.toDate(System.currentTimeMillis()));
+    }
+    public void deletePinStatesByFunction(long functionId)
+    {
+        mDatabase.pinStateDao().deletePinStatesByFunction(functionId);
+    }
     //endregion PinState
 
 }

@@ -33,6 +33,7 @@ public class TaskFunctionReset implements TaskInterface {
     public void execute() {
 
         try {
+            mRepository.deletePinStatesByFunction(function.getId());
             mRepository.deleteFunctionExecutions(function.getId());
             mRepository.deleteExecutionLogs(function.getId());
         } catch (Exception exc) {

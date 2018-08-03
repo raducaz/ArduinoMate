@@ -6,6 +6,8 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.FunctionExecution;
+import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
+import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 import java.util.Date;
 
@@ -59,13 +61,21 @@ public class FunctionExecutionEntity implements FunctionExecution {
     public void setCallState(int callState) {
         this.callState = callState;
     }
+    @Override
+    public String getCallStateText() {
+        return String.valueOf(FunctionCallStateEnum.forInt(callState));
+    }
 
     @Override
     public int getResultState() {
-        return callState;
+        return resultState;
     }
     public void setResultState(int resultState) {
         this.resultState = resultState;
+    }
+    @Override
+    public String getResultStateText() {
+        return String.valueOf(FunctionResultStateEnum.forInt(resultState));
     }
 
     @Override

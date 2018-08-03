@@ -18,8 +18,13 @@
 
 // Enter a MAC address and IP address for your controller below.
 byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
-IPAddress ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
-byte serverIp[] = { 192, 168, 1, 99 };
+IPAddress            ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
+const char myIp[15]  = "192.168.1.100";
+byte serverIp[] = { 192, 168, 1, 168 };
+
+
+/*Pins 0,1 are used by Serial cmyIpommunication via USB*/
+/*Pins 10,11,12,13 are user by Etherne Shield */
 
 const int ContactGenerator = 2; // controleaza releul pentru contact generator (default CUPLAT - trebuie DECUPLAT pentru functionare)
 const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
@@ -31,6 +36,7 @@ const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator 
 const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
 
 byte OnOffGeneratorState = 0; // 0=OFF,1=ON,2=Error
+byte OnOffPrizaState = 0; // 0=OFF,1=ON,2=Error
 byte deviceState = 0;
 
 ThreadController threadsController = ThreadController();
@@ -89,10 +95,10 @@ class MyMonitorTcpClientThread: public Thread
   {
     StaticJsonBuffer<200> _buffer;
     JsonObject& _root = _buffer.createObject();
-    _root["ip"] = "192.168.1.100";
+    _root["ip"] = myIp;
     _root["state"] = deviceState;
     JsonArray& pinStates = _root.createNestedArray("pinStates");
-    for(byte i=0;i<=13;i++)
+    for(byte i=0;i<10;i++)
     {
       pinStates.add(digitalRead(i));
     }
@@ -200,15 +206,18 @@ class MyTcpServerThread: public Thread
               { //TODO: reset device state
               }
             }
-            else if(strcmp(receivedText,"MonitorFct")==0)
+            else if(strcmp(receivedText,"OnOffPriza")==0)
             {
-              // DO nothing ... 
+              if(OnOffPrizaState==0)
+              {
+                onPriza(client);
+              }
+              else
+              {
+                offPriza(client);
+              }
             }
-            else if(strcmp(receivedText,"TestWaitFct")==0)
-            {
-              testWait(client);
-            }
-
+            
             // End communication with client - for any function
             client.println("END");
             
@@ -265,7 +274,7 @@ class MyTcpServerThread: public Thread
     JsonObject& _root = _buffer.createObject();
     _root["msg"] = msg;
     JsonArray& pinStates = _root.createNestedArray("pinStates");
-    for(byte i=0;i<=13;i++)
+    for(byte i=0;i<10;i++)
     {
       pinStates.add(digitalRead(i));
     }
@@ -365,13 +374,7 @@ class MyTcpServerThread: public Thread
       sendToServer(constructPinStatesJSON("Soc=OFF"),client);
   
       //TODO: Testare prezenta curent 220 - trebuie consumator pe priza
-      // In cazul in care nu este curent se initiaza procedura de inchidere generator
-  
-      // Cuplare priza 220V iesire
-      wait(2000);
-      sendToServer(constructPinStatesJSON("220->ON"),client);   
-      setPin(ContactRetea220V, LOW, client); // CUPLARE
-      sendToServer(constructPinStatesJSON("220=ON"),client);    
+      // In cazul in care nu este curent se initiaza procedura de inchidere generator  
 
       OnOffGeneratorState = 1;
       sendToServer(constructFctStateJSON(OnOffGeneratorState, "Generator=ON"),client);
@@ -394,6 +397,33 @@ class MyTcpServerThread: public Thread
       OnOffGeneratorState = 0;
       sendToServer(constructFctStateJSON(OnOffGeneratorState, "Generator=OFF"),client);
   }
+
+  void onPriza(EthernetClient& client)
+  {
+    if(OnOffGeneratorState==1)
+    {
+      // Cuplare priza 220V iesire
+      sendToServer(constructPinStatesJSON("220->ON"),client);   
+      setPin(ContactRetea220V, LOW, client); // CUPLARE
+      sendToServer(constructPinStatesJSON("220=ON"),client); 
+
+      OnOffPrizaState = 1;
+      sendToServer(constructFctStateJSON(OnOffPrizaState, "Priza220=ON"),client);
+    } else
+    {
+      OnOffPrizaState = 0;
+      sendToServer(constructFctStateJSON(OnOffPrizaState, "Priza220=OFF because generator OFF"),client);
+    }
+  }
+  void offPriza(EthernetClient& client)
+  {
+    sendToServer(constructPinStatesJSON("220->OFF"),client);
+    setPin(ContactRetea220V, HIGH, client);//DECUPLARE
+    sendToServer(constructPinStatesJSON("220=OFF"),client);  
+
+    OnOffPrizaState = 0;
+    sendToServer(constructFctStateJSON(OnOffPrizaState, "Priza220=OFF"),client);
+  }
 };
 
 void setupTcpServerThread()
@@ -403,9 +433,9 @@ void setupTcpServerThread()
   tcpServerThread.setInterval(1000); // in ms
   threadsController.add(&tcpServerThread);
 
-//  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
-//  monitorTcpClientThread.setInterval(500); // in ms
-//  threadsController.add(&monitorTcpClientThread);
+  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
+  monitorTcpClientThread.setInterval(500); // in ms
+  threadsController.add(&monitorTcpClientThread);
 }
 
 void setup() {

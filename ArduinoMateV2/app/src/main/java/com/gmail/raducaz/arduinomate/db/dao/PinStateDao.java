@@ -26,10 +26,17 @@ public interface PinStateDao {
 
     @Query(
             "UPDATE pinState SET " +
-                    "toDate = :toDate " +
+                    "toDate = :toDate, " +
+                    "lastUpdate = :toDate " +
                     "WHERE id = :id"
     )
     void updateToDate(long id, Date toDate);
+    @Query(
+            "UPDATE pinState SET " +
+                    "lastUpdate = :lastUpdate " +
+                    "WHERE id = :id"
+    )
+    void updateLastUpdate(long id, Date lastUpdate);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(PinStateEntity pinState);
@@ -74,5 +81,11 @@ public interface PinStateDao {
             "LIMIT 1")
     PinStateEntity loadDeviceCurrentPinStateSync(long deviceId, String pinName);
 
+    @Query("DELETE FROM pinState " +
+            "WHERE deviceId IN (" +
+            "SELECT deviceId FROM function " +
+            "WHERE id = :functionId" +
+            ")")
+    void deletePinStatesByFunction(long functionId);
 }
 

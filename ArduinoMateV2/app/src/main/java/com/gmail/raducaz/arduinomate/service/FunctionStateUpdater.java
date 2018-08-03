@@ -57,9 +57,24 @@ public class FunctionStateUpdater {
         log.setDate(DateConverter.toDate(System.currentTimeMillis()));
         return dataRepository.insertExecutionLog(log);
     }
+    public long insertExecutionLog(Exception exc){
+        ExecutionLogEntity log = new ExecutionLogEntity();
+        log.setExecutionId(functionExecution.getId());
+        log.setLog(exc.getMessage() + " " + exc.getStackTrace().toString());
+        log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        return dataRepository.insertExecutionLog(log);
+    }
+    public long insertExecutionLog(Throwable cause){
+        ExecutionLogEntity log = new ExecutionLogEntity();
+        log.setExecutionId(functionExecution.getId());
+        log.setLog(cause.getMessage() + " " + cause.getStackTrace().toString());
+        log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        return dataRepository.insertExecutionLog(log);
+    }
     public long startFunctionExecution(){
         functionExecution.setCallState(FunctionCallStateEnum.EXECUTING.getId());
         functionExecution.setStartDate(DateConverter.toDate(System.currentTimeMillis()));
+        functionExecution.setResultState(FunctionResultStateEnum.NA.getId());
         long executionId = dataRepository.insertFunctionExecution(functionExecution);
         functionExecution.setId(executionId);
 
@@ -71,7 +86,10 @@ public class FunctionStateUpdater {
     public void updateFunctionExecution(FunctionCallStateEnum callState) {
         functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
         functionExecution.setCallState(callState.getId());
-        functionExecution.setResultState(deviceStateInfo.getFunctionState().getId());
+
+        // Some calls to this function doesn't contain a fctState, in this case do not update
+        if(deviceStateInfo.getFunctionState() != FunctionResultStateEnum.NA)
+            functionExecution.setResultState(deviceStateInfo.getFunctionState().getId());
 
         dataRepository.updateFunctionExecution(functionExecution);
 

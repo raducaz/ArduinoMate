@@ -71,6 +71,7 @@ public class DeviceStateUpdater {
             newPinState.setDeviceId(deviceEntity.getId());
             newPinState.setName(pName);
             newPinState.setFromDate(DateConverter.toDate(System.currentTimeMillis()));
+            newPinState.setLastUpdate(DateConverter.toDate(System.currentTimeMillis()));
             newPinState.setState(pState);
             dataRepository.insertPinState(newPinState);
         }
@@ -87,6 +88,7 @@ public class DeviceStateUpdater {
                 Double pState = pinStates.get(pName).doubleValue();
                 if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() == pState) {
                     // Do nothing as the state is the same as the current pin State in the History
+                    dataRepository.updatePinStateLastUpdate(currentPinsState.get(pName).getId());
                 } else {
                     if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() != pState) {
                         // Update history with the date until the state was unchanged

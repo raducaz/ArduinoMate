@@ -21,19 +21,18 @@ public class DataGenerator {
         DeviceEntity device = new DeviceEntity();
         device.setIp("192.168.1.100");
         device.setPort(8080);
-        device.setName("Generator");
-        device.setDescription("Controllerul de pornire/oprire generator si control pompa");
+        device.setName("TEST - Generator");
+        device.setDescription("Controllerul de pornire/oprire generator si control pompa - TEST");
         device.setId(1);
         devices.add(device);
 
         device = new DeviceEntity();
         device.setIp("192.168.1.200");
         device.setPort(8080);
-        device.setName("Prize automate (control bolier)");
-        device.setDescription("Controller de pornire/oprire prize");
+        device.setName("PROD - Generator");
+        device.setDescription("Controllerul de pornire/oprire generator si control pompa - PROD");
         device.setId(2);
         devices.add(device);
-
 
 //        List<ProductEntity> products = new ArrayList<>(FIRST.length * SECOND.length);
 //        Random rnd = new Random();
@@ -55,45 +54,39 @@ public class DataGenerator {
 
         List<FunctionEntity> functions = new ArrayList<>();
 
-        // Device Generator
+        // Device Generator - TEST
         Device device = devices.get(0);
         FunctionEntity function = new FunctionEntity();
         function.setDeviceId(device.getId());
         function.setName("OnOffGenerator");
-        function.setDescription("Start/Stop Generator" + device.getId());
+        function.setDescription("Start/Stop Generator " + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("StateFct");
-        function.setDescription("Send exec steps sync" + device.getId());
+        function.setName("OnOffPriza");
+        function.setDescription("Start/Stop 220V supply" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
+        // Device Generator - TEST
 
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("MonitorFct");
-        function.setDescription("Begins sending states of pins" + device.getId());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("TestWaitFct");
-        function.setDescription("Tests the wait and request timeout problem" + device.getId());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
+        // Device Generator - PROD
         device = devices.get(1);
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("OnOffPump");
-        function.setDescription("Start/Stop Pompa" + device.getId());
+        function.setName("OnOffGenerator");
+        function.setDescription("Start/Stop Generator" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("OnOffPriza");
+        function.setDescription("Start/Stop 220V supply" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

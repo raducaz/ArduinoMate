@@ -72,7 +72,7 @@ public class TaskFunctionCaller implements TaskInterface {
         } catch (Exception exc) {
 
             Log.e(TAG, exc.getMessage());
-
+            functionStateUpdater.insertExecutionLog(exc);
             functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.ERROR);
         }
     }

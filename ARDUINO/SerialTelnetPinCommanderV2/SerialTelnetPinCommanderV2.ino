@@ -183,6 +183,16 @@ class MyTcpServerThread: public Thread
         
       }
     }
+    else if(strncmp(receivedText, "reset", 5)==0){
+     initializePins(); 
+     
+     for(byte i=0;i<=13;i++)
+      {
+        Serial.print(i);Serial.print("=");Serial.println(digitalRead(i));
+        client.print(i);client.print("=");client.println(digitalRead(i));
+        
+      }
+    }
     else if(cmdChar == '=')
     {
       value = atoi(receivedText);
@@ -212,6 +222,9 @@ class MyTcpServerThread: public Thread
     {
       Serial.println("no command");
     }
+
+    // Reset command
+    cmdChar=0;
   }
   void wait(unsigned int msInterval)
   {
@@ -227,6 +240,27 @@ class MyTcpServerThread: public Thread
       
      // Serial.print("done wait");Serial.println(millis());
   } 
+
+  public:static void initializePins()
+  {
+  /*Pins 0,1 are used by Serial cmyIpommunication via USB*/
+  /*Pins 10,11,12,13 are user by Etherne Shield */
+  
+  const int ContactGenerator = 2; // controleaza releul pentru contact generator (default CUPLAT - trebuie DECUPLAT pentru functionare)
+  const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
+  
+  const int ContactDemaror12V = 5; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
+  
+  // Atentie, default Borna rosie = -, Borna neagra = -; Daca se cupleaza ambele relee ambele borne vor fi pe + !!!
+  const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
+  const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
+    
+    digitalWrite(ContactGenerator, HIGH); // Cuplat = contact OFF
+    digitalWrite(ActuatorNormal, HIGH); // Decuplat 
+    digitalWrite(ActuatorInversat, HIGH); // Decuplat
+    digitalWrite(ContactRetea220V, HIGH); // Decuplat
+    digitalWrite(ContactDemaror12V, LOW); // Decuplat
+  }
 };
 
 void setup() {
@@ -246,6 +280,8 @@ void setup() {
   pinMode(11, OUTPUT);
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
+
+MyTcpServerThread::initializePins();
 
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip);

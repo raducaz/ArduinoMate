@@ -23,3 +23,5 @@ const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (de
 	- on = 0
 	- off = 1
 
+--test commit to git
+

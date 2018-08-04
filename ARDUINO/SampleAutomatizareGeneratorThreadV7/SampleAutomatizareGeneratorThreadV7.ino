@@ -226,7 +226,7 @@ class MyTcpServerThread: public Thread
           else
           {
             size_t len = strlen(receivedText);
-            if (len < SIZE)
+            if (len < SIZE-1)
             {
               receivedText[len] = receivedChar;
               receivedText[len + 1] = '\0';

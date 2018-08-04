@@ -1,8 +1,6 @@
 #include <Thread.h>
 #include <ThreadController.h>
 
-#include <TimerOne.h>
-
 #include <Dns.h>
 #include <Ethernet.h>
 #include <EthernetServer.h>
@@ -17,20 +15,9 @@
 
 // Enter a MAC address and IP address for your controller below.
 byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
-IPAddress ip(192,168,11,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
+IPAddress ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
 
 ThreadController threadsController = ThreadController();
-
-void startThreadsController()
-{
-  // Is best practice to start the threadController from a Timer interrupt so we avoid blocking the main thread
-  Timer1.stop();
-
-  Timer1.initialize(500); // in micro second (us)
-  Timer1.attachInterrupt(starterTimerCallback);
-  Timer1.start();
-}
-
 class MyTcpServerThread: public Thread
 {
     EthernetServer server = EthernetServer(8080);

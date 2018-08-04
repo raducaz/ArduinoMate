@@ -393,6 +393,9 @@ class MyTcpServerThread: public Thread
       sendToServer(constructPinStatesJSON("Contact->OFF"),client);
       setPin(ContactGenerator, HIGH, client);//DECUPLARE releu = inchidere circuit contact pentru oprire generator
       sendToServer(constructPinStatesJSON("Contact=OFF"),client);
+
+      // Reset pins to initial state when stop generator
+      initializePins();
       
       OnOffGeneratorState = 0;
       sendToServer(constructFctStateJSON(OnOffGeneratorState, "Generator=OFF"),client);
@@ -424,6 +427,14 @@ class MyTcpServerThread: public Thread
     OnOffPrizaState = 0;
     sendToServer(constructFctStateJSON(OnOffPrizaState, "Priza220=OFF"),client);
   }
+  public:static void initializePins()
+  {  
+    digitalWrite(ContactGenerator, HIGH); // Cuplat = contact OFF
+    digitalWrite(ActuatorNormal, HIGH); // Decuplat 
+    digitalWrite(ActuatorInversat, HIGH); // Decuplat
+    digitalWrite(ContactRetea220V, HIGH); // Decuplat
+    digitalWrite(ContactDemaror12V, LOW); // Decuplat
+  }
 };
 
 void setupTcpServerThread()
@@ -448,11 +459,7 @@ void setup() {
   pinMode(ContactRetea220V, OUTPUT);
   pinMode(ContactDemaror12V, OUTPUT);
   
-  digitalWrite(ContactGenerator, HIGH); // Cuplat = contact OFF
-  digitalWrite(ActuatorNormal, HIGH); // Decuplat 
-  digitalWrite(ActuatorInversat, HIGH); // Decuplat
-  digitalWrite(ContactRetea220V, HIGH); // Decuplat
-  digitalWrite(ContactDemaror12V, LOW); // Decuplat
+  MyTcpServerThread::initializePins();
   
   // start the Ethernet connecti  on and the server:
   Ethernet.begin(mac, ip);

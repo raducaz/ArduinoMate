@@ -13,9 +13,29 @@
 #include <spi4teensy3.h>
 #endif
 
+/*Pins 0,1 are used by Serial cmyIpommunication via USB*/
+/*Pins 10,11,12,13 are user by Etherne Shield */
+
+const int ContactGenerator = 2; // controleaza releul pentru contact generator (default CUPLAT - trebuie DECUPLAT pentru functionare)
+const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
+
+const int ContactDemaror12V = 5; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
+
+// Atentie, default Borna rosie = -, Borna neagra = -; Daca se cupleaza ambele relee ambele borne vor fi pe + !!!
+const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
+const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
+
+byte OnOffGeneratorState = 0; // 0=OFF,1=ON,2=Error
+
 // Enter a MAC address and IP address for your controller below.
+/* TEST */
 byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
 IPAddress ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
+/* TEST */
+/*PROD*/
+//byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x03 };
+//IPAddress ip(192,168,1,200); //<<< ENTER YOUR IP ADDRESS HERE!!!
+/*PROD*/
 
 ThreadController threadsController = ThreadController();
 class MyTcpServerThread: public Thread
@@ -132,7 +152,7 @@ class MyTcpServerThread: public Thread
 
      return false;
   }
-  void setPin(byte pin, int value)
+  void setPin(int pin, int value)
   {
       Serial.print("set pin:");Serial.print(pin);
       Serial.print(" to value:");Serial.println(value);
@@ -142,7 +162,7 @@ class MyTcpServerThread: public Thread
     
       digitalWrite(pin,value);
   }
-  void setPinTmp(byte pin, int value, int ms)
+  void setPinTemp(int pin, int value, int ms)
   {
       byte v = digitalRead(pin);
       
@@ -162,7 +182,7 @@ class MyTcpServerThread: public Thread
       client.print("reverted pin:");client.print(pin);
       client.print(" to value:");client.println(v);
   }
-  void getPin(byte pin)
+  void getPin(int pin)
   {
       Serial.print("pin:");Serial.print(pin);
       Serial.print(" is:");Serial.println(digitalRead(pin));
@@ -193,11 +213,17 @@ class MyTcpServerThread: public Thread
         
       }
     }
+    else if(strncmp(receivedText, "on", 2)==0){
+      generatorON();
+    }
+    else if(strncmp(receivedText, "off", 3)==0){
+      generatorOFF();
+    }
     else if(cmdChar == '=')
     {
       value = atoi(receivedText);
 
-      for(byte i=(pin==-1?0:pin);i<=(pin==-1?13:pin);i++)
+      for(int i=(pin==-1?0:pin);i<=(pin==-1?13:pin);i++)
       {
         setPin(i, value);
       }
@@ -206,14 +232,14 @@ class MyTcpServerThread: public Thread
     {
       value = atoi(receivedText);
     
-      for(byte i=(pin==-1?0:pin);i<=(pin==-1?13:pin);i++)
+      for(int i=(pin==-1?0:pin);i<=(pin==-1?13:pin);i++)
       {
-        setPinTmp(i, value, 500);
+        setPinTemp(i, value, 500);
       }
     }
     else if(cmdChar == '?')
     {
-      for(byte i=(pin==-1?0:pin);i<=(pin==-1?13:pin);i++)
+      for(int i=(pin==-1?0:pin);i<=(pin==-1?13:pin);i++)
       {
         getPin(i);
       }
@@ -240,21 +266,57 @@ class MyTcpServerThread: public Thread
       
      // Serial.print("done wait");Serial.println(millis());
   } 
-
-  public:static void initializePins()
+void generatorON()
   {
-  /*Pins 0,1 are used by Serial cmyIpommunication via USB*/
-  /*Pins 10,11,12,13 are user by Etherne Shield */
+    if(OnOffGeneratorState==0) //Only if it's OFF
+    {
+      // Tras soc
+      client.println("Soc->ON");
+      setPinTemp(ActuatorNormal, LOW, 500);
+      client.println("Soc=ON");
+      wait(1000);
   
-  const int ContactGenerator = 2; // controleaza releul pentru contact generator (default CUPLAT - trebuie DECUPLAT pentru functionare)
-  const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
-  
-  const int ContactDemaror12V = 5; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
-  
-  // Atentie, default Borna rosie = -, Borna neagra = -; Daca se cupleaza ambele relee ambele borne vor fi pe + !!!
-  const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
-  const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
+        // Punere contact
+        client.println("Contact->ON,Starter->ONOFF,Soc->OFF");
+        setPin(ContactGenerator, LOW);//CUPLARE releu = intrerupere circuit contact pentru pornire generator
+        client.println("Contact=ON");
+        
+        wait(1000);
     
+        // Contact motor - for 2 seconds
+        setPinTemp(ContactDemaror12V, HIGH, 2000);
+        
+      // Scoatere soc
+      setPinTemp(ActuatorInversat, LOW, 500);
+      client.println("Starter=OFF");
+      client.println("Soc=OFF");
+  
+      //TODO: Testare prezenta curent 220 - trebuie consumator pe priza
+      // In cazul in care nu este curent se initiaza procedura de inchidere generator  
+
+      OnOffGeneratorState = 1;
+      client.println("Generator=ON");
+    }
+  
+  }
+  
+  void generatorOFF()
+  {
+      client.println("220->OFF");
+      setPin(ContactRetea220V, HIGH);//DECUPLARE
+      client.println("220=OFF");  
+      wait(2000);
+      
+      // Oprire contact
+      client.println("Contact->OFF");
+      setPin(ContactGenerator, HIGH);//DECUPLARE releu = inchidere circuit contact pentru oprire generator
+      client.println("Contact=OFF");
+      
+      OnOffGeneratorState = 0;
+      client.println("Generator=OFF");
+  }
+  public:static void initializePins()
+  {  
     digitalWrite(ContactGenerator, HIGH); // Cuplat = contact OFF
     digitalWrite(ActuatorNormal, HIGH); // Decuplat 
     digitalWrite(ActuatorInversat, HIGH); // Decuplat

@@ -284,7 +284,7 @@ void generatorON()
         wait(1000);
     
         // Contact motor - for 2 seconds
-        setPinTemp(ContactDemaror12V, HIGH, 2000);
+        setPinTemp(ContactDemaror12V, HIGH, 1000);
         
       // Scoatere soc
       setPinTemp(ActuatorInversat, LOW, 500);

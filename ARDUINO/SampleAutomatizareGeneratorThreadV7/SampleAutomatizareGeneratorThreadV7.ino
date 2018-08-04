@@ -17,9 +17,18 @@
 #endif
 
 // Enter a MAC address and IP address for your controller below.
+/* TEST */
 byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
 IPAddress            ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
 const char myIp[15]  = "192.168.1.100";
+/* TEST */
+
+/* PROD */
+//byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x03 };
+//IPAddress            ip(192,168,1,200); //<<< ENTER YOUR IP ADDRESS HERE!!!
+//const char myIp[15]  = "192.168.1.200";
+/* PROD */
+
 byte serverIp[] = { 192, 168, 1, 168 };
 
 

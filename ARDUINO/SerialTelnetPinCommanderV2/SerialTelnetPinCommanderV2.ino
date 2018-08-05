@@ -3,23 +3,22 @@
 #include <Thread.h>
 #include <ThreadController.h>
 
-#include <Dns.h>
 #include <Ethernet.h>
 #include <EthernetServer.h>
-#include <EthernetUdp.h>
 
 // Satisfy IDE, which only needs to see the include statment in the ino.
 #ifdef dobogusinclude
 #include <spi4teensy3.h>
 #endif
 
+bool debug=1;
 /*Pins 0,1 are used by Serial cmyIpommunication via USB*/
 /*Pins 10,11,12,13 are user by Etherne Shield */
 
 const int ContactGenerator = 2; // controleaza releul pentru contact generator (default CUPLAT - trebuie DECUPLAT pentru functionare)
 const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
 
-const int ContactDemaror12V = 5; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
+const int ContactDemaror12V = 8; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
 
 // Atentie, default Borna rosie = -, Borna neagra = -; Daca se cupleaza ambele relee ambele borne vor fi pe + !!!
 const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
@@ -29,12 +28,12 @@ byte OnOffGeneratorState = 0; // 0=OFF,1=ON,2=Error
 
 // Enter a MAC address and IP address for your controller below.
 /* TEST */
-byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
-IPAddress ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
+//byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
+//IPAddress ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
 /* TEST */
 /*PROD*/
-//byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x03 };
-//IPAddress ip(192,168,1,200); //<<< ENTER YOUR IP ADDRESS HERE!!!
+byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x03 };
+IPAddress ip(192,168,1,200); //<<< ENTER YOUR IP ADDRESS HERE!!!
 /*PROD*/
 
 ThreadController threadsController = ThreadController();
@@ -47,32 +46,24 @@ class MyTcpServerThread: public Thread
   int pin = 0;
   
     char endChar = '\n';
-    EthernetServer server = EthernetServer(8080);
     EthernetClient client = EthernetClient();
     
     // Function executed on thread execution
     void run(){
-
+      
+    if(debug) Serial.println("TCP: Start server.");
+    EthernetServer server = EthernetServer(8080);
     server.begin(); 
     client = server.available();
 
-    if (Serial.available()!=0) {             //Wait for user input
-      char receivedChar = Serial.read();
-      Serial.print(receivedChar);
-      
-      if(collectInput(receivedChar)){
-        Serial.println("Exec Serial CMD.");
-        execCmd();
-      }
-      
-    }
-
     if (client) {
+      if(debug) Serial.println("TCP:Client exists.");
       client.println("2=1 to set pin 2 to 1; ls to list all pins; use 2/1 to set pin 2 to 1 for 500ms"); //Prompt User for input
       client.println("Serial commands cannot be sent until end of this session."); //Prompt User for input
       while (client.connected()) {
+        if(debug) Serial.println("TCP: Client connected.");
         if (client.available()) {
-          
+          if(debug) Serial.println("TCP: Client available.");
           char receivedChar = client.read();
 
           if(collectInput(receivedChar)) {
@@ -97,14 +88,25 @@ class MyTcpServerThread: public Thread
 //      Serial.println();
 //      Serial.println("CLOSE CONNECTION"); 
       //client.stop();
-//      Serial.println("END LOOP");
+      if(debug) Serial.println("TCP:END LOOP");
 
     }
     else
     {
       // No client, server not available()
-//      Serial.println("No client, server stopped.");
+      if(debug) Serial.println("TCP:No client, server stopped.");
     }  
+
+    if (Serial.available()!=0) {             //Wait for user input
+      char receivedChar = Serial.read();
+      Serial.print(receivedChar);
+      
+      if(collectInput(receivedChar)){
+        Serial.println("Exec Serial CMD.");
+        execCmd();
+      }
+      
+    }
 
     runned();
   }
@@ -212,6 +214,8 @@ class MyTcpServerThread: public Thread
         client.print(i);client.print("=");client.println(digitalRead(i));
         
       }
+      
+      Ethernet.begin(mac, ip);
     }
     else if(strncmp(receivedText, "on", 2)==0){
       generatorON();
@@ -329,7 +333,7 @@ void setup() {
   Serial.begin(9600);
 
   // OUTPUT PINS
-  pinMode(1, OUTPUT);
+//  pinMode(1, OUTPUT);
   pinMode(2, OUTPUT);
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
@@ -338,10 +342,10 @@ void setup() {
   pinMode(7, OUTPUT);
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
+//  pinMode(10, OUTPUT);
+//  pinMode(11, OUTPUT);
+//  pinMode(12, OUTPUT);
+//  pinMode(13, OUTPUT);
 
 MyTcpServerThread::initializePins();
 
@@ -355,14 +359,17 @@ MyTcpServerThread::initializePins();
 }
 void setupTcpServerThread()
 {
+  if(debug) Serial.println("TCP: Setup server.");
   MyTcpServerThread tcpServerThread = MyTcpServerThread();
   // Set the interval the thread should run in loop
   tcpServerThread.setInterval(1); // in ms
   threadsController.add(&tcpServerThread);
+  if(debug) Serial.println("TCP: End Setup server.");
 }
 
 void loop() {
-
+  if(debug) Serial.println("Enter Loop");
   threadsController.run();
+  if(debug) Serial.println("Exit Loop");
 }
 

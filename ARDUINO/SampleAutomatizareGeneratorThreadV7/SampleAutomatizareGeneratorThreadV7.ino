@@ -3,11 +3,9 @@
 
 #include <ArduinoJson.h>
 
-#include <Dns.h>
 #include <Ethernet.h>
 #include <EthernetClient.h>
 #include <EthernetServer.h>
-#include <EthernetUdp.h>
 
 #include <SPI.h>
 
@@ -22,6 +20,7 @@ byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
 IPAddress            ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
 const char myIp[15]  = "192.168.1.100";
 /* TEST */
+int myPort = 8080;
 
 /* PROD */
 //byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x03 };
@@ -30,6 +29,9 @@ const char myIp[15]  = "192.168.1.100";
 /* PROD */
 
 byte serverIp[] = { 192, 168, 1, 168 };
+int serverPort = 9090;
+byte gateway[] = { 192, 168, 1, 1 };
+byte subnet[] = { 255, 255, 255, 0 };
 
 
 /*Pins 0,1 are used by Serial cmyIpommunication via USB*/
@@ -38,7 +40,7 @@ byte serverIp[] = { 192, 168, 1, 168 };
 const int ContactGenerator = 2; // controleaza releul pentru contact generator (default CUPLAT - trebuie DECUPLAT pentru functionare)
 const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
 
-const int ContactDemaror12V = 5; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
+const int ContactDemaror12V = 8; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
 
 // Atentie, default Borna rosie = -, Borna neagra = -; Daca se cupleaza ambele relee ambele borne vor fi pe + !!!
 const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
@@ -54,50 +56,28 @@ class MyMonitorTcpClientThread: public Thread
 {
   EthernetClient arduinoClient;
   
-  String ReceiveMsgFromServer()
-  {
-    char endChar = '\n';
-    String receivedText = "";
-  
-    if(arduinoClient)
-    {
-      while (arduinoClient.available()) {
-         char receivedChar = arduinoClient.read();
-         Serial.print(receivedChar);
-    
-         if (receivedChar==endChar){
-          //TODO: Check the line received
-          Serial.println(receivedText);
-    
-          // Reset the line received
-          receivedText = "";
-          Serial.println("END");
-          break;
-        }
-        else
-        {
-          receivedText.concat(receivedChar);
-        } 
-       }
-    }
-  
-    return receivedText;
-  }
-  public:boolean ConnectToServer()
+  public:boolean ConnectToServer(byte* ip, int port)
   {
     if(arduinoClient)
     {
-      Serial.println("MON: Stop client.");
+//      Serial.println("MON: Stop client.");
       arduinoClient.stop();
-      delay(1000);
+//      delay(1000);
     }
   
-    Serial.println("MON: Connect client.");
-    if (arduinoClient.connect(serverIp, 9090)) {
-      Serial.println("MON: Client connected.");
+//    Serial.println("MON: Connect client.");
+    if (arduinoClient.connect(ip, port)) {
+      Serial.print("MON: Client connected to ");
+      for(int i=0;i<4;i++){ Serial.print(ip[i]);}
+      Serial.println("");
+      
       return arduinoClient.connected();
     }
-    Serial.println("MON: Client didn't connect.");
+    
+    Serial.println("MON: Client didn't connect to ");
+    for(int i=0;i<4;i++){ Serial.print(ip[i]);}
+    Serial.println("");
+    
     return false;
   }
   private: JsonObject& constructJSON()
@@ -118,7 +98,7 @@ class MyMonitorTcpClientThread: public Thread
   {
     JsonObject& _root = constructJSON();
     
-    Serial.print("MON: Send ");
+//    Serial.print("MON: Send ");
     _root.printTo(Serial);Serial.println("");
      
     if(arduinoClient.connected())
@@ -133,7 +113,7 @@ class MyMonitorTcpClientThread: public Thread
      {
         Serial.println("MON: Client not connected, try connect");
         // Retry once
-        if(ConnectToServer())
+        if(ConnectToServer(serverIp, serverPort))
         {
           Serial.println("MON: Client connected on retry");
           _root.printTo(arduinoClient);
@@ -143,7 +123,14 @@ class MyMonitorTcpClientThread: public Thread
         }
         else
         {
-          Serial.println("MON: Retry connect failed");
+          Serial.println("MON: Retry connect failed.");
+          if(!ConnectToServer(gateway, 80))
+          {
+            Serial.println("MON: Reinitialize.");
+            Ethernet.begin(mac, ip, gateway, subnet);
+          }
+          else
+            arduinoClient.stop();  
           // Failed
           return false;
         }
@@ -154,7 +141,7 @@ class MyMonitorTcpClientThread: public Thread
   // Function executed on thread execution
   void run(){
 
-    Serial.println("MON: exec monitor");
+//    Serial.println("MON: exec monitor");
 
     // If needed the message from server
     //Serial.println(ReceiveMsgFromServer());
@@ -176,97 +163,98 @@ class MyMonitorTcpClientThread: public Thread
 
 class MyTcpServerThread: public Thread
 {
-    EthernetServer server = EthernetServer(8080);
-   
+    EthernetServer server = EthernetServer(myPort);
     // Function executed on thread execution
     void run(){
 
-    server.begin();
-  
-    EthernetClient client = server.available();
-    char endChar = '\n';
-    const byte SIZE = 50;
-    char receivedText[SIZE] = ""; //safe to change char text[] = "" despite char* receivedText="";
+      Serial.println("Restart Server...");
+      server = EthernetServer(myPort);
+      server.begin();
     
-    Serial.println("Server started...listening...");
-    if (client) {
-      while (client.connected()) {
-        if (client.available()) {
-          
-          char receivedChar = client.read();
-          
-          Serial.println(receivedChar);
-  
-          if (receivedChar==endChar)
-          {
-            Serial.print("CMD:");Serial.println(receivedText);
+      EthernetClient client = server.available();
+      char endChar = '\n';
+      const byte SIZE = 50;
+      char receivedText[SIZE] = ""; //safe to change char text[] = "" despite char* receivedText="";
+      
+//      Serial.println("Server started...listening...");
+      if (client) {
+        while (client.connected()) {
+          if (client.available()) {
             
-            if(strcmp(receivedText,"OnOffGenerator")==0)
-            {
-              if(OnOffGeneratorState == 0)
-              {
-                generatorON(client);
-              }
-              else if(OnOffGeneratorState == 1)
-              {
-                generatorOFF(client);
-              }
-              else // if error state
-              { //TODO: reset device state
-              }
-            }
-            else if(strcmp(receivedText,"OnOffPriza")==0)
-            {
-              if(OnOffPrizaState==0)
-              {
-                onPriza(client);
-              }
-              else
-              {
-                offPriza(client);
-              }
-            }
+            char receivedChar = client.read();
             
-            // End communication with client - for any function
-            client.println("END");
-            
-            strcpy(receivedText, "\0");
-          }
-          else
-          {
-            size_t len = strlen(receivedText);
-            if (len < SIZE-1)
+//            Serial.println(receivedChar);
+    
+            if (receivedChar==endChar)
             {
-              receivedText[len] = receivedChar;
-              receivedText[len + 1] = '\0';
+              Serial.print("CMD:");Serial.println(receivedText);
+              
+              if(strcmp(receivedText,"OnOffGenerator")==0)
+              {
+                if(OnOffGeneratorState == 0)
+                {
+                  generatorON(client);
+                }
+                else if(OnOffGeneratorState == 1)
+                {
+                  generatorOFF(client);
+                }
+                else // if error state
+                { //TODO: reset device state
+                }
+              }
+              else if(strcmp(receivedText,"OnOffPriza")==0)
+              {
+                if(OnOffPrizaState==0)
+                {
+                  onPriza(client);
+                }
+                else
+                {
+                  offPriza(client);
+                }
+              }
+              
+              // End communication with client - for any function
+              client.println("END");
+              
+              strcpy(receivedText, "\0");
             }
             else
             {
-              Serial.println("Max received message len riched.");
-            }
+              size_t len = strlen(receivedText);
+              if (len < SIZE-1)
+              {
+                receivedText[len] = receivedChar;
+                receivedText[len + 1] = '\0';
+              }
+              else
+              {
+                Serial.println("Max received message len riched.");
+              }
+            } 
           } 
-        } 
-      }
+        }
+    
+        Serial.println();
+        Serial.println("CLOSE CONNECTION"); 
+        client.stop();
+        //Serial.println("END LOOP");
   
-      Serial.println();
-      Serial.println("CLOSE CONNECTION"); 
-      client.stop();
-      Serial.println("END LOOP");
+      }
+      else
+      {
+        // No client, server not available()
+//        Serial.println("No client, server stopped.");
+      }  
 
-    }
-    else
-    {
-      // No client, server not available()
-      Serial.println("No client, server stopped.");
-    }  
-
-    runned();
+      runned();
   }
 
   void wait(unsigned int msInterval)
   {
       unsigned long waitStart = millis();
-      Serial.print("wait");Serial.println(msInterval);Serial.println(waitStart);
+//      Serial.print("wait");Serial.println(msInterval);Serial.println(waitStart);
   
       unsigned long current = millis();
       while((current - waitStart)< msInterval) 
@@ -275,7 +263,7 @@ class MyTcpServerThread: public Thread
         //Serial.print("Current:");Serial.println(current);
       }; // wait until 
       
-      Serial.print("done wait");Serial.println(millis());
+//      Serial.print("done wait");Serial.println(millis());
   }  
   private: JsonObject& constructPinStatesJSON(const char* msg)
   {
@@ -328,14 +316,12 @@ class MyTcpServerThread: public Thread
   }
   private: void setPin(byte pin, byte state, EthernetClient& client)
   {
+    //Serial.print("Set pin:");Serial.print(pin);Serial.print(" to ");Serial.println(state);
     digitalWrite(pin, state);
-    if(client.connected())
-    {
-      sendToServer(constructPinStateJSON(pin), client);
-    }
   }
   private: void setPinTemp(byte pin, byte state, unsigned int interval, EthernetClient& client)
   {
+    //Serial.print("Set pin:");Serial.print(pin);Serial.print(" to ");Serial.print(state);Serial.print(" for ");Serial.print(interval);Serial.println(" ms");
     if(client.connected())
     {
       sendToServer(constructPinStateJSON(pin), client);
@@ -345,17 +331,6 @@ class MyTcpServerThread: public Thread
     digitalWrite(pin, state);
     wait(interval);
     digitalWrite(pin, state1);
-    
-    if(client.connected())
-    {
-      sendToServer(constructPinStateJSON(pin), client);
-    }
-  }
-  void testWait(EthernetClient& client)
-  {
-    client.println("Start");
-    wait(40000);
-    client.println("Stop");
   }
   void generatorON(EthernetClient& client)
   {
@@ -460,6 +435,7 @@ void setupTcpServerThread()
 
 void setup() {
   Serial.begin(9600);
+Serial.println("Entering Setup");
 
   // OUTPUT PINS
   pinMode(ContactGenerator, OUTPUT);
@@ -471,7 +447,7 @@ void setup() {
   MyTcpServerThread::initializePins();
   
   // start the Ethernet connecti  on and the server:
-  Ethernet.begin(mac, ip);
+  Ethernet.begin(mac, ip, gateway, subnet);
   delay(1000);
   
   setupTcpServerThread();

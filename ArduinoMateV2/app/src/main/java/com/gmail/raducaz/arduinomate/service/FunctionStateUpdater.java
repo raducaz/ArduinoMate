@@ -10,6 +10,8 @@ import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.Function;
 import com.gmail.raducaz.arduinomate.model.FunctionExecution;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +20,38 @@ public class FunctionStateUpdater {
     DataRepository dataRepository;
     DeviceStateInfo deviceStateInfo;
 
+    JSONObject _messageData = null;
+    String _messageRaw = null;
+
     FunctionExecutionEntity functionExecution;
 
     public FunctionStateUpdater(DataRepository dataRepository, FunctionExecutionEntity functionExecution) {
         this.dataRepository = dataRepository;
         this.functionExecution = functionExecution;
         this.deviceStateInfo = new DeviceStateInfo(null);
+    }
+    public FunctionStateUpdater(DataRepository dataRepository, String msg) {
+        this.dataRepository = dataRepository;
+        this.deviceStateInfo = new DeviceStateInfo(msg);
+
+        String fctName = deviceStateInfo.getFunctionName();
+        String devIp = deviceStateInfo.getDeviceIp();
+        if(devIp != null && fctName != null) {
+            DeviceEntity deviceEntity = this.dataRepository.loadDeviceSync(devIp);
+            if(deviceEntity != null) {
+                FunctionEntity functionEntity = this.dataRepository.loadFunctionSync(deviceEntity.getId(), fctName);
+
+                if(functionEntity != null) {
+                    this.functionExecution = this.dataRepository.loadLastUnfinishedFunctionExecution(functionEntity.getId());
+                    if (functionExecution == null) {
+                        functionExecution = new FunctionExecutionEntity();
+                        functionExecution.setFunctionId(functionEntity.getId());
+                        functionExecution.setName(functionEntity.getName());
+                        this.startFunctionExecution();
+                    }
+                }
+            }
+        }
     }
 
     public FunctionStateUpdater(DataRepository dataRepository, String msg, FunctionExecutionEntity functionExecution) {
@@ -51,6 +79,9 @@ public class FunctionStateUpdater {
     }
 
     public long insertExecutionLog(String msg){
+        if(functionExecution == null)
+            return -1;
+
         ExecutionLogEntity log = new ExecutionLogEntity();
         log.setExecutionId(functionExecution.getId());
         log.setLog(msg);
@@ -58,6 +89,9 @@ public class FunctionStateUpdater {
         return dataRepository.insertExecutionLog(log);
     }
     public long insertExecutionLog(Exception exc){
+        if(functionExecution == null)
+            return -1;
+
         ExecutionLogEntity log = new ExecutionLogEntity();
         log.setExecutionId(functionExecution.getId());
         log.setLog(exc.getMessage() + " " + exc.getStackTrace().toString());
@@ -65,6 +99,9 @@ public class FunctionStateUpdater {
         return dataRepository.insertExecutionLog(log);
     }
     public long insertExecutionLog(Throwable cause){
+        if(functionExecution == null)
+            return -1;
+
         ExecutionLogEntity log = new ExecutionLogEntity();
         log.setExecutionId(functionExecution.getId());
         log.setLog(cause.getMessage() + " " + cause.getStackTrace().toString());
@@ -72,6 +109,9 @@ public class FunctionStateUpdater {
         return dataRepository.insertExecutionLog(log);
     }
     public long startFunctionExecution(){
+        if(functionExecution == null)
+            return -1;
+
         functionExecution.setCallState(FunctionCallStateEnum.EXECUTING.getId());
         functionExecution.setStartDate(DateConverter.toDate(System.currentTimeMillis()));
         functionExecution.setResultState(FunctionResultStateEnum.NA.getId());
@@ -83,21 +123,26 @@ public class FunctionStateUpdater {
 
         return executionId;
     }
-    public void updateFunctionExecution(FunctionCallStateEnum callState) {
-        functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
+    public FunctionExecutionEntity updateFunctionExecution(FunctionCallStateEnum callState) {
+        if(functionExecution == null)
+            return null;
+
         functionExecution.setCallState(callState.getId());
 
         // Some calls to this function doesn't contain a fctState, in this case do not update
         if(deviceStateInfo.getFunctionState() != FunctionResultStateEnum.NA)
             functionExecution.setResultState(deviceStateInfo.getFunctionState().getId());
 
-        dataRepository.updateFunctionExecution(functionExecution);
-
         if (callState.equals(FunctionCallStateEnum.READY)) {
+            functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
             insertExecutionLog("Execution completed");
         }
         if (callState.equals(FunctionCallStateEnum.ERROR)) {
+            functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
             insertExecutionLog("Execution failed");
         }
+        dataRepository.updateFunctionExecution(functionExecution);
+
+        return  functionExecution;
     }
 }

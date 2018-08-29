@@ -14,4 +14,9 @@ public interface Function {
     String getLog();
     void setLog(String log);
     Date getDateSample();
+
+    int getResultState();
+    String getResultStateText();
+    int getCallState();
+    String getCallStateText();
 }

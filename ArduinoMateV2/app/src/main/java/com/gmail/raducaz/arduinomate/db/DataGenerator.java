@@ -58,7 +58,7 @@ public class DataGenerator {
         Device device = devices.get(0);
         FunctionEntity function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("OnOffGenerator");
+        function.setName("GeneratorOnOff");
         function.setDescription("Start/Stop Generator " + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
@@ -66,8 +66,16 @@ public class DataGenerator {
 
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("OnOffPriza");
+        function.setName("PowerOnOff");
         function.setDescription("Start/Stop 220V supply" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("PowerAutoEnableDisable");
+        function.setDescription("Enable/Disable 220V supply" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
@@ -77,7 +85,7 @@ public class DataGenerator {
         device = devices.get(1);
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("OnOffGenerator");
+        function.setName("GeneratorOnOff");
         function.setDescription("Start/Stop Generator" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
@@ -85,8 +93,16 @@ public class DataGenerator {
 
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("OnOffPriza");
+        function.setName("PowerOnOff");
         function.setDescription("Start/Stop 220V supply" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("PowerAutoEnableDisable");
+        function.setDescription("Enable/Disable 220V supply" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

@@ -21,10 +21,18 @@ public interface FunctionDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(FunctionEntity function);
 
+    @Query(
+            "UPDATE function SET " +
+                    "callState = :callState," +
+                    "resultState = :resultState " +
+                    "WHERE id = :id"
+    )
+    void updateStates(long id, int callState, int resultState);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(FunctionEntity function);
 
-    @Query("SELECT * FROM function")
+    @Query("SELECT * FROM function ")
     LiveData<List<FunctionEntity>> loadAllFunctions();
 
     @Query("SELECT * FROM function where deviceId = :deviceId")
@@ -41,5 +49,8 @@ public interface FunctionDao {
 
     @Query("select * from function where id = :functionId")
     FunctionEntity loadFunctionSync(long functionId);
+
+    @Query("select * from function where deviceId = :deviceId and name = :functionName")
+    FunctionEntity loadFunctionSync(long deviceId, String functionName);
 }
 

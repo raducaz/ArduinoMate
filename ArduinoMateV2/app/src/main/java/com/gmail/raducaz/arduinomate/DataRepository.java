@@ -106,6 +106,9 @@ public class DataRepository {
     public FunctionEntity loadFunctionSync(final long functionId) {
         return mDatabase.functionDao().loadFunctionSync(functionId);
     }
+    public FunctionEntity loadFunctionSync(final long deviceId, final String functionName) {
+        return mDatabase.functionDao().loadFunctionSync(deviceId, functionName);
+    }
     public void insertFunction(FunctionEntity function) {
         mDatabase.functionDao().insert(function);
     }
@@ -122,6 +125,9 @@ public class DataRepository {
     public LiveData<FunctionExecutionEntity> loadLastFunctionExecution(final long functionId) {
         return mDatabase.functionExecutionDao().loadLastFunctionExecution(functionId);
     }
+    public FunctionExecutionEntity loadLastUnfinishedFunctionExecution(final long functionId) {
+        return mDatabase.functionExecutionDao().loadLastUnfinishedFunctionExecutionSync(functionId);
+    }
 
     public void deleteFunctionExecutions(final long functionId) {
         mDatabase.functionExecutionDao().deleteFunctionExecution(functionId);
@@ -130,6 +136,12 @@ public class DataRepository {
         return mDatabase.functionExecutionDao().insert(execution);
     }
     public void updateFunctionExecution(FunctionExecutionEntity execution) {
+        long functionId = execution.getFunctionId();
+        int callState = execution.getCallState();
+        int resultState = execution.getResultState();
+
+        mDatabase.functionDao().updateStates(functionId, callState, resultState);
+
         mDatabase.functionExecutionDao().update(execution);
     }
     //endregion FunctionExecution

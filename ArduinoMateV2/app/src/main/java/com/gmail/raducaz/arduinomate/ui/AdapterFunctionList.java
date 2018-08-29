@@ -57,6 +57,8 @@ public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionLis
                     Function oldFunction = mFunctionList.get(oldItemPosition);
                     return newFunction.getId() == oldFunction.getId()
                             && Objects.equals(newFunction.getDescription(), oldFunction.getDescription())
+                            && Objects.equals(newFunction.getCallState(), oldFunction.getCallState())
+                            && Objects.equals(newFunction.getResultState(), oldFunction.getResultState())
                             && Objects.equals(newFunction.getName(), oldFunction.getName());
                 }
             });

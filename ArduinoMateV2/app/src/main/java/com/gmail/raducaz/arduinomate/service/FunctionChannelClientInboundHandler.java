@@ -56,17 +56,27 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
     public void channelRead(ChannelHandlerContext ctx, String msg) throws Exception {
 
         try {
-            FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(mRepository, msg, functionExecution);
-
             if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
+                FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(mRepository, msg, functionExecution);
                 // This will automatically set the Execution Log as well
-                functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // Success
+                functionExecution = functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // Success
             } else {
                 DeviceStateUpdater deviceStateUpdater = new DeviceStateUpdater(mRepository, msg, function.getDeviceId());
                 deviceStateUpdater.updatePinStates();
 
-                functionStateUpdater.insertExecutionLog();
-                functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.EXECUTING); // Success
+                FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(mRepository, msg, functionExecution);
+                if(!function.getName().equals(deviceStateUpdater.deviceStateInfo.getFunctionName()))
+                {
+                    // We can receive states for other functions as well
+                    // Get the function from Function Name received from Device
+                    functionStateUpdater = new FunctionStateUpdater(mRepository, msg);
+                    functionStateUpdater.insertExecutionLog();
+                    functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.EXECUTING); // Success
+                }
+                else {
+                    functionStateUpdater.insertExecutionLog();
+                    functionExecution = functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.EXECUTING); // Success
+                }
             }
 
             // Don't want to confirm to server that client received the message

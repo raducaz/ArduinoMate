@@ -30,7 +30,8 @@ int myPort = 8080;
 //const char myIp[15]  = "192.168.1.200";
 /* PROD */
 
-byte serverIp[] = { 192, 168, 1, 168 };
+//byte serverIp[] = { 192, 168, 1, 168 };
+byte serverIp[] = { 192, 168, 1, 102 };
 int serverPort = 9090;
 byte gateway[] = { 192, 168, 1, 1 };
 byte subnet[] = { 255, 255, 255, 0 };
@@ -55,20 +56,21 @@ const int CurrentSensor = A5;
 ACS712 sensor(ACS712_30A, A5);
 float zeroCurrent = 0;
 
-byte OnOffGeneratorState = 0; // 0=OFF,1=ON,2=Error
+byte OnOffGeneratorState = 0; // 0=OFF,1=ON,2=Error,255=Executing
 byte OnOffPowerState = 0; // 0=OFF,1=ON,2=Error
 byte OnOffPowerAutoState = 0; // 0=Disabled,1=Enabled,2=Error
-byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
+volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
 
 ThreadController threadsController = ThreadController();
 
-const char MSG[3] = "msg";
-const char PIN[3] = "pin";
-const char IP[2] = "ip";
-const char DEVICESTATE[2] = "state";
-const char VALUE[5] = "value";
-const char FCTSTATE[5] = "fctState";
-const char PINSTATES[9] = "pinStates";
+const char MSG[4] = "msg";
+const char PIN[4] = "pin";
+const char IP[3] = "ip";
+const char DEVICESTATE[6] = "state";
+const char VALUE[6] =     "value";
+const char FCTNAME[8] =   "fctName";
+const char FCTSTATE[9] =  "fctState";
+const char PINSTATES[10] = "pinStates";
 /*=====================================================================================================*/
 
 /*=Classes=============================================================================================*/
@@ -99,8 +101,6 @@ class Configuration
 
 class JSONSerializer
 {
-  
-
   public: static JsonObject& constructPinStatesJSON()
   {
     return constructPinStatesJSON("");
@@ -123,28 +123,29 @@ class JSONSerializer
   }
   public: static JsonObject& constructPinStateJSON(byte pin, const char* msg)
   {
-    StaticJsonBuffer<200> _buffer;
+    StaticJsonBuffer<400> _buffer;
     JsonObject& _root = _buffer.createObject();
-    _root[MSG] = msg;
+    if(strcmp(msg,"")==0)
+      _root[MSG] = msg;
     _root[PIN] = pin;
+    _root[IP] = myIp;
+    _root[DEVICESTATE] = DeviceState;
     _root[VALUE] = digitalRead(pin);
     
     return _root;
   }
   public: static JsonObject& constructPinStateJSON(byte pin)
   {
-    StaticJsonBuffer<200> _buffer;
-    JsonObject& _root = _buffer.createObject();
-    _root[PIN] = pin;
-    _root[VALUE] = digitalRead(pin);
-    
-    return _root;
+    return constructPinStateJSON(pin, "");
   }
-  public: static JsonObject& constructFctStateJSON(byte state, const char* msg)
+  public: static JsonObject& constructFctStateJSON(byte state, const char* msg, const char* fct)
   {
-    StaticJsonBuffer<200> _buffer;
+    StaticJsonBuffer<400> _buffer;
     JsonObject& _root = _buffer.createObject();
     _root[MSG] = msg;
+    _root[IP] = myIp;
+    _root[DEVICESTATE] = DeviceState;
+    _root[FCTNAME] = fct;
     _root[FCTSTATE] = state;
     
     return _root;
@@ -192,7 +193,7 @@ class MyExecutor
     //Serial.print("Set pin:");Serial.print(pin);Serial.print(" to ");Serial.print(state);Serial.print(" for ");Serial.print(interval);Serial.println(" ms");
     if(client.connected())
     {
-      sendToServer(JSONSerializer::constructPinStateJSON(pin), client);
+      //sendToServer(JSONSerializer::constructPinStateJSON(pin), client);
     }
     
     byte state1 = digitalRead(pin);
@@ -202,6 +203,7 @@ class MyExecutor
   }
   public: static void generatorON(EthernetClient& client)
   {
+    const char FCTNAME[15] = "GeneratorOnOff";
     if(OnOffGeneratorState==0) //Only if it's OFF
     {
       // Tras soc
@@ -237,7 +239,7 @@ class MyExecutor
       else
       {
         OnOffGeneratorState = 1;
-        sendToServer(JSONSerializer::constructFctStateJSON(OnOffGeneratorState, "Generator=ON"),client);
+        sendToServer(JSONSerializer::constructFctStateJSON(OnOffGeneratorState, "Generator=ON", FCTNAME),client);
       }
     }
   
@@ -245,6 +247,8 @@ class MyExecutor
   
   public: static void generatorOFF(EthernetClient& client)
   {
+    const char FCTNAME[15] = "GeneratorOnOff";
+    
       sendToServer(JSONSerializer::constructPinStatesJSON("220->OFF"),client);
       setPin(ContactRetea220V, HIGH, client);//DECUPLARE
       sendToServer(JSONSerializer::constructPinStatesJSON("220=OFF"),client);  
@@ -270,11 +274,13 @@ class MyExecutor
         OnOffGeneratorState = 0;
       }
       
-      sendToServer(JSONSerializer::constructFctStateJSON(OnOffGeneratorState, "Generator=OFF"),client);
+      sendToServer(JSONSerializer::constructFctStateJSON(OnOffGeneratorState, "Generator=OFF", FCTNAME),client);
   }
 
   public: static void powerON(EthernetClient& client)
   {
+    const char FCTNAME[11] = "PowerOnOff";
+    
     if(OnOffGeneratorState==1)
     {
       // Cuplare priza 220V iesire
@@ -283,41 +289,53 @@ class MyExecutor
       sendToServer(JSONSerializer::constructPinStatesJSON("220=ON"),client); 
 
       OnOffPowerState = 1;
-      sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerState, "Power=ON"),client);
+      sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerState, "Power=ON", FCTNAME),client);
     } else
     {
       OnOffPowerState = 0;
-      sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerState, "Power=OFF because generator OFF"),client);
+      sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerState, "Power=OFF because generator OFF", FCTNAME),client);
     }
   }
   public: static void powerOFF(EthernetClient& client)
   {
+    const char FCTNAME[11] = "PowerOnOff";
+    
     sendToServer(JSONSerializer::constructPinStatesJSON("220->OFF"),client);
     setPin(ContactRetea220V, HIGH, client);//DECUPLARE
     sendToServer(JSONSerializer::constructPinStatesJSON("220=OFF"),client);  
 
     OnOffPowerState = 0;
-    sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerState, "Power=OFF"),client);
+    sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerState, "Power=OFF", FCTNAME),client);
   }
   public: static void powerAutoENABLE(EthernetClient& client)
   {
+    const char FCTNAME[23] = "PowerAutoEnableDisable";
+
+    //Serial.println("Enable power auto: power off");
     // Make sure to start from virgin grounds
     powerOFF(client);
+    //Serial.println("Enable power auto: generator off");
     generatorOFF(client);
     
     OnOffPowerAutoState = 1;
     DeviceState = 1;
-  
+    
+    sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerAutoState, "PowerAuto=Enabled", FCTNAME),client);
+    //Serial.println("Enable power auto: execute first time");
     powerAutoEXECUTE(client);
   }
   public: static void powerAutoDISABLE(EthernetClient& client)
   {
+    const char FCTNAME[23] = "PowerAutoEnableDisable";
+    
     // Make sure to let virgin grounds behind us
     powerOFF(client);
     generatorOFF(client);
     
     OnOffPowerAutoState = 0;
     DeviceState = 0;
+
+    sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerAutoState, "PowerAuto=Disabled", FCTNAME),client);
   }
   public: static void powerAutoEXECUTE(EthernetClient& client)
   {
@@ -325,38 +343,48 @@ class MyExecutor
     {
         if(OnOffGeneratorState==0) 
         {
+          Serial.println("Gen off - power off");
           //Make sure priza is off as well
           powerOFF(client);
           
           digitalWrite(A3,HIGH); //Probe if Presostat is activated - presure low
           if(digitalRead(A4)==HIGH)
           {
+            Serial.println("Probe active, start generator.");
             digitalWrite(A3,LOW);
             
             generatorON(client);
             powerON(client);
           } 
+          Serial.println("Probe inactive, exit.");
         } 
         else if(OnOffGeneratorState==1)
         {
+          Serial.println("Generator on");
           if(OnOffPowerState==0)
           {
+            Serial.println("Power off, starting power");
             // Make sure the priza is on as well
             powerON(client);
           }
           
           if(OnOffPowerState==1)
           {
+            Serial.println("Power on, probing current.");
             float current = sensor.getCurrentAC();
             if((current - zeroCurrent) < 0.1) //there is no current flowing
             {
+              Serial.println("No current, stop power.");
               powerOFF(client);
               generatorOFF(client);
             }
+
+            Serial.println("There is current, let power on.");
           }
           
         }
     }
+    Serial.println("Exit execution.");
   }
 };
 
@@ -372,17 +400,17 @@ class MyMonitorTcpClientThread: public Thread
     }
   
     if (arduinoClient.connect(ip, port)) {
-      Serial.print("MON: Client connected to ");
-      for(int i=0;i<4;i++){ Serial.print(ip[i]);}
-      Serial.println("");
+      
+//      for(int i=0;i<4;i++){ Serial.print(ip[i]);}
+//      Serial.println("");
       
       return arduinoClient.connected();
     }
 
     // Failed to connect
-    Serial.println("MON: Client didn't connect to ");
-    for(int i=0;i<4;i++){ Serial.print(ip[i]);}
-    Serial.println("");
+//    Serial.println("MON: Client didn't connect to ");
+//    for(int i=0;i<4;i++){ Serial.print(ip[i]);}
+//    Serial.println("");
     
     return false;
   }
@@ -391,17 +419,17 @@ class MyMonitorTcpClientThread: public Thread
   void run(){
 
     int i = 0;
-    while(arduinoClient.connected() && i < 2)
+    while(!(arduinoClient.connected()) && (i < 2))
     {
       ConnectToServer(serverIp, serverPort);
       i++;
     }
     if(!arduinoClient.connected())
     {
-      Serial.println("MON: Check connection to gateway.");
+//      Serial.println("MON: Check connection to gateway.");
       if(!ConnectToServer(gateway, 80))
       {
-        Serial.println("MON: Reinitialize ethernet.");
+        Serial.println("MON: Cannot connect, reinitialize ethernet.");
         Ethernet.begin(mac, ip, gateway, subnet);
       }
     } else
@@ -411,6 +439,7 @@ class MyMonitorTcpClientThread: public Thread
       {
         // TODO: Check what happens on the server if END is not sent ...
         // The state of the pins are sent by the functions them selves
+        Serial.println("Execute AUTO function.");
         executeAuto();
       }
       else
@@ -532,11 +561,11 @@ class MyTcpServerThread: public Thread
     {
       if(OnOffPowerAutoState==0)
       {
-        MyExecutor::powerAutoDISABLE(client);
+        MyExecutor::powerAutoENABLE(client);
       }
       else
       {
-        MyExecutor::powerAutoENABLE(client);
+        MyExecutor::powerAutoDISABLE(client);
       }
     }
   }

@@ -13,10 +13,6 @@ import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
-import com.gmail.raducaz.arduinomate.model.Function;
-import com.gmail.raducaz.arduinomate.model.FunctionExecution;
-
-import java.util.List;
 
 public class FunctionViewModel extends AndroidViewModel {
 
@@ -27,7 +23,7 @@ public class FunctionViewModel extends AndroidViewModel {
     public ObservableField<FunctionEntity> function = new ObservableField<>();
     public ObservableField<FunctionExecutionEntity> functionExecution = new ObservableField<>();
 
-    private final long mFunctionId;
+    public final long functionId;
     public long deviceId;
     public String functionName;
 
@@ -36,12 +32,12 @@ public class FunctionViewModel extends AndroidViewModel {
     public FunctionViewModel(@NonNull Application application, DataRepository repository,
                              final long functionId) {
         super(application);
-        mFunctionId = functionId;
+        this.functionId = functionId;
         dataRepository = repository;
 
 //        mObservableFunctions = repository.loadFunctions(mDeviceId);
-        mObservableFunctionExecution = repository.loadLastFunctionExecution(mFunctionId);
-        mObservableFunction = repository.loadFunction(mFunctionId);
+        mObservableFunctionExecution = repository.loadLastFunctionExecution(this.functionId);
+        mObservableFunction = repository.loadFunction(this.functionId);
     }
 
 //    /**

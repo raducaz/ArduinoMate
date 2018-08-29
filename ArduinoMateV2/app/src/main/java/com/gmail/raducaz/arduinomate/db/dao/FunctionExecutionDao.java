@@ -36,6 +36,11 @@ public interface FunctionExecutionDao {
     List<FunctionExecutionEntity> loadLastFunctionExecutionSync(long functionId);
 
     @Query("SELECT * FROM functionExecution " +
+            "where functionId = :functionId and endDate is null " +
+            "ORDER BY startDate DESC LIMIT 1")
+    FunctionExecutionEntity loadLastUnfinishedFunctionExecutionSync(long functionId);
+
+    @Query("SELECT * FROM functionExecution " +
             "where functionId = :functionId " +
             "ORDER BY startDate DESC")
     LiveData<List<FunctionExecutionEntity>> loadFunctionExecutions(long functionId);

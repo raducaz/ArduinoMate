@@ -11,6 +11,8 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.Function;
+import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
+import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 import java.util.Date;
 
@@ -30,6 +32,8 @@ public class FunctionEntity implements Function {
     private String name;
     private String description;
     private String log;
+    private int resultState;
+    private int callState;
     private Date dateSample;
 
     @Override
@@ -77,6 +81,29 @@ public class FunctionEntity implements Function {
     }
 
     @Override
+    public int getResultState() {
+        return resultState;
+    }
+    public void setResultState(int resultState) {
+        this.resultState = resultState;
+    }
+    @Override
+    public String getResultStateText() {
+        return String.valueOf(FunctionResultStateEnum.forInt(resultState));
+    }
+    @Override
+    public int getCallState() {
+        return callState;
+    }
+    public void setCallState(int callState) {
+        this.resultState = callState;
+    }
+    @Override
+    public String getCallStateText() {
+        return String.valueOf(FunctionCallStateEnum.forInt(callState));
+    }
+
+    @Override
     public Date getDateSample() {
         return dateSample;
     }
@@ -88,11 +115,13 @@ public class FunctionEntity implements Function {
     public FunctionEntity() {
     }
 
-    public FunctionEntity(long id, long deviceId, String name, String log, Date dateSample) {
+    public FunctionEntity(long id, long deviceId, String name, String log, int resultState,int callState, Date dateSample) {
         this.id = id;
         this.deviceId = deviceId;
         this.name = name;
         this.log = log;
+        this.resultState = resultState;
+        this.callState = callState;
         this.dateSample = dateSample;
     }
 
@@ -101,5 +130,7 @@ public class FunctionEntity implements Function {
         this.deviceId = function.getDeviceId();
         this.name = function.getName();
         this.description = function.getDescription();
+        this.resultState = function.getResultState();
+        this.callState = function.getCallState();
     }
 }

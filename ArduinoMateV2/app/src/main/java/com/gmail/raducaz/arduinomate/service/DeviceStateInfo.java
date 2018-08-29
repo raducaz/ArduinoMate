@@ -66,6 +66,16 @@ public class DeviceStateInfo {
         }
         catch (Exception e){return FunctionResultStateEnum.NA;}
     }
+    public String getFunctionName()
+    {
+        try {
+            if (_messageData != null && _messageData.has("fctName")) {
+                return _messageData.getString("fctName");
+            } else
+                return null;
+        }
+        catch (Exception e){return null;}
+    }
     public String getMessage()
     {
         try {

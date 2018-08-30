@@ -227,20 +227,20 @@ class MyExecutor
       sendToServer(JSONSerializer::constructPinStatesJSON("Starter=OFF"),client);
       sendToServer(JSONSerializer::constructPinStatesJSON("Soc=OFF"),client);
   
-      // Testare prezenta curent 220 - trebuie consumator pe priza
-      // In cazul in care nu este curent se initiaza procedura de inchidere generator  
-      float currentAC = sensor.getCurrentAC()-zeroCurrent;
-      if(currentAC<=0.1) // a relevant current value for a led bulb permanently connected to the circuit of the board
-      {
-        // Stop generator to ensure doesn't remain on because of a sensor error
-        generatorOFF(client);
-        
-      }
-      else
-      {
+//      // Testare prezenta curent 220 - trebuie consumator pe priza
+//      // In cazul in care nu este curent se initiaza procedura de inchidere generator  
+//      float currentAC = sensor.getCurrentAC()-zeroCurrent;
+//      if(currentAC<=0.1) // a relevant current value for a led bulb permanently connected to the circuit of the board
+//      {
+//        // Stop generator to ensure doesn't remain on because of a sensor error
+//        generatorOFF(client);
+//        
+//      }
+//      else
+//      {
         OnOffGeneratorState = 1;
         sendToServer(JSONSerializer::constructFctStateJSON(OnOffGeneratorState, "Generator=ON", FCTNAME),client);
-      }
+//      }
     }
   
   }
@@ -356,30 +356,30 @@ class MyExecutor
             generatorON(client);
             powerON(client);
           } 
-          Serial.println("Probe inactive, exit.");
+          //Serial.println("Probe inactive, exit.");
         } 
         else if(OnOffGeneratorState==1)
         {
           Serial.println("Generator on");
           if(OnOffPowerState==0)
           {
-            Serial.println("Power off, starting power");
+            //Serial.println("Power off, starting power");
             // Make sure the priza is on as well
             powerON(client);
           }
           
           if(OnOffPowerState==1)
           {
-            Serial.println("Power on, probing current.");
-            float current = sensor.getCurrentAC();
-            if((current - zeroCurrent) < 0.1) //there is no current flowing
-            {
-              Serial.println("No current, stop power.");
-              powerOFF(client);
-              generatorOFF(client);
-            }
+//            Serial.println("Power on, probing current.");
+//            float current = sensor.getCurrentAC();
+//            if((current - zeroCurrent) < 0.1) //there is no current flowing
+//            {
+//              Serial.println("No current, stop power.");
+//              powerOFF(client);
+//              generatorOFF(client);
+//            }
 
-            Serial.println("There is current, let power on.");
+            //Serial.println("There is current, let power on.");
           }
           
         }
@@ -444,6 +444,7 @@ class MyMonitorTcpClientThread: public Thread
       }
       else
       {
+        Serial.println("MON: Sending status...");
         // Send the state of the pins
         MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(),arduinoClient);
         MyExecutor::sendToServer("END",arduinoClient);
@@ -468,7 +469,7 @@ class MyTcpServerThread: public Thread
     // Function executed on thread execution
     void run(){
 
-      Serial.println("Start Server to listen clients...");
+      //Serial.println("Start Server to listen clients...");
       EthernetServer server = EthernetServer(myPort);
       server.begin();
     

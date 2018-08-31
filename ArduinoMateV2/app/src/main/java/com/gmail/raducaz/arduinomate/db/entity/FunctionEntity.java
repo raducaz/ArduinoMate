@@ -96,7 +96,7 @@ public class FunctionEntity implements Function {
         return callState;
     }
     public void setCallState(int callState) {
-        this.resultState = callState;
+        this.callState = callState;
     }
     @Override
     public String getCallStateText() {

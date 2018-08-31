@@ -85,7 +85,7 @@ class Configuration
     pinMode(ContactRetea220V, OUTPUT);
     pinMode(ContactDemaror12V, OUTPUT);
     pinMode(PresostatProbeSender, OUTPUT);
-    pinMode(PresostatProbeReceiver, INPUT);
+    pinMode(PresostatProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
     pinMode(CurrentSensor, OUTPUT);
   }
   public:static void initializePins()
@@ -95,7 +95,7 @@ class Configuration
     digitalWrite(ActuatorInversat, HIGH); // Decuplat
     digitalWrite(ContactRetea220V, HIGH); // Decuplat
     digitalWrite(ContactDemaror12V, LOW); // Decuplat
-    digitalWrite(PresostatProbeSender, LOW); // Send nothing
+    digitalWrite(PresostatProbeSender, HIGH); // This will be our ground when probing, until then let it HIGH
   }
 };
 
@@ -109,7 +109,7 @@ class JSONSerializer
   {
     StaticJsonBuffer<400> _buffer;
     JsonObject& _root = _buffer.createObject();
-    if(strcmp(msg,"")==0)
+    if(strcmp(msg,"")!=0)
       _root[MSG] = msg;
     _root[IP] = myIp;
     _root[DEVICESTATE] = DeviceState;
@@ -322,7 +322,7 @@ class MyExecutor
     
     sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerAutoState, "PowerAuto=Enabled", FCTNAME),client);
     //Serial.println("Enable power auto: execute first time");
-    powerAutoEXECUTE(client);
+    //powerAutoEXECUTE(client); //Wait for the executor to do the job
   }
   public: static void powerAutoDISABLE(EthernetClient& client)
   {
@@ -337,6 +337,24 @@ class MyExecutor
 
     sendToServer(JSONSerializer::constructFctStateJSON(OnOffPowerAutoState, "PowerAuto=Disabled", FCTNAME),client);
   }
+  private: static bool isPressureLow()
+  {
+    digitalWrite(PresostatProbeSender,LOW); //Probe if Presostat is activated - presure low. Set sender to ground
+    wait(100);
+    if(digitalRead(PresostatProbeReceiver)==LOW)
+    {
+      wait(100);
+      if(digitalRead(PresostatProbeReceiver)==LOW) //Doube check
+      {
+        Serial.println("Pressure low.");
+        digitalWrite(PresostatProbeSender,HIGH);// Revert the state of Sender
+        
+        return true;
+      }
+    } 
+
+    return false;
+  }
   public: static void powerAutoEXECUTE(EthernetClient& client)
   {
     if(OnOffPowerAutoState == 1)
@@ -347,12 +365,8 @@ class MyExecutor
           //Make sure priza is off as well
           powerOFF(client);
           
-          digitalWrite(A3,HIGH); //Probe if Presostat is activated - presure low
-          if(digitalRead(A4)==HIGH)
-          {
-            Serial.println("Probe active, start generator.");
-            digitalWrite(A3,LOW);
-            
+          if(isPressureLow())
+          {  
             generatorON(client);
             powerON(client);
           } 
@@ -367,6 +381,14 @@ class MyExecutor
             // Make sure the priza is on as well
             powerON(client);
           }
+
+          //TEST
+          if(!isPressureLow())
+          {  
+            generatorOFF(client);
+            powerOFF(client);
+          } 
+          //TEST
           
           if(OnOffPowerState==1)
           {
@@ -442,13 +464,13 @@ class MyMonitorTcpClientThread: public Thread
         Serial.println("Execute AUTO function.");
         executeAuto();
       }
-      else
-      {
-        Serial.println("MON: Sending status...");
-        // Send the state of the pins
-        MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(),arduinoClient);
-        MyExecutor::sendToServer("END",arduinoClient);
-      }
+
+      // Send status all the time
+      Serial.println("MON: Sending status...");
+      // Send the state of the pins
+      MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(),arduinoClient);
+      MyExecutor::sendToServer("END",arduinoClient);
+      
     }
 
     // Finish Thread execution

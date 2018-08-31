@@ -119,7 +119,7 @@ public class FunctionStateUpdater {
         functionExecution.setId(executionId);
 
         // Automatically insert log as well
-        insertExecutionLog("Command sent to device ... ");
+        insertExecutionLog("Starting execution ... ");
 
         return executionId;
     }

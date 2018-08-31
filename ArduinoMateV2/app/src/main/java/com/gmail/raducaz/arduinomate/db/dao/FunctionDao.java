@@ -25,7 +25,7 @@ public interface FunctionDao {
             "UPDATE function SET " +
                     "callState = :callState," +
                     "resultState = :resultState " +
-                    "WHERE id = :id"
+            "WHERE id = :id"
     )
     void updateStates(long id, int callState, int resultState);
 

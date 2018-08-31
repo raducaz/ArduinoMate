@@ -65,13 +65,13 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
                 deviceStateUpdater.updatePinStates();
 
                 FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(mRepository, msg, functionExecution);
-                if(!function.getName().equals(deviceStateUpdater.deviceStateInfo.getFunctionName()))
+                if(deviceStateUpdater.deviceStateInfo.getFunctionName()!= null && !function.getName().equals(deviceStateUpdater.deviceStateInfo.getFunctionName()))
                 {
                     // We can receive states for other functions as well
                     // Get the function from Function Name received from Device
                     functionStateUpdater = new FunctionStateUpdater(mRepository, msg);
                     functionStateUpdater.insertExecutionLog();
-                    functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.EXECUTING); // Success
+                    functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // For Result State updating
                 }
                 else {
                     functionStateUpdater.insertExecutionLog();

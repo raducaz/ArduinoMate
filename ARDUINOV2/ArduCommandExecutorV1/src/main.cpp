@@ -7,11 +7,10 @@
 #include <Ethernet.h>
 #include <EthernetClient.h>
 #include <EthernetServer.h>
-
+#include "globals.h"
 #include <SPI.h>
 #include <ACS712.h>
 #include <configuration.cpp>
-#include "globals.h"
 #include <tcpclient.h>
 #include <tcpserver.h>
 #include <executor.h>
@@ -48,7 +47,11 @@ void setupTcpServerThread()
   tcpServerThread.setInterval(1000); // in ms
   threadsController.add(&tcpServerThread);
 
-  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
+  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread(ip, 
+                                        mac, 
+                                        serverIp, 
+                                        serverPort, 
+                                        gateway, dns, subnet);
   monitorTcpClientThread.setInterval(500); // in ms
   threadsController.add(&monitorTcpClientThread);
 }

@@ -24,7 +24,7 @@ void MyTcpServerThread::run(){
   const byte SIZE = 50;
   char receivedText[SIZE] = ""; //safe to change char text[] = "" despite char* receivedText="";
   
-//      Serial.println("Server started...listening...");
+      // Serial.println("Server started...listening...");
   if (client) 
   {
     while (client.connected()) 
@@ -33,7 +33,7 @@ void MyTcpServerThread::run(){
       {
         char receivedChar = client.read();
         
-//            Serial.println(receivedChar);
+            Serial.println(receivedChar);
 
         if (receivedChar==endChar)
         {

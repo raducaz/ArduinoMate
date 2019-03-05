@@ -6,6 +6,7 @@
 #include <EthernetClient.h>
 #include <jsonhelper.cpp>
 #include <executor.h>
+#include "logger.h"
 
 MyMonitorTcpClientThread::MyMonitorTcpClientThread(byte* ip, 
                                         byte* mac, 
@@ -23,9 +24,8 @@ MyMonitorTcpClientThread::MyMonitorTcpClientThread(byte* ip,
 }
 boolean MyMonitorTcpClientThread::ConnectToServer(const byte* ip, const int port)
 {
-  Serial.println("Try connect to ");
-  for(int i=0;i<4;i++){ Serial.print(ip[i]); Serial.print("."); }
-     Serial.println("");
+  Logger::logln("Try connect to ");
+  Logger::logbyteln(ip);
 
   if(arduinoClient)
   {
@@ -37,9 +37,8 @@ boolean MyMonitorTcpClientThread::ConnectToServer(const byte* ip, const int port
   }
 
   // Failed to connect
-//    Serial.println("MON: Client didn't connect to ");
-//    for(int i=0;i<4;i++){ Serial.print(ip[i]);}
-//    Serial.println("");
+  Logger::debugln("MON: Client didn't connect to ");
+  Logger::debugbyte(ip);
   
   return false;
 }
@@ -55,16 +54,16 @@ void MyMonitorTcpClientThread::run(){
   }
   if(!arduinoClient.connected())
   {
-//      Serial.println("MON: Check connection to gateway.");
+    Logger::debugln("MON: Check connection to gateway.");
     if(!ConnectToServer(gateway, 80))
     {
-      Serial.println("MON: Cannot connect, reinitialize ethernet.");
+      Logger::logln("MON: Cannot connect, reinitialize ethernet.");
       Ethernet.begin(mac, ip, dns, gateway, subnet);
     }
   } else
   {
     // Send status all the time
-    Serial.print("MON: Sending status from ...");Serial.println(Ethernet.localIP());
+    Logger::debug("MON: Sending status from ...");Logger::debugln(Ethernet.localIP());
     // Send the state of the pins
     MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(),arduinoClient);
     MyExecutor::sendToServer("END",arduinoClient);

@@ -2,15 +2,14 @@
 #include <Thread.h>
 #include <ThreadController.h>
 
-#include <ArduinoJson.h>
-
 #include <Ethernet.h>
 #include <EthernetClient.h>
 #include <EthernetServer.h>
 #include "globals.h"
 #include <SPI.h>
 #include <ACS712.h>
-#include <configuration.cpp>
+#include <configuration.h>
+#include "logger.h"
 #include <tcpclient.h>
 #include <tcpserver.h>
 #include <executor.h>
@@ -47,20 +46,20 @@ void setupTcpServerThread()
   tcpServerThread.setInterval(1000); // in ms
   threadsController.add(&tcpServerThread);
 
-  MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread(ip, 
-                                        mac, 
-                                        serverIp, 
-                                        serverPort, 
-                                        gateway, dns, subnet);
-  monitorTcpClientThread.setInterval(500); // in ms
-  threadsController.add(&monitorTcpClientThread);
+  // MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread(ip, 
+  //                                       mac, 
+  //                                       serverIp, 
+  //                                       serverPort, 
+  //                                       gateway, dns, subnet);
+  // monitorTcpClientThread.setInterval(500); // in ms
+  // threadsController.add(&monitorTcpClientThread);
 }
 
 void setup() {
   // put your setup code here, to run once:
 
   Serial.begin(9600);
-  Serial.println("Entering Setup");
+  Logger::logln("Entering Setup");
 
   Configuration::setupPins();
   Configuration::initializePins();
@@ -71,8 +70,8 @@ void setup() {
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway, subnet);
   delay(1000);
-  Serial.print("My IP address: ");
-  Serial.println(Ethernet.localIP());
+  Logger::log("My IP address: ");
+  Logger::logln(Ethernet.localIP());
   
   setupTcpServerThread();
 }
@@ -84,4 +83,16 @@ void loop() {
   //Start the Thread in loop
   threadsController.run();
   delay(500);
+
+// char endChar = '\n';
+//   String receivedText = ""; 
+//   if(Serial){
+//     Serial.setTimeout(10000);
+
+//     if (Serial.available()!=0) {
+//       receivedText = Serial.readStringUntil(endChar);
+//       //Logger::debugln(receivedText.as<char*>());
+//       Serial.println(receivedText);
+//     }
+//   }
 }

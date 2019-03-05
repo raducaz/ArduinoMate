@@ -5,28 +5,25 @@
 #include <EthernetClient.h>
 #include <EthernetServer.h>
 #include <ArduinoJson.h>
-
+#include "logger.h"
 
 void MyExecutor::wait(unsigned int msInterval)
 {
+    Logger::debug("wait for ");Logger::debug(msInterval);Logger::debugln(" ms");
     unsigned long waitStart = millis();
-//      Serial.print("wait");Serial.println(msInterval);Serial.println(waitStart);
 
     unsigned long current = millis();
     while((current - waitStart)< msInterval) 
     {
       current = millis();
-      //Serial.print("Current:");Serial.println(current);
-    }; // wait until 
-    
-//      Serial.print("done wait");Serial.println(millis());
+    }; 
 }  
 
 void MyExecutor::sendToServer(const char* msg, EthernetClient& client)
 {
   client.println(msg);
 
-  Serial.println(msg);
+  Logger::logln(msg);
 }
 void MyExecutor::sendToServer(JsonObject& json, EthernetClient& client)
 {
@@ -36,19 +33,20 @@ void MyExecutor::sendToServer(JsonObject& json, EthernetClient& client)
   json.printTo(Serial);
   Serial.println();
 }
-void MyExecutor::setPin(byte pin, byte state, EthernetClient& client)
+void MyExecutor::setPin(byte pin, byte state)
 {
-  //Serial.print("Set pin:");Serial.print(pin);Serial.print(" to ");Serial.println(state);
+  Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
   digitalWrite(pin, state);
 }
-void MyExecutor::setPinTemp(byte pin, byte state, unsigned int interval, EthernetClient& client)
+void MyExecutor::setPinTemp(byte pin, byte state, unsigned int interval)
 {
-  //Serial.print("Set pin:");Serial.print(pin);Serial.print(" to ");Serial.print(state);Serial.print(" for ");Serial.print(interval);Serial.println(" ms");
-  if(client.connected())
-  {
-    //sendToServer(JSONSerializer::constructPinStateJSON(pin), client);
-  }
-  
+  // if(client.connected())
+  // {
+  //   //sendToServer(JSONSerializer::constructPinStateJSON(pin), client);
+  // }
+  Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
+  Logger::debug(" for ");Logger::debugln(interval);
+
   byte state1 = digitalRead(pin);
   digitalWrite(pin, state);
   wait(interval);

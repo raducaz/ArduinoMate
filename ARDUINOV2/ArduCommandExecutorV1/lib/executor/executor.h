@@ -13,8 +13,8 @@ class MyExecutor
         static void wait(unsigned int msInterval);
         static void sendToServer(const char* msg, EthernetClient& client);
         static void sendToServer(JsonObject& json, EthernetClient& client);
-        static void setPin(byte pin, byte state, EthernetClient& client);
-        static void setPinTemp(byte pin, byte state, unsigned int interval, EthernetClient& client);
+        static void setPin(byte pin, byte state);
+        static void setPinTemp(byte pin, byte state, unsigned int interval);
 
 };
 #endif

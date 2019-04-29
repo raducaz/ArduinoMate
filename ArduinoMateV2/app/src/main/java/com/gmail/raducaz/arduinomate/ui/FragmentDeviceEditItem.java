@@ -51,7 +51,7 @@ public class FragmentDeviceEditItem extends Fragment {
 
         subscribeToModel(model);
 
-        Button button = (Button) mBinding.getRoot().findViewById(R.id.save_button);
+        Button button = mBinding.getRoot().findViewById(R.id.save_button);
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 

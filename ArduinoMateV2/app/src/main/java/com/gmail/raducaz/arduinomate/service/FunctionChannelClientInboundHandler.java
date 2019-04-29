@@ -44,6 +44,7 @@ public class FunctionChannelClientInboundHandler extends TcpClientInboundHandler
     public void channelActive(ChannelHandlerContext ctx) {
 
         String functionText = function.getName();
+        // This sends the message to Arduino
         channelActive(ctx, functionText);
 
         FunctionStateUpdater fu = new FunctionStateUpdater(mRepository, functionExecution);

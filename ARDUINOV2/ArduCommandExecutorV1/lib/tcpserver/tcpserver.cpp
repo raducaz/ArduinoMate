@@ -17,12 +17,12 @@ MyTcpServerThread::~MyTcpServerThread() {;}
 // Function executed on thread execution
 void MyTcpServerThread::run(){
 
-  if(Configuration::isDebug()){
-    this->listenSerial();
+  if(Configuration::useEthernet()){
+    this->listenEthernet();
   }
   else
   {
-    listenEthernet();
+    this->listenSerial();
   }
   
   runned();
@@ -59,7 +59,8 @@ void MyTcpServerThread::listenSerial()
       //TODO: Test - this executes actual commands and blocks the thread until done
       if(endCmd)
       {
-        this->parseCommand(buffer);
+        String result = this->parseCommand(buffer);
+        Serial.println(result);
         buffer[0]=0;
         bufferSize=0;
       }
@@ -73,35 +74,35 @@ void MyTcpServerThread::listenEthernet()
   server.begin();
 
   EthernetClient client = server.available();
+  // Logger::debugln("Server started...listening...");
+
   char endChar = '\n';
-  // const unsigned int SIZE = 200;
-  // char receivedText[SIZE] = ""; //safe to change char text[] = "" despite char* receivedText="";
   String receivedText = "";
-      // Serial.println("Server started...listening...");
+      
   if (client) 
   {
-    client.setTimeout(10000);
+    client.setTimeout(10000); //reads input for 10 seconds or until endChar is reached
     if (client.connected()) 
     {
+      Logger::logln("Client connected");
       if (client.available()) 
       {
         receivedText = client.readStringUntil(endChar);
-        //Logger::debugln(receivedText);
+        Logger::logln(receivedText);
 
         //TODO: Test - this executes actual commands and blocks the thread until done
-        this->parseCommand(receivedText);
+        String result = this->parseCommand(receivedText);
+        client.println(result);
       }
     }
 
     Logger::debugln("");
     Logger::debugln("CLOSE CONNECTION"); 
     client.stop();
-    //Serial.println("END LOOP");
   }
   else
   {
-    // No client, server not available()
-//        Serial.println("No client, server stopped.");
+    //Logger::logln("No client, server stopped");
   }
 }
 void MyTcpServerThread::processCommand(const char* commandText, EthernetClient& client)
@@ -114,12 +115,12 @@ void MyTcpServerThread::processCommand(const char* commandText, EthernetClient& 
   }
 }
 
-void MyTcpServerThread::parseCommand(String plainJson)
+String MyTcpServerThread::parseCommand(String plainJson)
 {
   // [
-  //   {"set/1":0.25,"for":2}, // for 2 ms and revert
-  //   {"set/13":0},//indefinite
-  //   {"wait":20} // wait for 20 ms
+  //   {"=3":0.25,"@":2}, // for 2 ms and revert
+  //   {"=13":0},//set indefinite
+  //   {"!":20} // wait for 20 ms
   //   {"get/13":"?"}
   // ]
   // [{"=3":1,"@":2},{"?13":0},{"=13":0},{"?13":0},{"!":20}]
@@ -165,11 +166,15 @@ void MyTcpServerThread::parseCommand(String plainJson)
          
         }
       }
-      arr.printTo(Serial);
-      Logger::debugln("");
+
+      String output;
+      arr.printTo(output);
+      return output;
+
     } else {
       // parseObject() failed
       Logger::debugln("Deserialize received message failed.");
+      return "";
     }
 }
 int MyTcpServerThread::getPin(const byte size, const char* key)

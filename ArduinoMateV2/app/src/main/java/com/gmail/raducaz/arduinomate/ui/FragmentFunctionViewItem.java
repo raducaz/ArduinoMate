@@ -52,7 +52,7 @@ public class FragmentFunctionViewItem extends Fragment {
 
         subscribeToModel(model);
 
-        Button buttonExecute = (Button) mBinding.getRoot().findViewById(R.id.execute_button);
+        Button buttonExecute = mBinding.getRoot().findViewById(R.id.execute_button);
         buttonExecute.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 
@@ -62,7 +62,7 @@ public class FragmentFunctionViewItem extends Fragment {
             }
         });
 
-        Button buttonReset = (Button) mBinding.getRoot().findViewById(R.id.reset_button);
+        Button buttonReset = mBinding.getRoot().findViewById(R.id.reset_button);
         buttonReset.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 

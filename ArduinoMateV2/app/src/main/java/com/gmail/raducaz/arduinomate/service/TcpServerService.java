@@ -53,7 +53,7 @@ public class TcpServerService implements Runnable {
 
     private final ExecutorService pool;
 
-    private TcpServerService(DataRepository dataRepository) throws IOException {
+    private TcpServerService(DataRepository dataRepository) {
 
         // Initialize a dynamic pool that starts the required no of threads according to the no of tasks submitted
         pool = Executors.newFixedThreadPool(1);
@@ -125,7 +125,7 @@ public class TcpServerService implements Runnable {
                         .handler(new LoggingHandler(LogLevel.INFO))
                         .childHandler(new ChannelInitializer<SocketChannel>() {
                             @Override
-                            public void initChannel(SocketChannel ch) throws Exception {
+                            public void initChannel(SocketChannel ch) {
                                 ChannelPipeline p = ch.pipeline();
                                 if (sslCtx != null) {
                                     p.addLast(sslCtx.newHandler(ch.alloc()));

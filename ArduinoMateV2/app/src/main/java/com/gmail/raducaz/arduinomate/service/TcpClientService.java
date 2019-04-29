@@ -23,7 +23,7 @@ import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-public class TcpClientService implements Callable<Void> {
+public class TcpClientService implements Callable<String> {
     private String TAG = "TcpClientService";
 
     TcpClientInboundHandler tcpInboundHandler;
@@ -35,8 +35,7 @@ public class TcpClientService implements Callable<Void> {
 
     private final ExecutorService pool;
 
-    public TcpClientService(String serverIp, int serverPort, TcpClientInboundHandler tcpClientInboundHandler)
-            throws IOException {
+    public TcpClientService(String serverIp, int serverPort, TcpClientInboundHandler tcpClientInboundHandler) {
 
         // Initialize a dynamic pool that starts the required no of threads according to the no of tasks submitted
         pool = Executors.newCachedThreadPool();
@@ -46,7 +45,7 @@ public class TcpClientService implements Callable<Void> {
         PORT = serverPort;
     }
 
-    public Void call() throws Exception
+    public String call() throws Exception
     {
         //Old style
         //pool.execute(new TcpClientServiceHandler());
@@ -55,7 +54,7 @@ public class TcpClientService implements Callable<Void> {
         Future<?> future = pool.submit(new TcpClientServiceHandler());
 
         try {
-            future.get();
+            return (String)future.get();
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Reset interrupted status
@@ -108,7 +107,7 @@ public class TcpClientService implements Callable<Void> {
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000)
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
-                            public void initChannel(SocketChannel ch) throws Exception {
+                            public void initChannel(SocketChannel ch) {
                                 ChannelPipeline p = ch.pipeline();
                                 p.addLast( new DelimiterBasedFrameDecoder(65536, Delimiters.lineDelimiter()));
                                 p.addLast(DECODER);

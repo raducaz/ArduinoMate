@@ -16,8 +16,7 @@ public class Utils {
         if (line == null) return false;
         String str = line.toString();
         int cr_index = str.indexOf(CR_STRING);
-        if (cr_index < 0) return false;
-        return true;
+        return cr_index >= 0;
     }
 
     public static boolean canProcessCR(CharSequence line) {
@@ -29,8 +28,7 @@ public class Utils {
 
         if (lf_index < 0) return false;
 
-        if (lf_index < cr_index) return true;
-        else return false;
+        return lf_index < cr_index;
     }
 
     public static CharSequence processCR(CharSequence line) {

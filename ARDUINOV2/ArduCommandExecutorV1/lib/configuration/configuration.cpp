@@ -6,6 +6,10 @@ bool Configuration::isDebug()
 {
   return true;
 }
+bool Configuration::useEthernet()
+{
+  return true;
+}
 void Configuration::setupPins()
 {
   // OUTPUT PINS

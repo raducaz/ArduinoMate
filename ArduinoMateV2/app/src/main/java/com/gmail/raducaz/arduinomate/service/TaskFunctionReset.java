@@ -26,7 +26,7 @@ public class TaskFunctionReset implements TaskInterface {
         mApplication = app;
         this.function = function;
 
-        mRepository = ((ArduinoMateApp) mApplication).getRepository();
+        mRepository = mApplication.getRepository();
         mExecutor = mApplication.getNetworkExecutor();
     }
 

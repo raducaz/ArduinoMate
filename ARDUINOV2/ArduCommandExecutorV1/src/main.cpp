@@ -69,6 +69,7 @@ void setup() {
   
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway, subnet);
+  
   delay(1000);
   Logger::log("My IP address: ");
   Logger::logln(Ethernet.localIP());

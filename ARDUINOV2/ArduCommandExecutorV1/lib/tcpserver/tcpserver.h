@@ -20,7 +20,7 @@ class MyTcpServerThread: public Thread
 
     private: void listenSerial();
              void listenEthernet();
-             void parseCommand(String plainJson);
+             String parseCommand(String plainJson);
              int getPin(const byte size, const char* key);
   
 };

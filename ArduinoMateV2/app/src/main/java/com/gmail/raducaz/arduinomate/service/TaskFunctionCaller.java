@@ -30,7 +30,7 @@ public class TaskFunctionCaller implements TaskInterface {
         mApplication = app;
         this.function = function;
 
-        mRepository = ((ArduinoMateApp) mApplication).getRepository();
+        mRepository = mApplication.getRepository();
         mExecutor = mApplication.getNetworkExecutor();
     }
 

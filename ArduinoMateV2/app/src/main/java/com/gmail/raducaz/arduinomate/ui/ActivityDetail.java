@@ -49,7 +49,7 @@ public class ActivityDetail extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         functionId = getIntent().getLongExtra(EXTRA_ID, 0);
@@ -64,11 +64,11 @@ public class ActivityDetail extends AppCompatActivity {
         this.setTitle(getIntent().getStringExtra(EXTRA_NAME));
 
         // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         // Set Tabs inside Toolbar
-        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         /* Add the other tabs needed except the first tab */
         tabs.addTab(tabs.newTab().setText("Executions"));

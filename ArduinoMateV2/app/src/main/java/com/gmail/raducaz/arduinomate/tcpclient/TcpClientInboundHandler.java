@@ -1,4 +1,4 @@
-package com.gmail.raducaz.arduinomate.service;
+package com.gmail.raducaz.arduinomate.tcpclient;
 
 import android.os.SystemClock;
 import android.util.Log;

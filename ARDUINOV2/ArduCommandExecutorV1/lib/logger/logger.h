@@ -8,8 +8,10 @@ class Logger
 {
     public:
         static void debugln(const char* msg);
+        static void debugln(const String msg);
         static void debug(const char* msg);
         static void debugln(const int msg);
+        static void debugln(IPAddress ip);
         static void debug(const int msg);
         static void debugbyte(const byte* msg);
         static void logln(IPAddress ip);

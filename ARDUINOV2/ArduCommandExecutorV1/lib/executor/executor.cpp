@@ -23,7 +23,7 @@ void MyExecutor::sendToServer(const char* msg, EthernetClient& client)
 {
   client.println(msg);
 
-  Logger::logln(msg);
+  Logger::debugln(msg);
 }
 void MyExecutor::sendToServer(JsonObject& json, EthernetClient& client)
 {

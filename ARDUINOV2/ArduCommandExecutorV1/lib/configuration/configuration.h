@@ -6,6 +6,8 @@
 
 class Configuration
 {
+    
+
     public:
         static bool isDebug();
         static bool useEthernet();

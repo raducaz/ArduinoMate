@@ -30,14 +30,14 @@ void MyTcpServerThread::run(){
 void MyTcpServerThread::listenSerial()
 {
   char endChar = '\n';
-  const unsigned int SerialSize = 64; // This is Serial.read limit
+  const byte SerialSize = 64; // This is Serial.read limit
   
   if(Serial){
 
     if (Serial.available()!=0) {
       char c = 0;
       bool endCmd = false;
-      int i=0;
+      byte i=0;
       while(((c=Serial.read())!=endChar) && i<SerialSize ){
         buffer[bufferSize]=c;
         buffer[bufferSize+1]='\0';
@@ -74,7 +74,7 @@ void MyTcpServerThread::listenEthernet()
   server.begin();
 
   EthernetClient client = server.available();
-  // Logger::debugln("Server started...listening...");
+  Logger::debugln("Server started...listening...");
 
   char endChar = '\n';
   String receivedText = "";
@@ -84,15 +84,16 @@ void MyTcpServerThread::listenEthernet()
     client.setTimeout(10000); //reads input for 10 seconds or until endChar is reached
     if (client.connected()) 
     {
-      Logger::logln("Client connected");
+      Logger::debugln("Client connected");
       if (client.available()) 
       {
         receivedText = client.readStringUntil(endChar);
-        Logger::logln(receivedText);
+        Logger::debugln(receivedText);
 
         //TODO: Test - this executes actual commands and blocks the thread until done
         String result = this->parseCommand(receivedText);
         client.println(result);
+        Logger::debugln(result);
       }
     }
 
@@ -102,19 +103,9 @@ void MyTcpServerThread::listenEthernet()
   }
   else
   {
-    //Logger::logln("No client, server stopped");
+    Logger::debugln("No client, server stopped");
   }
 }
-void MyTcpServerThread::processCommand(const char* commandText, EthernetClient& client)
-{
-  Logger::debug("CMD:");Logger::debugln(commandText);
-            
-  if(strcmp(commandText,"GeneratorOnOff")==0)
-  {
-      //MyExecutor::setPin(3, 1, client);
-  }
-}
-
 String MyTcpServerThread::parseCommand(String plainJson)
 {
   // [
@@ -137,7 +128,6 @@ String MyTcpServerThread::parseCommand(String plainJson)
           JsonObject& obj = elem.as<JsonObject>();
 
           int pin=0;
-          int value=0;
           for (JsonPair& p : obj) {
             //p.key is a const char* pointing to the key
             if(strncmp(p.key,"=",1)==0)

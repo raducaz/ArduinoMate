@@ -46,33 +46,33 @@ class JSONSerializer
         
         return _root;
     }
-    public: static JsonObject& constructPinStateJSON(byte pin, const char* msg)
-    {
-        StaticJsonBuffer<400> _buffer;
-        JsonObject& _root = _buffer.createObject();
-        if(strcmp(msg,"")==0)
-            _root[MSG] = msg;
-        _root[PIN] = pin;
-        _root[IP] = "192.168.100.100";
-        _root[DEVICESTATE] = 0;
-        _root[VALUE] = digitalRead(pin);
+    // public: static JsonObject& constructPinStateJSON(byte pin, const char* msg)
+    // {
+    //     StaticJsonBuffer<400> _buffer;
+    //     JsonObject& _root = _buffer.createObject();
+    //     if(strcmp(msg,"")==0)
+    //         _root[MSG] = msg;
+    //     _root[PIN] = pin;
+    //     _root[IP] = "192.168.100.100";
+    //     _root[DEVICESTATE] = 0;
+    //     _root[VALUE] = digitalRead(pin);
         
-        return _root;
-    }
-    public: static JsonObject& constructPinStateJSON(byte pin)
-    {
-        return constructPinStateJSON(pin, "");
-    }
-    public: static JsonObject& constructFctStateJSON(byte state, const char* msg, const char* fct)
-    {
-        StaticJsonBuffer<400> _buffer;
-        JsonObject& _root = _buffer.createObject();
-        _root[MSG] = msg;
-        _root[IP] = "192.168.100.100";
-        _root[DEVICESTATE] = 0;
-        _root[FCTNAME] = fct;
-        _root[FCTSTATE] = state;
+    //     return _root;
+    // }
+    // public: static JsonObject& constructPinStateJSON(byte pin)
+    // {
+    //     return constructPinStateJSON(pin, "");
+    // }
+    // public: static JsonObject& constructFctStateJSON(byte state, const char* msg, const char* fct)
+    // {
+    //     StaticJsonBuffer<400> _buffer;
+    //     JsonObject& _root = _buffer.createObject();
+    //     _root[MSG] = msg;
+    //     _root[IP] = "192.168.100.100";
+    //     _root[DEVICESTATE] = 0;
+    //     _root[FCTNAME] = fct;
+    //     _root[FCTSTATE] = state;
         
-        return _root;
-    }
+    //     return _root;
+    // }
 };

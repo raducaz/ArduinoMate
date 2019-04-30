@@ -24,23 +24,33 @@ MyMonitorTcpClientThread::MyMonitorTcpClientThread(byte* ip,
 }
 boolean MyMonitorTcpClientThread::ConnectToServer(const byte* ip, const int port)
 {
-  Logger::logln("Try connect to ");
-  Logger::logbyteln(ip);
-
   if(arduinoClient)
-  {
-    arduinoClient.stop();
+  { 
+    Logger::debugln("1");
+    if(!arduinoClient.connected())
+    {
+      Logger::debugln("2");
+      arduinoClient.stop();
+      
+      if (arduinoClient.connect(ip, port)) {    
+        // Logger::debugln("MON: Connected.");
+        Logger::debugln("3");
+        return arduinoClient.connected();
+      }
+      else
+      {
+        Logger::debugln("4");
+        return false;
+      }
+      
+    }
   }
-
-  if (arduinoClient.connect(ip, port)) {    
+  else
+  {
+    Logger::debugln("5");
+    arduinoClient.connect(ip, port);
     return arduinoClient.connected();
   }
-
-  // Failed to connect
-  Logger::debugln("MON: Client didn't connect to ");
-  Logger::debugbyte(ip);
-  
-  return false;
 }
   
 // Function executed on thread execution
@@ -57,7 +67,7 @@ void MyMonitorTcpClientThread::run(){
     Logger::debugln("MON: Check connection to gateway.");
     if(!ConnectToServer(gateway, 80))
     {
-      Logger::logln("MON: Cannot connect, reinitialize ethernet.");
+      Logger::debugln("MON: Cannot connect, reinitialize ethernet.");
       Ethernet.begin(mac, ip, dns, gateway, subnet);
     }
   } else

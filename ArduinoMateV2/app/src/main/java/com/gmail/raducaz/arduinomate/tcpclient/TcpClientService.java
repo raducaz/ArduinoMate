@@ -1,8 +1,7 @@
-package com.gmail.raducaz.arduinomate.service;
+package com.gmail.raducaz.arduinomate.tcpclient;
 
 import android.util.Log;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;

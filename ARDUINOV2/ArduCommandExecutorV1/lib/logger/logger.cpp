@@ -9,10 +9,20 @@ void Logger::debugln(const char* msg)
     if(Configuration::isDebug())
       Logger::logln(msg);
 }
+void Logger::debugln(const String msg)
+{
+    if(Configuration::isDebug())
+      Logger::logln(msg);
+}
 void Logger::debugln(const int msg)
 {
     if(Configuration::isDebug())
       Logger::logln(msg);
+}
+void Logger::debugln(IPAddress ip)
+{
+    if(Configuration::isDebug())
+      Logger::logln(ip);
 }
 void Logger::debug(const char* msg)
 {
@@ -55,11 +65,10 @@ void Logger::log(const int msg)
 }
 void Logger::logbyteln(const byte* msg)
 {
-    // int i=0;
-    // while(msg[i]){
-    //   Serial.print(msg[i]); 
-    //   Serial.print(","); 
-    //   i++;
-    // }
+    for(byte i=0;i<4;i++){
+      Serial.print(msg[i]); 
+      
+      if(i<3) Serial.print(","); 
+    }
 }
   

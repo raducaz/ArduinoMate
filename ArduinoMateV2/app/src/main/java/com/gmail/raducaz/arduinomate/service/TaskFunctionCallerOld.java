@@ -7,16 +7,15 @@ import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
-
-import java.io.IOException;
-import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
+import com.gmail.raducaz.arduinomate.processes.TaskInterface;
+import com.gmail.raducaz.arduinomate.tcpclient.FunctionChannelClientInboundHandler;
+import com.gmail.raducaz.arduinomate.tcpclient.TcpClientService;
 
 import java.util.concurrent.ExecutionException;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-public class TaskFunctionCaller implements TaskInterface {
+public class TaskFunctionCallerOld implements TaskInterface {
 
     private String TAG = "TaskFunctionCaller";
 
@@ -26,7 +25,7 @@ public class TaskFunctionCaller implements TaskInterface {
     private FunctionExecutionEntity functionExecution;
     private final DataRepository mRepository;
     private final ExecutorService mExecutor;
-    public TaskFunctionCaller(final ArduinoMateApp app, FunctionEntity function) {
+    public TaskFunctionCallerOld(final ArduinoMateApp app, FunctionEntity function) {
         mApplication = app;
         this.function = function;
 

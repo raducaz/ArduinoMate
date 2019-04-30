@@ -1,34 +1,16 @@
-package com.gmail.raducaz.arduinomate.service;
+package com.gmail.raducaz.arduinomate.tcpserver;
 
-import android.os.OperationCanceledException;
-import android.os.SystemClock;
-import android.provider.ContactsContract.Data;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
-import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
-import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
-import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
-import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
-import com.gmail.raducaz.arduinomate.model.PinState;
+import com.gmail.raducaz.arduinomate.service.DeviceStateUpdater;
+import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
+import com.gmail.raducaz.arduinomate.service.FunctionStateUpdater;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.lang.reflect.Array;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;

@@ -1,7 +1,5 @@
-package com.gmail.raducaz.arduinomate.service;
+package com.gmail.raducaz.arduinomate.tcpserver;
 
-import android.nfc.Tag;
-import android.provider.ContactsContract.Data;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;

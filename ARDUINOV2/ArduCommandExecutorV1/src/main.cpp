@@ -17,6 +17,7 @@
 volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
 
 ThreadController threadsController = ThreadController();
+ThreadController threadsController2 = ThreadController();
 
 // We have 30 amps version sensor connected to A5 pin of arduino
 ACS712 sensor(ACS712_30A, A5);
@@ -39,20 +40,43 @@ void calibrateCurrentSensor()
   zeroCurrent = c / 10;
 }
 
+// class MyTcpServerThread: public Thread
+// {
+//   void run(){
+//     Logger::debugln("1");
+//     runned();
+//   }
+// };
+// class MyMonitorTcpClientThread: public Thread
+// {
+//   void run(){
+//     Logger::debugln("2");
+//     runned();
+//   }
+// };
+MyTcpServerThread tcpServerThread = MyTcpServerThread();
+MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread(
+                                        ip, 
+                                        mac, 
+                                        serverIp, 
+                                        serverPort, 
+                                        gateway, dns, subnet
+                                        );
 void setupTcpServerThread()
 {
-  MyTcpServerThread tcpServerThread = MyTcpServerThread();
   // Set the interval the thread should run in loop
   tcpServerThread.setInterval(1000); // in ms
   threadsController.add(&tcpServerThread);
 
-  // MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread(ip, 
+  // MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread(
+  //                                       ip, 
   //                                       mac, 
   //                                       serverIp, 
   //                                       serverPort, 
-  //                                       gateway, dns, subnet);
-  // monitorTcpClientThread.setInterval(500); // in ms
-  // threadsController.add(&monitorTcpClientThread);
+  //                                       gateway, dns, subnet
+  //                                       );
+  monitorTcpClientThread.setInterval(2000); // in ms
+  threadsController.add(&monitorTcpClientThread);
 }
 
 void setup() {
@@ -69,7 +93,7 @@ void setup() {
   
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway, subnet);
-  
+
   delay(1000);
   Logger::log("My IP address: ");
   Logger::logln(Ethernet.localIP());
@@ -82,18 +106,9 @@ void loop() {
 
   delay(500);
   //Start the Thread in loop
+  Logger::debugln("Start thread");
   threadsController.run();
+  // threadsController2.run();
   delay(500);
 
-// char endChar = '\n';
-//   String receivedText = ""; 
-//   if(Serial){
-//     Serial.setTimeout(10000);
-
-//     if (Serial.available()!=0) {
-//       receivedText = Serial.readStringUntil(endChar);
-//       //Logger::debugln(receivedText.as<char*>());
-//       Serial.println(receivedText);
-//     }
-//   }
 }

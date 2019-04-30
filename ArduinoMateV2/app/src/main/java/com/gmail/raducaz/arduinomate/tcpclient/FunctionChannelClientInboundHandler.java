@@ -1,10 +1,14 @@
-package com.gmail.raducaz.arduinomate.service;
+package com.gmail.raducaz.arduinomate.tcpclient;
 
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
+import com.gmail.raducaz.arduinomate.service.DeviceStateUpdater;
+import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
+import com.gmail.raducaz.arduinomate.service.FunctionStateUpdater;
+import com.gmail.raducaz.arduinomate.tcpclient.TcpClientInboundHandler;
 
 import io.netty.channel.ChannelHandlerContext;
 

@@ -1,4 +1,4 @@
-package com.gmail.raducaz.arduinomate.service;
+package com.gmail.raducaz.arduinomate.tcpserver;
 
 import android.app.IntentService;
 import android.app.Notification;

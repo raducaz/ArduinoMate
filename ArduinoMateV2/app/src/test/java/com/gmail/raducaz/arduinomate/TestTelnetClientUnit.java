@@ -23,7 +23,7 @@ public class TestTelnetClientUnit {
         final TelnetClient telnetClient = new TelnetClient("192.168.100.100", 8080,
                 "test", "test");
         Map<String, Object> map = new HashMap<>();
-        String[] commands = new String[]{"[{\"=13\":0}]"};
+        String[] commands = new String[]{"[{\"?13\":0}]"};
         long start = System.currentTimeMillis();
         telnetClient.executeCommands(Arrays.asList(commands), map);
         long end = System.currentTimeMillis();

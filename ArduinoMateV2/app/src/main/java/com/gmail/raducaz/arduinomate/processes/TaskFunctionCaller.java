@@ -22,6 +22,7 @@ public class TaskFunctionCaller implements TaskInterface {
     private FunctionExecutionEntity functionExecution;
     private final DataRepository mRepository;
 
+    //TODO: Needs to know the desired functionResultState when called
     public TaskFunctionCaller(DataRepository dataRepository, FunctionEntity function) {
         this.function = function;
 
@@ -50,6 +51,7 @@ public class TaskFunctionCaller implements TaskInterface {
 
             }
 
+            //TODO: Function result state needs to be handled here - will not be communicated by arduino
 
         } catch (Exception exc) {
 

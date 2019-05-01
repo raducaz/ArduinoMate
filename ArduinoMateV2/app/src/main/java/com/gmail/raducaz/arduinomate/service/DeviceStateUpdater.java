@@ -1,15 +1,12 @@
 package com.gmail.raducaz.arduinomate.service;
 
-import android.os.OperationCanceledException;
-
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
-import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
+import com.gmail.raducaz.arduinomate.events.DeviceStateChangeEvent;
 import com.gmail.raducaz.arduinomate.events.PinStateChangeEvent;
 import com.gmail.raducaz.arduinomate.events.PinStateChangeListener;
-import com.gmail.raducaz.arduinomate.model.Device;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +15,7 @@ import java.util.Map;
 
 public class DeviceStateUpdater {
     DataRepository dataRepository;
-    DeviceStateInfo deviceStateInfo;
+    public DeviceStateInfo deviceStateInfo;
 
     DeviceEntity deviceEntity;
 
@@ -106,6 +103,8 @@ public class DeviceStateUpdater {
 
             Map<String, Double> pinStates = deviceStateInfo.getPinStates();
             Map<String, PinStateEntity> currentPinsState = getCurrentPinStates();
+            Map<String, Double> newPinStates = new HashMap<>();
+            Map<String, Double> oldPinStates = new HashMap<>();
             //        currentPinsState.stream().filter(p->p.getName().equals("p1")).findAny(); - unsupported by API22
 
             for (String pName : pinStates.keySet()) {
@@ -114,6 +113,11 @@ public class DeviceStateUpdater {
                     // Do nothing as the state is the same as the current pin State in the History
                     dataRepository.updatePinStateLastUpdate(currentPinsState.get(pName).getId());
                 } else {
+                    // Prepare the Device pin state change event
+                    newPinStates.put(pName, pState);
+                    if(currentPinsState.containsKey(pName))
+                        oldPinStates.put(pName, currentPinsState.get(pName).getState());
+
                     // Trigger here the custom event PinChanged
                     processPinStateChangeEvent(new PinStateChangeEvent(this, pName, pState));
 
@@ -127,6 +131,16 @@ public class DeviceStateUpdater {
                     }
                     insertPinStateHistory(pName,pState);
                 }
+            }
+
+            //TODO: Delete from history what has toDate < yesterday
+
+            // Trigger the change event containing all the changes
+            //TODO: Test if need to start this on a separate thread to avoid blocking the Server thread -
+            // should not be the case as this is executed on a Handler
+            if(newPinStates.size()>0) { // There is at least one change
+                DeviceStateChangeEvent deviceStateChangeEvent = new DeviceStateChangeEvent(dataRepository, deviceEntity);
+                deviceStateChangeEvent.trigger(oldPinStates, newPinStates);
             }
         }
     }

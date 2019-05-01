@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
+import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
@@ -28,7 +29,6 @@ public class TaskFunctionCaller implements TaskInterface {
     }
 
     public void execute() {
-
         functionExecution = new FunctionExecutionEntity();
         functionExecution.setFunctionId(function.getId());
         functionExecution.setName(function.getName());
@@ -40,12 +40,11 @@ public class TaskFunctionCaller implements TaskInterface {
             functionStateUpdater.startFunctionExecution();
 
             DeviceEntity device = mRepository.loadDeviceSync(function.getDeviceId());
-            ProcessExecutor processExecutor = new ProcessExecutor(device.getIp(), device.getPort());
 
             switch (function.getName())
             {
                 case "GeneratorOnOff":
-                    ProcessStartGenerator.execute(processExecutor);
+                    ProcessStartGenerator.execute(mRepository, functionStateUpdater);
                 break;
                 default:
 

@@ -8,44 +8,52 @@ const char VALUE[6] =     "value";
 const char FCTNAME[8] =   "fctName";
 const char FCTSTATE[9] =  "fctState";
 const char MSG[4] = "msg";
-const char PINSTATES[10] = "pinStates";
+const char DIGITAL[12] = "digitalPins";
+const char ANALOG[11] = "analogPins";
 
 class JSONSerializer
 {
-    public: static JsonObject& constructPinStatesJSON()
+    public: static JsonObject& constructPinStatesJSON(
+                                    const byte* deviceIp,
+                                    const byte deviceState,
+                                    byte pinType, 
+                                    float* pinStates, byte size)
     {
-        // return constructPinStatesJSON("");
-
-        StaticJsonBuffer<400> _buffer;
-        JsonObject& _root = _buffer.createObject();
-        
-        _root[IP] = "192.168.100.100";
-        _root[DEVICESTATE] = 0;//DeviceState;
-        JsonArray& pinStates = _root.createNestedArray(PINSTATES);
-        for(byte i=0;i<10;i++)
-        {
-            pinStates.add(digitalRead(i));
-        }
-        
-        return _root;
-
+        return constructPinStatesJSON(deviceIp, deviceState, pinType, pinStates, size, "");
     }
-    public: static JsonObject& constructPinStatesJSON(const char* msg)
+    public: static JsonObject& constructPinStatesJSON(
+                                    const byte* deviceIp,
+                                    const byte deviceState,
+                                    byte pinType, 
+                                    const float* pinStates, byte size, 
+                                    const char* msg)
     {
         StaticJsonBuffer<400> _buffer;
         JsonObject& _root = _buffer.createObject();
         if(strcmp(msg,"") != 0)
             _root[MSG] = msg;
-        _root[IP] = "192.168.100.100";
-        _root[DEVICESTATE] = 0;//DeviceState;
-        JsonArray& pinStates = _root.createNestedArray(PINSTATES);
-        for(byte i=0;i<10;i++)
+        _root[IP] = "192.168.100.100";//ipToString(deviceIp);
+        _root[DEVICESTATE] = deviceState;
+
+        JsonArray& psArr = _root.createNestedArray(pinType==0?DIGITAL:ANALOG);
+        for(byte i=0;i<size;i++)
         {
-            pinStates.add(digitalRead(i));
+            psArr.add(pinStates[i]);
         }
-        
+
         return _root;
     }
+    // static String ipToString(const byte* ip)
+    // {
+    //     char[20] result;
+    //     char sIp[4] = "";
+    //     for(byte i=0;i<4;i++){
+    //         sprintf (sIp, "%d", ip[i]);
+    //         result[i] = sIp[i];
+    //     }
+
+    //     return result;
+    // }
     // public: static JsonObject& constructPinStateJSON(byte pin, const char* msg)
     // {
     //     StaticJsonBuffer<400> _buffer;

@@ -2,24 +2,25 @@
 #include <Arduino.h>
 
 const int ContactGenerator = 2; // controleaza releul pentru contact generator (default CUPLAT - trebuie DECUPLAT pentru functionare)
-    const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
+const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
 
-    const int ContactDemaror12V = 8; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
+const int ContactDemaror12V = 8; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
 
-    // Atentie, default Borna rosie = -, Borna neagra = -; Daca se cupleaza ambele relee ambele borne vor fi pe + !!!
-    const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
-    const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
+// Atentie, default Borna rosie = -, Borna neagra = -; Daca se cupleaza ambele relee ambele borne vor fi pe + !!!
+const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
+const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
 
-    const int PresostatProbeSender = A3;
-    const int PresostatProbeReceiver = A4;
-    const int CurrentSensor = A5;
+const int PresostatProbeSender = A3;
+const int PresostatProbeReceiver = A4;
+const int CurrentSensor = A1;
+
 bool Configuration::isDebug()
 {
   return true;
 }
 bool Configuration::useEthernet()
 {
-  return true;
+  return false;
 }
 void Configuration::setupPins()
 {
@@ -31,7 +32,7 @@ void Configuration::setupPins()
   pinMode(ContactDemaror12V, OUTPUT);
   pinMode(PresostatProbeSender, OUTPUT);
   pinMode(PresostatProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
-  pinMode(CurrentSensor, OUTPUT);
+  pinMode(CurrentSensor, INPUT);
 }
 void Configuration::initializePins()
 {  

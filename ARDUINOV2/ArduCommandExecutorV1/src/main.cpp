@@ -14,13 +14,13 @@
 #include <tcpserver.h>
 #include <executor.h>
 
-volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
+//volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
 
 ThreadController threadsController = ThreadController();
 ThreadController threadsController2 = ThreadController();
 
 // We have 30 amps version sensor connected to A5 pin of arduino
-ACS712 sensor(ACS712_30A, A5);
+ACS712 sensor(ACS712_30A, A1);
 float zeroCurrent = 0;
 
 void calibrateCurrentSensor()
@@ -37,30 +37,18 @@ void calibrateCurrentSensor()
     c += sensor.getCurrentAC();
     delay(100);
   }
-  zeroCurrent = c / 10;
+  zeroCurrent = c / 10.0;
 }
 
-// class MyTcpServerThread: public Thread
-// {
-//   void run(){
-//     Logger::debugln("1");
-//     runned();
-//   }
-// };
-// class MyMonitorTcpClientThread: public Thread
-// {
-//   void run(){
-//     Logger::debugln("2");
-//     runned();
-//   }
-// };
+// This needs to be global in order to work - probably because of the EthernetClient variable
 MyTcpServerThread tcpServerThread = MyTcpServerThread();
 MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread(
                                         ip, 
                                         mac, 
                                         serverIp, 
                                         serverPort, 
-                                        gateway, dns, subnet
+                                        gateway, dns, subnet,
+                                        zeroCurrent
                                         );
 void setupTcpServerThread()
 {
@@ -68,13 +56,6 @@ void setupTcpServerThread()
   tcpServerThread.setInterval(1000); // in ms
   threadsController.add(&tcpServerThread);
 
-  // MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread(
-  //                                       ip, 
-  //                                       mac, 
-  //                                       serverIp, 
-  //                                       serverPort, 
-  //                                       gateway, dns, subnet
-  //                                       );
   monitorTcpClientThread.setInterval(2000); // in ms
   threadsController.add(&monitorTcpClientThread);
 }
@@ -106,9 +87,16 @@ void loop() {
 
   delay(500);
   //Start the Thread in loop
-  Logger::debugln("Start thread");
   threadsController.run();
-  // threadsController2.run();
   delay(500);
+
+  Serial.println(sensor.getCurrentAC()-zeroCurrent);
+  // if(digitalRead(17)==HIGH)
+  //   digitalWrite(17,LOW); //Probe if Presostat is activated - presure low. Set sender to ground
+  // else
+  //   digitalWrite(17,HIGH);
+  
+  // delay(1000);
+  // Serial.println(digitalRead(18));
 
 }

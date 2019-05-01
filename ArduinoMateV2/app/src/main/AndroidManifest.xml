@@ -53,7 +53,7 @@
         </activity>
 
         <service
-            android:name=".service.TcpServerIntentService"
+            android:name=".tcpserver.TcpServerIntentService"
             android:exported="false"/>
     </application>
 </manifest>

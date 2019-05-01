@@ -41,12 +41,18 @@
                     android:textColor="?attr/colorPrimary"
                     android:layout_alignParentRight="true"
                     android:text="RESET" />
-
+                <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/auto_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/execute_button"
+                    android:checked="@{functionViewModel.function.isAutoEnabled}"/>
                 <TextView
                     android:id="@+id/description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/execute_button"
+                    android:layout_below="@id/auto_checkbox"
                     android:text="@{functionViewModel.function.description}"/>
 
                 <LinearLayout

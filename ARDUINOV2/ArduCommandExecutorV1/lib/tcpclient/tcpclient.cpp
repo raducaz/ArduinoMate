@@ -7,12 +7,16 @@
 #include <jsonhelper.cpp>
 #include <executor.h>
 #include "logger.h"
+#include <ACS712.h>
 
-MyMonitorTcpClientThread::MyMonitorTcpClientThread(byte* ip, 
+MyMonitorTcpClientThread::MyMonitorTcpClientThread(
+                                        const byte* ip, 
                                         byte* mac, 
                                         byte* serverIp, 
                                         int serverPort, 
-                                        byte* gateway, byte* dns, byte* subnet):Thread()
+                                        byte* gateway, byte* dns, byte* subnet,
+                                        float zeroCurrent
+                                        ):Thread()
 {
   this->ip = ip;
   this->mac = mac;
@@ -21,33 +25,35 @@ MyMonitorTcpClientThread::MyMonitorTcpClientThread(byte* ip,
   this-> gateway = gateway;
   this->dns = dns;
   this->subnet = subnet;
+
+  this->zeroCurrent = zeroCurrent;
 }
 boolean MyMonitorTcpClientThread::ConnectToServer(const byte* ip, const int port)
 {
   if(arduinoClient)
   { 
-    Logger::debugln("1");
     if(!arduinoClient.connected())
     {
-      Logger::debugln("2");
       arduinoClient.stop();
       
+      Logger::debugln("MON: Reconnecting...");
       if (arduinoClient.connect(ip, port)) {    
-        // Logger::debugln("MON: Connected.");
-        Logger::debugln("3");
         return arduinoClient.connected();
       }
       else
       {
-        Logger::debugln("4");
         return false;
       }
-      
     }
+    else
+    {
+      return true;
+    }
+    
   }
   else
   {
-    Logger::debugln("5");
+    Logger::debugln("MON: Connecting...");
     arduinoClient.connect(ip, port);
     return arduinoClient.connected();
   }
@@ -75,7 +81,22 @@ void MyMonitorTcpClientThread::run(){
     // Send status all the time
     Logger::debug("MON: Sending status from ...");Logger::debugln(Ethernet.localIP());
     // Send the state of the pins
-    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(),arduinoClient);
+    float digitalPinStates[14];
+    for(byte i=0;i<14;i++)
+    {
+        digitalPinStates[i] = digitalRead(i);
+    }
+    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(ip, 0, 0, digitalPinStates, 14),arduinoClient);
+
+    float analogPinStates[6];
+    for(byte i=0;i<=5;i++)
+    {
+        analogPinStates[i] = analogRead(i+14);
+    }
+    ACS712 sensor(ACS712_30A, A1);
+    analogPinStates[1] = sensor.getCurrentAC()-zeroCurrent;
+
+    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(ip, 0, 1, analogPinStates, 6),arduinoClient);
     MyExecutor::sendToServer("END",arduinoClient);
   }
 

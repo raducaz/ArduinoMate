@@ -1,6 +1,8 @@
 package com.gmail.raducaz.arduinomate.telnet;
 
 //import com.google.common.base.Preconditions;
+import android.util.Log;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -66,7 +68,11 @@ public final class TelnetClient {
             lastWriteFuture.sync();
         } catch (InterruptedException ex) {
             LOG.error("Exception was caught {}", ex.getMessage());
-        } finally {
+        } catch (Exception generalExc) {
+            LOG.error("Exception was caught {}", generalExc.getMessage());
+            throw generalExc;
+        }
+        finally {
             closeConnecton();
         }
     }

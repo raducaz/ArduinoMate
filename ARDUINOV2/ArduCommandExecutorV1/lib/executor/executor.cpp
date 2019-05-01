@@ -33,17 +33,18 @@ void MyExecutor::sendToServer(JsonObject& json, EthernetClient& client)
   json.printTo(Serial);
   Serial.println();
 }
-void MyExecutor::setPin(byte pin, byte state)
+void MyExecutor::setDigitalPin(byte pin, byte state)
 {
   Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
   digitalWrite(pin, state);
 }
-void MyExecutor::setPinTemp(byte pin, byte state, unsigned int interval)
+void MyExecutor::setAnalogPin(byte pin, float state)
 {
-  // if(client.connected())
-  // {
-  //   //sendToServer(JSONSerializer::constructPinStateJSON(pin), client);
-  // }
+  Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
+  analogWrite(pin, state);
+}
+void MyExecutor::setDigitalPinTemp(byte pin, byte state, unsigned int interval)
+{
   Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
   Logger::debug(" for ");Logger::debugln(interval);
 
@@ -51,4 +52,15 @@ void MyExecutor::setPinTemp(byte pin, byte state, unsigned int interval)
   digitalWrite(pin, state);
   wait(interval);
   digitalWrite(pin, state1);
+}
+
+void MyExecutor::setAnalogPinTemp(byte pin, float state, unsigned int interval)
+{
+  Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
+  Logger::debug(" for ");Logger::debugln(interval);
+
+  float state1 = analogRead(pin);
+  analogWrite(pin, state);
+  wait(interval);
+  analogWrite(pin, state1);
 }

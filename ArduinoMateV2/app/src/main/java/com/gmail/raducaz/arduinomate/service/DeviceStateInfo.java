@@ -95,8 +95,10 @@ public class DeviceStateInfo {
     {
         try {
             if (_messageData != null) {
-                if (_messageData.has("pinStates")) {
-                    return convertJSONArrayListToMap("pinStates");
+                if (_messageData.has("digitalPins")) {
+                    return convertJSONArrayListToMap("digitalPins", "");
+                } else if (_messageData.has("analogPins")) {
+                    return convertJSONArrayListToMap("analogPins", "A");
                 } else if (_messageData.has("pin")) {
                     return convertJSONPinStatePairToMap();
                 }
@@ -107,7 +109,7 @@ public class DeviceStateInfo {
         return new HashMap<String, Double>();
     }
 
-    private Map<String, Double> convertJSONArrayListToMap(String arrayName) {
+    private Map<String, Double> convertJSONArrayListToMap(String arrayName, String keyPrefix) {
         Map<String, Double> map = new HashMap<String, Double>();
 
         try {
@@ -116,7 +118,7 @@ public class DeviceStateInfo {
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     Double value = jsonArray.getDouble(i);
-                    map.put(String.valueOf(i), value);
+                    map.put(keyPrefix+String.valueOf(i), value);
                 }
             }
         }

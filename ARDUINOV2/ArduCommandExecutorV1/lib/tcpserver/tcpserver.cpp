@@ -10,21 +10,25 @@
 #include "logger.h"
 #include "configuration.h"
 
-
 MyTcpServerThread::MyTcpServerThread() {;}
 MyTcpServerThread::~MyTcpServerThread() {;}
 
 // Function executed on thread execution
 void MyTcpServerThread::run(){
 
-  if(Configuration::useEthernet()){
-    this->listenEthernet();
-  }
-  else
+  if(DeviceState==0)
   {
-    this->listenSerial();
+    DeviceState = 1;
+    if(Configuration::useEthernet()){
+      this->listenEthernet();
+    }
+    else
+    {
+      this->listenSerial();
+    }
   }
   
+  DeviceState = 0;
   runned();
 }
 void MyTcpServerThread::listenSerial()
@@ -59,8 +63,10 @@ void MyTcpServerThread::listenSerial()
       //TODO: Test - this executes actual commands and blocks the thread until done
       if(endCmd)
       {
-        String result = this->parseCommand(buffer);
-        Serial.println(result);
+        JsonArray& result = this->parseCommand(buffer);
+        
+          result.printTo(Serial);
+
         buffer[0]=0;
         bufferSize=0;
       }
@@ -91,9 +97,11 @@ void MyTcpServerThread::listenEthernet()
         Logger::debugln(receivedText);
 
         //TODO: Test - this executes actual commands and blocks the thread until done
-        String result = this->parseCommand(receivedText);
-        client.println(result);
-        Logger::debugln(result);
+        JsonArray& result = this->parseCommand(receivedText);
+        
+          result.printTo(client);
+          result.printTo(Serial);
+        
       }
     }
 
@@ -106,7 +114,7 @@ void MyTcpServerThread::listenEthernet()
     Logger::debugln("No client, server stopped");
   }
 }
-String MyTcpServerThread::parseCommand(String plainJson)
+JsonArray& MyTcpServerThread::parseCommand(String plainJson)
 {
   // [
   //   {"=3":0.25,"@":2}, // for 2 ms and revert
@@ -116,7 +124,7 @@ String MyTcpServerThread::parseCommand(String plainJson)
   // ]
   // [{"=3":1,"@":2},{"?13":0},{"=13":0},{"?13":0},{"!":20}]
   // [set 3=1 for 2, get 13, set 13 to 0, get 13, wait 20]
-    const int capacity = JSON_ARRAY_SIZE(10) + 10*JSON_OBJECT_SIZE(2) + 32;
+    const int capacity = JSON_ARRAY_SIZE(10) + 10*JSON_OBJECT_SIZE(2) + 100;
     StaticJsonBuffer<capacity> jb;
 
     // Parse JSON object
@@ -130,25 +138,48 @@ String MyTcpServerThread::parseCommand(String plainJson)
           int pin=0;
           for (JsonPair& p : obj) {
             //p.key is a const char* pointing to the key
-            if(strncmp(p.key,"=",1)==0)
+            if(strncmp(p.key,"=",1)==0 || 
+                strncmp(p.key,"~",1)==0) //Cmd set
             {
               pin = getPin(1, p.key);
-              if(obj["@"]){
-                MyExecutor::setPinTemp(pin,p.value,obj["@"].as<int>());
+              if(obj["@"]){ // Cmd set temp for x ms
+                if(strncmp(p.key,"~",1)==0) 
+                { 
+                  MyExecutor::setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
+                }
+                else
+                {
+                  if(pin<=13) MyExecutor::setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
+                  else MyExecutor::setAnalogPinTemp(pin,p.value,obj["@"].as<float>());  
+                }
+                
                 obj[">"] = 1;
               }
-              else
+              else // Cmd permanent set
               {
-                MyExecutor::setPin(pin, p.value);
+                if(strncmp(p.key,"~",1)==0) 
+                {
+                  MyExecutor::setDigitalPin(pin, p.value.as<int>());
+                }
+                else
+                {
+                  if(pin<=13) MyExecutor::setDigitalPin(pin, p.value.as<int>());
+                  else MyExecutor::setAnalogPin(pin, p.value.as<float>());
+                }
+                
                 obj[">"] = 1;
               }
             }
-            if(strncmp(p.key,"?",1)==0)
+            if(strncmp(p.key,"?",1)==0 || 
+                strncmp(p.key,"#",1)==0) // Cmd get
             {
               pin = getPin(1, p.key);
-              obj[p.key] = digitalRead(pin);
+              if(strncmp(p.key,"#",1)==0)
+                obj[p.key] = digitalRead(pin);
+              else
+                obj[p.key] = pin<=13 ? digitalRead(pin) : analogRead(pin);
             }
-            if(strcmp(p.key,"!")==0){
+            if(strcmp(p.key,"!")==0){ // Cmd wait
               MyExecutor::wait(p.value);
               obj[">"] = 1;
             }
@@ -157,24 +188,30 @@ String MyTcpServerThread::parseCommand(String plainJson)
         }
       }
 
-      String output;
-      arr.printTo(output);
-      return output;
+      return arr;
 
     } else {
       // parseObject() failed
+      JsonArray& arr = jb.createArray();
+      arr.add("Error parsing message");
       Logger::debugln("Deserialize received message failed.");
-      return "";
+      return arr;
     }
 }
-int MyTcpServerThread::getPin(const byte size, const char* key)
+int MyTcpServerThread::getPin(const byte startIndex, const char* key)
 {
-  char sPin[2]="";
-  byte i=0;
-  while(key[size+i]){
-    sPin[i]=key[size+i];
+  char sPin[5]="";
+  bool isAnalogPin = (key[startIndex]=='A'||key[startIndex]=='a');
+  
+  byte i= 0; //Start from second character id analog
+  byte index = startIndex + (isAnalogPin ? 1 : 0);
+  while(key[index+i]){
+    sPin[i]=key[index+i];
     i++;
   }
   sPin[i] = '\0';
-  return atoi(sPin);
+  
+  int pinNo = atoi(sPin);
+  //return isAnalogPin ? (pinNo<2 ? pinNo+16 : pinNo+18) : pinNo;
+  return isAnalogPin ? pinNo+14 : pinNo; //A0 is 14, A1 is 15...
 }

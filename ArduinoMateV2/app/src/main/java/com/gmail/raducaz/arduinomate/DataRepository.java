@@ -115,6 +115,9 @@ public class DataRepository {
     public void updateFunction(FunctionEntity function) {
         mDatabase.functionDao().update(function);
     }
+    public void updateFunctionAutoEnabled(final long functionId, boolean isChecked) {
+        mDatabase.functionDao().updateAutoEnabled(functionId, isChecked);
+    }
     //endregion Function
 
     //region FunctionExecution

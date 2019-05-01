@@ -72,13 +72,6 @@ public class DataGenerator {
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("PowerAutoEnableDisable");
-        function.setDescription("Enable/Disable 220V supply" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
         // Device Generator - TEST
 
         // Device Generator - PROD
@@ -95,14 +88,6 @@ public class DataGenerator {
         function.setDeviceId(device.getId());
         function.setName("PowerOnOff");
         function.setDescription("Start/Stop 220V supply" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("PowerAutoEnableDisable");
-        function.setDescription("Enable/Disable 220V supply" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

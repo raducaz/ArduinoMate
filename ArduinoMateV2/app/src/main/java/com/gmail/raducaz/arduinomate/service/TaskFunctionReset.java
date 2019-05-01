@@ -4,13 +4,11 @@ import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
-import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
+import com.gmail.raducaz.arduinomate.processes.TaskInterface;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class TaskFunctionReset implements TaskInterface {
 

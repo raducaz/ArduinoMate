@@ -3,8 +3,8 @@ package com.gmail.raducaz.arduinomate;
 import android.app.Application;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
-import com.gmail.raducaz.arduinomate.service.TcpServerInboundHandler;
-import com.gmail.raducaz.arduinomate.service.TcpServerService;
+import com.gmail.raducaz.arduinomate.tcpserver.TcpServerService;
+import com.gmail.raducaz.arduinomate.timer.TimerService;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
@@ -18,6 +18,7 @@ public class ArduinoMateApp extends Application {
 
     private AppExecutors mAppExecutors;
     private TcpServerService tcpServerService;
+    private TimerService timerService;
 
     @Override
     public void onCreate() {
@@ -29,6 +30,16 @@ public class ArduinoMateApp extends Application {
         try {
             tcpServerService = TcpServerService.getInstance(this.getRepository());
             this.getNetworkExecutor().execute(tcpServerService);
+        }
+        catch (IOException exc)
+        {
+            //TODO: handle it somehow
+        }
+
+        // Start the timer trigger
+        try {
+            timerService = TimerService.getInstance(this.getRepository());
+            this.getNetworkExecutor().execute(timerService);
         }
         catch (IOException exc)
         {

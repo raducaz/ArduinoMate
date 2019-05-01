@@ -13,6 +13,7 @@ public interface Function {
     String getDescription();
     String getLog();
     void setLog(String log);
+    boolean getIsAutoEnabled();
     Date getDateSample();
 
     int getResultState();

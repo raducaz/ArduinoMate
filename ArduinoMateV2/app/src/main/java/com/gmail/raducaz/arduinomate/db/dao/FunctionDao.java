@@ -28,6 +28,12 @@ public interface FunctionDao {
             "WHERE id = :id"
     )
     void updateStates(long id, int callState, int resultState);
+    @Query(
+            "UPDATE function SET " +
+                    "isAutoEnabled = :isChecked " +
+                    "WHERE id = :id"
+    )
+    void updateAutoEnabled(long id, boolean isChecked);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(FunctionEntity function);

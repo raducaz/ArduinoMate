@@ -1,4 +1,4 @@
-package com.gmail.raducaz.arduinomate.service;
+package com.gmail.raducaz.arduinomate.events;
 
 import android.util.Log;
 
@@ -29,8 +29,10 @@ public class DeviceStateChangeEvent {
             // Example - if pin 1 has a new value of 1 then call function GeneratorOnOff
             if (newPinStates.containsKey("1") && newPinStates.get("1").equals(1)) {
                 FunctionEntity functionEntity = dataRepository.loadFunctionSync(deviceEntity.getId(), "GeneratorOnOff");
-                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, functionEntity);
-                new TaskExecutor().execute(functionCaller);
+                if(functionEntity.getIsAutoEnabled()) {
+                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, functionEntity);
+                    new TaskExecutor().execute(functionCaller);
+                }
             }
         }
         catch (Exception exc) {

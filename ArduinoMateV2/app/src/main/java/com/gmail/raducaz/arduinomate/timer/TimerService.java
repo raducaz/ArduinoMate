@@ -3,34 +3,17 @@ package com.gmail.raducaz.arduinomate.timer;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
-import com.gmail.raducaz.arduinomate.commands.ArduinoCommander;
-import com.gmail.raducaz.arduinomate.commands.CommandProbePressure;
-import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
-import com.gmail.raducaz.arduinomate.tcpserver.TcpServerInboundHandler;
+import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
+import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
+import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
+import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
 
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.ssl.SslContext;
 
 public class TimerService implements Runnable {
 
@@ -83,14 +66,28 @@ public class TimerService implements Runnable {
                 public void run() {
 
                     try {
-                        ArduinoCommander arduinoCommander = new ArduinoCommander("192.168.100.100", 8080);
-                        CommandProbePressure.execute(arduinoCommander);
+                        DeviceEntity deviceEntity = dataRepository.loadDeviceSync("192.168.100.100");
+                        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(deviceEntity.getIp(), deviceEntity.getPort());
+                        if(deviceGeneratorFunctions.isPressureLow())
+                        {
+                            try {
+                                FunctionEntity functionEntity = dataRepository.loadFunctionSync(deviceEntity.getId(), "GeneratorOnOff");
+                                if(functionEntity.getIsAutoEnabled()) {
+                                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, functionEntity);
+                                    new TaskExecutor().execute(functionCaller);
+                                }
+
+                            }
+                            catch (Exception exc) {
+                                Log.e(TAG, exc.getMessage());
+                            }
+                        }
                     }
                     catch (Exception exc) {
                         Log.e(TAG, exc.getMessage());
                     }
                 }
-            }, 1000, 1000);
+            }, 1000, 5000);
         }
     }
 }

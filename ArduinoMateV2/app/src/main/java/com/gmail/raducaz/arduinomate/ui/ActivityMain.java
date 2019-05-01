@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gmail.raducaz.arduinomate.R;
-import com.gmail.raducaz.arduinomate.service.TcpServerIntentService;
 
 
 /**

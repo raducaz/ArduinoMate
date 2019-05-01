@@ -1,10 +1,6 @@
 package com.gmail.raducaz.arduinomate;
 
-import com.gmail.raducaz.arduinomate.service.FunctionChannelClientInboundHandler;
-import com.gmail.raducaz.arduinomate.service.TaskFunctionCaller;
-import com.gmail.raducaz.arduinomate.service.TcpClientService;
 import com.gmail.raducaz.arduinomate.telnet.TelnetClient;
-import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
 
 import org.junit.Test;
 
@@ -13,10 +9,6 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import static org.junit.Assert.*;
 
 /**
  * Example local unit test, which will execute on the development machine (host).

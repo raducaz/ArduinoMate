@@ -34,6 +34,7 @@ public class FunctionEntity implements Function {
     private String log;
     private int resultState;
     private int callState;
+    private boolean isAutoEnabled;
     private Date dateSample;
 
     @Override
@@ -101,6 +102,15 @@ public class FunctionEntity implements Function {
     @Override
     public String getCallStateText() {
         return String.valueOf(FunctionCallStateEnum.forInt(callState));
+    }
+
+    @Override
+    public boolean getIsAutoEnabled() {
+        return isAutoEnabled;
+    }
+
+    public void setIsAutoEnabled(boolean isAutoEnabled) {
+        this.isAutoEnabled = isAutoEnabled;
     }
 
     @Override

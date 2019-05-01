@@ -13,6 +13,8 @@ class MyTcpServerThread: public Thread
         char buffer[MAXBUFFERSIZE] = ""; 
         unsigned int bufferSize = 0;
 
+        volatile byte DeviceState = 0;
+
     public: MyTcpServerThread();
     ~MyTcpServerThread();
     public: void run();
@@ -21,7 +23,7 @@ class MyTcpServerThread: public Thread
     private: void listenSerial();
              void listenEthernet();
         //      char* parseCommand(char* plainJson);
-                String parseCommand(String plainJson);
+                JsonArray& parseCommand(String plainJson);
              int getPin(const byte size, const char* key);
   
 };

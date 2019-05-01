@@ -95,6 +95,7 @@ void MyTcpServerThread::listenEthernet()
       {
         receivedText = client.readStringUntil(endChar);
         Logger::debugln(receivedText);
+        Serial.println(receivedText);
 
         //TODO: Test - this executes actual commands and blocks the thread until done
         JsonArray& result = this->parseCommand(receivedText);

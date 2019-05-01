@@ -56,8 +56,8 @@ void setupTcpServerThread()
   tcpServerThread.setInterval(1000); // in ms
   threadsController.add(&tcpServerThread);
 
-  monitorTcpClientThread.setInterval(2000); // in ms
-  threadsController.add(&monitorTcpClientThread);
+  // monitorTcpClientThread.setInterval(2000); // in ms
+  // threadsController.add(&monitorTcpClientThread);
 }
 
 void setup() {

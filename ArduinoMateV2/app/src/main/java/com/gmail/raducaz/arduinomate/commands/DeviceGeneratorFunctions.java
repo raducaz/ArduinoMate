@@ -2,14 +2,31 @@ package com.gmail.raducaz.arduinomate.commands;
 
 import android.util.Log;
 
+import com.gmail.raducaz.arduinomate.DataRepository;
+import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class DeviceGeneratorFunctions {
     ArduinoCommander arduinoCommander;
+    DataRepository dataRepository;
+    DeviceEntity deviceEntity;
 
-    public DeviceGeneratorFunctions(String host, int port) {
-        arduinoCommander = new ArduinoCommander(host, port);
+    public DeviceGeneratorFunctions(DataRepository dataRepository, String deviceIp) {
+        this.deviceEntity = dataRepository.loadDeviceSync(deviceIp);
+        arduinoCommander = new ArduinoCommander(deviceEntity.getIp(), deviceEntity.getPort());
+    }
+
+    public boolean isCurrentAbove(double threshold)
+    {
+        // Check AC current - if high then it's on
+        String command = "[{\"?A1\":0}]";
+        String result = arduinoCommander.SendCommand(command);
+        if(new Parser(result).getDouble("?A1")>=threshold)
+            return true;
+        else
+            return false;
     }
 
     // Returns true if probe proves the pressure sensor is activated
@@ -73,12 +90,7 @@ public class DeviceGeneratorFunctions {
             arduinoCommander.SendCommand(command);
 
             // Check AC current - if low then it stopped
-            command = "[{\"?A1\":0}]";
-            String result = arduinoCommander.SendCommand(command);
-            if(new Parser(result).getDouble("?A1")<0.18)
-                return true;
-            else
-                return false;
+            return !isCurrentAbove(0.18);
         }
         catch (Exception exc)
         {
@@ -98,13 +110,7 @@ public class DeviceGeneratorFunctions {
             String command = "[{\"=3\":0}]";
             arduinoCommander.SendCommand(command);
 
-            // Check AC current - if high then it's on
-            command = "[{\"?A1\":0}]";
-            String result = arduinoCommander.SendCommand(command);
-            if(new Parser(result).getDouble("?A1")>=0.18)
-                return true;
-            else
-                return false;
+            return isCurrentAbove(0.18);
         }
         catch (Exception exc)
         {
@@ -125,12 +131,7 @@ public class DeviceGeneratorFunctions {
             arduinoCommander.SendCommand(command);
 
             // Check AC current - if low then it's off
-            command = "[{\"?A1\":0}]";
-            String result = arduinoCommander.SendCommand(command);
-            if(new Parser(result).getDouble("?A1")<0.18)
-                return true;
-            else
-                return false;
+            return !isCurrentAbove(0.18);
         }
         catch (Exception exc)
         {

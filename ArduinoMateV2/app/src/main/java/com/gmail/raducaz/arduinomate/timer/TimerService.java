@@ -7,6 +7,7 @@ import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
+import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
 
 import java.io.IOException;
@@ -66,17 +67,14 @@ public class TimerService implements Runnable {
                 public void run() {
 
                     try {
-                        DeviceEntity deviceEntity = dataRepository.loadDeviceSync("192.168.100.100");
-                        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(deviceEntity.getIp(), deviceEntity.getPort());
+
+                        // Check the pressure periodically by probing, if pressure low start generator and pump
+                        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "192.168.100.100");
                         if(deviceGeneratorFunctions.isPressureLow())
                         {
                             try {
-                                FunctionEntity functionEntity = dataRepository.loadFunctionSync(deviceEntity.getId(), "GeneratorOnOff");
-                                if(functionEntity.getIsAutoEnabled()) {
-                                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, functionEntity);
-                                    new TaskExecutor().execute(functionCaller);
-                                }
-
+                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "192.168.100.100", "PumpOnOff", FunctionResultStateEnum.ON);
+                                new TaskExecutor().execute(functionCaller);
                             }
                             catch (Exception exc) {
                                 Log.e(TAG, exc.getMessage());

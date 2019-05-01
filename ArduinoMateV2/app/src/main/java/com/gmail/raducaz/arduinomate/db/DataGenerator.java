@@ -72,6 +72,22 @@ public class DataGenerator {
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("PumpOnOff");
+        function.setDescription("Start/Stop generator and 220V supply to " + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("BoilerOnOff");
+        function.setDescription("Start/Stop generator for Boiler circuit " + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
         // Device Generator - TEST
 
         // Device Generator - PROD

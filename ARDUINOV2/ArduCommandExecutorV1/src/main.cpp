@@ -215,18 +215,28 @@ void listenEthernet()
     if (client.connected()) 
     {
       Logger::debugln("Client connected");
-      if (client.available()) 
-      {
-        receivedText = client.readStringUntil(endChar);
-        Logger::debugln(receivedText);
-        Serial.println(receivedText);
 
-        //TODO: Test - this executes actual commands and blocks the thread until done
-        JsonArray& result = parseCommand(receivedText);
-        
-          result.printTo(client);
-          result.printTo(Serial);
-        
+      if(DeviceState==0)
+      {
+        DeviceState=1;
+        if (client.available()) 
+        {
+          receivedText = client.readStringUntil(endChar);
+          Logger::debugln(receivedText);
+          Serial.println(receivedText);
+
+          //TODO: Test - this executes actual commands and blocks the thread until done
+          JsonArray& result = parseCommand(receivedText);
+          
+            result.printTo(client);
+            result.printTo(Serial);
+        }
+      }
+      else
+      {
+        arduinoClient.println("[\"Device is busy\"]");
+        arduinoClient.println("END");
+        Logger::debugln("[\"Device is busy\"]");
       }
     }
 
@@ -241,9 +251,6 @@ void listenEthernet()
 }
 void serverThreadCallback()
 {
-  if(DeviceState==0)
-  {
-    DeviceState = 1;
     if(Configuration::useEthernet()){
       listenEthernet();
     }
@@ -251,9 +258,6 @@ void serverThreadCallback()
     {
       listenSerial();
     }
-  }
-  
-  DeviceState = 0;
 }
 bool ConnectToServer(const byte* ip, const int port)
 {

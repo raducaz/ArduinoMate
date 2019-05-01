@@ -1,30 +1,32 @@
-#ifndef tcpserver_h
-#define tcpserver_h
+// #ifndef tcpserver_h
+// #define tcpserver_h
 
-#include <Arduino.h>
-#include <ArduinoJson.h>
-#include <Thread.h>
-#include <Ethernet.h>
-#include <EthernetServer.h>
+// #include <Arduino.h>
+// #include <ArduinoJson.h>
+// #include <Thread.h>
+// #include <Ethernet.h>
+// #include <EthernetServer.h>
 
-class MyTcpServerThread: public Thread
-{
-        static const unsigned int MAXBUFFERSIZE = 200;
-        char buffer[MAXBUFFERSIZE] = ""; 
-        unsigned int bufferSize = 0;
+// class MyTcpServerThread //: public Thread
+// {
+        
 
-        volatile byte DeviceState = 0;
+//         static const unsigned int MAXBUFFERSIZE = 200;
+//         char buffer[MAXBUFFERSIZE] = ""; 
+//         unsigned int bufferSize = 0;
 
-    public: MyTcpServerThread();
-    ~MyTcpServerThread();
-    public: void run();
-            void processCommand(const char* commandText, EthernetClient& client);
+//         volatile byte DeviceState = 0;
 
-    private: void listenSerial();
-             void listenEthernet();
-        //      char* parseCommand(char* plainJson);
-                JsonArray& parseCommand(String plainJson);
-             int getPin(const byte size, const char* key);
+//     public: MyTcpServerThread();
+//     ~MyTcpServerThread();
+//     public: void run();
+//             void processCommand(const char* commandText, EthernetClient& client);
+
+//     private: void listenSerial();
+//              void listenEthernet();
+//         //      char* parseCommand(char* plainJson);
+//                 JsonArray& parseCommand(String plainJson);
+//              int getPin(const byte size, const char* key);
   
-};
-#endif
+// };
+// #endif

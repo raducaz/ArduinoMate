@@ -14,7 +14,7 @@ public class ProcessPumpOnOff extends Process {
     }
 
     @Override
-    protected boolean on()
+    protected boolean on() throws Exception
     {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 
@@ -40,7 +40,7 @@ public class ProcessPumpOnOff extends Process {
     }
 
     @Override
-    protected boolean off()
+    protected boolean off() throws Exception
     {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 

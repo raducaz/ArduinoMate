@@ -69,7 +69,7 @@ public abstract class Process {
         }
     }
 
-    protected boolean on()
+    protected boolean on() throws Exception
     {
         // Function result state needs to be handled here - will not be communicated by arduino
         // This will automatically set the Execution Log as well
@@ -78,7 +78,7 @@ public abstract class Process {
         return true;
     }
 
-    protected boolean off()
+    protected boolean off() throws Exception
     {
         // Function result state needs to be handled here - will not be communicated by arduino
         // This will automatically set the Execution Log as well

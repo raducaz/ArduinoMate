@@ -29,7 +29,7 @@ public class DeviceStateChangeEvent {
         try {
             // if current is below a threshold generator must be stopped
             if (newPinStates.containsKey("A1") && newPinStates.get("A1")<0.18) {
-                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, deviceEntity.getId(), "GeneratorOnOff", FunctionResultStateEnum.OFF);
+                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, deviceEntity.getIp(), "GeneratorOnOff", FunctionResultStateEnum.OFF);
                 new TaskExecutor().execute(functionCaller);
             }
         }

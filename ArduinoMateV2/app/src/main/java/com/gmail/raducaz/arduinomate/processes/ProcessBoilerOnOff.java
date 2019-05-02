@@ -12,7 +12,7 @@ public class ProcessBoilerOnOff extends Process {
     }
 
     @Override
-    protected boolean on()
+    protected boolean on() throws Exception
     {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 
@@ -24,7 +24,7 @@ public class ProcessBoilerOnOff extends Process {
             pGen.execute(false, FunctionResultStateEnum.ON);
 
             //TODO: Test if after Boiler is ready the power consumption stops.
-            
+
 
             return super.on();
         } catch (Exception exc) {
@@ -34,21 +34,19 @@ public class ProcessBoilerOnOff extends Process {
     }
 
     @Override
-    protected boolean off()
+    protected boolean off() throws Exception
     {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 
         try {
-            // Don't want to validate the children process as long as the parent is AutoEnabled
+            // Prevent other events to stop this - only manually overwrite
+            function.setIsAutoEnabled(false);
+
             ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getIp());
-            ProcessPowerOnOff pPower = new ProcessPowerOnOff(dataRepository, deviceEntity.getIp());
+            pGen.execute(false, FunctionResultStateEnum.OFF);
 
-            pPower.execute(false, FunctionResultStateEnum.OFF);
+            //TODO: Test if after Boiler is ready the power consumption stops.
 
-            if(!pGen.execute(false, FunctionResultStateEnum.OFF))
-            {
-                throw new Exception("Generator couldn't be stopped. Retry.");
-            }
 
             return super.on();
         } catch (Exception exc) {

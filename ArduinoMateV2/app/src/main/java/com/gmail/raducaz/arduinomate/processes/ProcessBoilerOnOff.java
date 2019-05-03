@@ -10,48 +10,42 @@ public class ProcessBoilerOnOff extends Process {
     {
         super(dataRepository, deviceIp, "BoilerOnOff");
     }
-
-    @Override
-    protected boolean on() throws Exception
+    public ProcessBoilerOnOff(DataRepository dataRepository, long deviceId)
     {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
-
-        try {
-            // Prevent other events to stop this - only manually overwrite
-            function.setIsAutoEnabled(false);
-
-            ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getIp());
-            pGen.execute(false, FunctionResultStateEnum.ON);
-
-            //TODO: Test if after Boiler is ready the power consumption stops.
-
-
-            return super.on();
-        } catch (Exception exc) {
-            functionExecution.setResultState(FunctionResultStateEnum.ERROR.getId());
-            throw exc;
-        }
+        super(dataRepository, deviceId, "BoilerOnOff");
     }
 
     @Override
-    protected boolean off() throws Exception
-    {
+    protected boolean on() throws Exception {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 
-        try {
-            // Prevent other events to stop this - only manually overwrite
-            function.setIsAutoEnabled(false);
+        // Prevent other events to stop this - only manually overwrite
+        function.setIsAutoEnabled(false);
 
-            ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getIp());
-            pGen.execute(false, FunctionResultStateEnum.OFF);
+        ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getIp());
+        pGen.execute(false, FunctionResultStateEnum.ON);
 
-            //TODO: Test if after Boiler is ready the power consumption stops.
+        //TODO: Test if after Boiler is ready the power consumption stops.
 
 
-            return super.on();
-        } catch (Exception exc) {
-            functionExecution.setResultState(FunctionResultStateEnum.ERROR.getId());
-            throw exc;
-        }
+        return super.on();
+    }
+
+    @Override
+    protected boolean off() throws Exception {
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
+
+
+        // Prevent other events to stop this - only manually overwrite
+        function.setIsAutoEnabled(false);
+
+        ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getIp());
+        pGen.execute(false, FunctionResultStateEnum.OFF);
+
+        //TODO: Test if after Boiler is ready the power consumption stops.
+
+
+        return super.off();
+
     }
 }

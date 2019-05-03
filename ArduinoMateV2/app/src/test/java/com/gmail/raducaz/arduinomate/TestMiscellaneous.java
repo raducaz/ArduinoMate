@@ -20,8 +20,8 @@ public class TestMiscellaneous {
     public void addition_isCorrect() {
         //assertEquals(4, 2 + 2);
 
-        byte repl_3[] = {(byte) 0xff, (byte) 0xfc, 0x01};
-        System.out.println("Result =" + repl_3);
+//        byte repl_3[] = {(byte) 0xff, (byte) 0xfc, 0x01};
+//        System.out.println("Result =" + repl_3);
 
     }
 }

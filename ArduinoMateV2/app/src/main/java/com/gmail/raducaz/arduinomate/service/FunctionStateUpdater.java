@@ -114,7 +114,7 @@ public class FunctionStateUpdater {
 
         functionExecution.setCallState(FunctionCallStateEnum.EXECUTING.getId());
         functionExecution.setStartDate(DateConverter.toDate(System.currentTimeMillis()));
-        functionExecution.setResultState(FunctionResultStateEnum.NA.getId());
+        //functionExecution.setResultState(FunctionResultStateEnum.NA.getId());
         long executionId = dataRepository.insertFunctionExecution(functionExecution);
         functionExecution.setId(executionId);
 
@@ -141,6 +141,17 @@ public class FunctionStateUpdater {
             functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
             insertExecutionLog("Execution failed");
         }
+        dataRepository.updateFunctionExecution(functionExecution);
+
+        return  functionExecution;
+    }
+    public FunctionExecutionEntity updateFunctionExecution(FunctionResultStateEnum resultState) {
+        if(functionExecution == null)
+            return null;
+
+        //if(deviceStateInfo.getFunctionState() != FunctionResultStateEnum.NA)
+        functionExecution.setResultState(resultState.getId());
+
         dataRepository.updateFunctionExecution(functionExecution);
 
         return  functionExecution;

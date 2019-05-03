@@ -14,10 +14,11 @@ public class TaskFunctionCaller implements TaskInterface {
 
     private String TAG = "TaskFunctionCaller";
 
-    private final DeviceEntity device;
-    private final FunctionEntity function;
-    private long executionId;
-    private FunctionExecutionEntity functionExecution;
+    private String deviceIp = null;
+    private String functionName;
+
+    private DeviceEntity device;
+    private FunctionEntity function;
     private final DataRepository mRepository;
     private  FunctionResultStateEnum desiredFunctionResult;
     private boolean isAutoExecution;
@@ -25,37 +26,42 @@ public class TaskFunctionCaller implements TaskInterface {
     // This is used by the UI
     public TaskFunctionCaller(DataRepository dataRepository, FunctionEntity function) {
         this.function = function;
+        this.functionName = function.getName();
 
         mRepository = dataRepository;
         this.desiredFunctionResult = FunctionResultStateEnum.NA;
         isAutoExecution = false;
-        this.device = mRepository.loadDeviceSync(function.getDeviceId());
+
+        // Do not add code to access data base here, as this contructor is called directly from UI
     }
 
     // Use this constructor to state the desired FunctionResultState after the execution
     public TaskFunctionCaller(DataRepository dataRepository, String deviceIp, String functionName, FunctionResultStateEnum desiredFunctionResult) {
-        DeviceEntity deviceEntity = dataRepository.loadDeviceSync(deviceIp);
-        FunctionEntity functionEntity = dataRepository.loadFunctionSync(deviceEntity.getId(), functionName);
-        this.function = functionEntity;
+        this.deviceIp = deviceIp;
+        this.functionName = functionName;
 
         mRepository = dataRepository;
-        this.device = mRepository.loadDeviceSync(function.getDeviceId());
         this.desiredFunctionResult = desiredFunctionResult;
         isAutoExecution = true;
     }
 
     public void execute() {
         try {
-            switch (function.getName())
+            if(deviceIp == null) {
+                device = mRepository.loadDeviceSync(function.getDeviceId());
+                deviceIp = device.getIp();
+            }
+
+            switch (functionName)
             {
                 case "GeneratorOnOff":
-                    new ProcessGeneratorOnOff(mRepository, device.getIp()).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessGeneratorOnOff(mRepository, deviceIp).execute(isAutoExecution, desiredFunctionResult);
                 break;
                 case "PowerOnOff":
-                    new ProcessPowerOnOff(mRepository, device.getIp()).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessPowerOnOff(mRepository, deviceIp).execute(isAutoExecution, desiredFunctionResult);
                     break;
                 case "PumpOnOff":
-                    new ProcessPumpOnOff(mRepository, device.getIp()).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessPumpOnOff(mRepository, deviceIp).execute(isAutoExecution, desiredFunctionResult);
                     break;
                 default:
 

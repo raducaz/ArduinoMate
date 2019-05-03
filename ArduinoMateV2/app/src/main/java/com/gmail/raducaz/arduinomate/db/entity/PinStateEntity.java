@@ -61,7 +61,7 @@ public class PinStateEntity implements PinState {
     }
     @Override
     public String getStateText() {
-        return Double.toString(state);
+        return String.format("%.2f", state);
     }
     public void setState(double state) {
         this.state = state;
@@ -100,7 +100,7 @@ public class PinStateEntity implements PinState {
     @Override
     public String getSecondsFromLastUpdateText() {
         long s = getSecondsFromLastUpdate();
-        return String.valueOf(s>100?">100":s);
+        return String.valueOf(s>100?"[>100s]":"["+s+"s]");
     }
 
     public PinStateEntity() {

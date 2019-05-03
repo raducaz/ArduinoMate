@@ -25,13 +25,13 @@ public class Parser {
                 if (obj.has(key))
                     return obj.getInt(key);
             }
+            return -1;
         }
         catch (Exception exc) {
             Log.e("Parser", exc.getMessage());
-        }
-        finally {
             return -1;
         }
+
     }
     public double getDouble(String key)
     {
@@ -41,12 +41,12 @@ public class Parser {
                 if (obj.has(key))
                     return obj.getDouble(key);
             }
+            return -1;
         }
         catch (Exception exc) {
             Log.e("Parser", exc.getMessage());
-        }
-        finally {
             return -1;
         }
+
     }
 }

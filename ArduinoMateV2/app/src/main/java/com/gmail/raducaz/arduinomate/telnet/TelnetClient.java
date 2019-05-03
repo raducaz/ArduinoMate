@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class TelnetClient {
 
-    public static final int DEFAULT_COMMAND_TIMEOUT = 5000;
+    public static final int DEFAULT_COMMAND_TIMEOUT = 20000;
     private static final Logger LOG = LoggerFactory.getLogger(TelnetClient.class);
     private final String host;
     private final int port;
@@ -61,9 +61,11 @@ public final class TelnetClient {
         BlockingQueue<String> queue = new LinkedBlockingQueue<>();
         try {
             final Channel channel = initConnection(queue);
-            ChannelFuture lastWriteFuture = channel.writeAndFlush(command + "\r\n");
+            ChannelFuture lastWriteFuture = channel.writeAndFlush(command + "\n");
             // Get command output
             String commandOutput = queue.poll(DEFAULT_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
+            //TODO: Determine why there is \r\n added inside the received commandOutput
+            commandOutput = (commandOutput ==null? "" : commandOutput).replace("\r\n", "");
             responseContext.put(command, commandOutput);
             lastWriteFuture.sync();
         } catch (InterruptedException ex) {
@@ -85,7 +87,7 @@ public final class TelnetClient {
             final Channel channel = initConnection(queue);
             ChannelFuture lastWriteFuture = null;
             for (String command : commands) {
-                lastWriteFuture = channel.writeAndFlush(command + "\r\n");
+                lastWriteFuture = channel.writeAndFlush(command + "\n");
                 // Get command output
                 String commandOutput = queue.poll(DEFAULT_COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
                 responseContext.put(command, commandOutput);

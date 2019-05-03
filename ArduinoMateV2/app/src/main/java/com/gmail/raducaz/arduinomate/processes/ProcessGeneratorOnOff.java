@@ -12,33 +12,29 @@ public class ProcessGeneratorOnOff extends Process {
     {
         super(dataRepository, deviceIp, "GeneratorOnOff");
     }
+    public ProcessGeneratorOnOff(DataRepository dataRepository, long deviceId)
+    {
+        super(dataRepository, deviceId, "GeneratorOnOff");
+    }
 
     @Override
     protected boolean on() throws Exception {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 
-        try {
-            deviceGeneratorFunctions.generatorON();
+        deviceGeneratorFunctions.generatorON();
 
-            return super.on();
-        } catch (Exception exc) {
-            functionExecution.setResultState(FunctionResultStateEnum.ERROR.getId());
-            throw exc;
-        }
+        return super.on();
     }
 
     @Override
-    protected boolean off() throws Exception
-    {
+    protected boolean off() throws Exception {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 
-        try {
-            deviceGeneratorFunctions.generatorOFF();
+        ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, deviceEntity.getIp());
+        pPump.execute(false, FunctionResultStateEnum.OFF);
 
-            return super.on();
-        } catch (Exception exc) {
-            functionExecution.setResultState(FunctionResultStateEnum.ERROR.getId());
-            throw exc;
-        }
+        //deviceGeneratorFunctions.generatorOFF();
+
+        return super.off();
     }
 }

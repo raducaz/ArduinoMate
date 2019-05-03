@@ -29,15 +29,27 @@ public abstract class Process {
         this.dataRepository = dataRepository;
         this.deviceEntity = dataRepository.loadDeviceSync(deviceIp);
         this.function = dataRepository.loadFunctionSync(deviceEntity.getId(), functionName);
-    }
-
-    public boolean execute(boolean isAutoExecution, FunctionResultStateEnum desiredResult) {
 
         functionExecution = new FunctionExecutionEntity();
         functionExecution.setFunctionId(function.getId());
-        functionExecution.setName(function.getName());
-
         functionStateUpdater = new FunctionStateUpdater(dataRepository, "Function started ...",functionExecution);
+    }
+    public Process(DataRepository dataRepository, long deviceId, String functionName)
+    {
+        this.functionName = functionName;
+        this.dataRepository = dataRepository;
+        this.deviceEntity = dataRepository.loadDeviceSync(deviceId);
+        this.function = dataRepository.loadFunctionSync(deviceEntity.getId(), functionName);
+
+        functionExecution = new FunctionExecutionEntity();
+        functionExecution.setFunctionId(function.getId());
+        functionStateUpdater = new FunctionStateUpdater(dataRepository, "Function started ...",functionExecution);
+    }
+    public void updateFunctionResultState(FunctionResultStateEnum resultState)
+    {
+        functionStateUpdater.updateFunctionExecution(resultState);
+    }
+    public boolean execute(boolean isAutoExecution, FunctionResultStateEnum desiredResult) {
 
         try {
             if (isAutoExecution && !function.getIsAutoEnabled()) {
@@ -51,20 +63,28 @@ public abstract class Process {
             functionStateUpdater.startFunctionExecution();
 
             if (desiredResult == FunctionResultStateEnum.OFF) {
-                return off();
+                return off(); //Redo the off command - should not be a problem
             } else if (desiredResult == FunctionResultStateEnum.ON) {
+                if(function.getResultState()==FunctionResultStateEnum.ON.getId())
+                    //throw new Exception("Function already ON. Reset function and retry.");
+                    return true; // don't do it again, it may break things (generator is already started..)
+
+                    //TODO: Test if there is better to automatically run off before each on function ?
+
                 return on();
             } else {
-
+                if(function.getResultState()==FunctionResultStateEnum.ON.getId())
+                    return off();
+                else
+                    return on();
             }
 
         } catch (Exception exc) {
 
             Log.e(functionName, exc.getMessage());
             functionStateUpdater.insertExecutionLog(exc);
-            functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.ERROR);
-        }
-        finally {
+            functionExecution = functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.ERROR);
+            //functionExecution = functionStateUpdater.updateFunctionExecution(FunctionResultStateEnum.ERROR);
             return false;
         }
     }
@@ -74,7 +94,7 @@ public abstract class Process {
         // Function result state needs to be handled here - will not be communicated by arduino
         // This will automatically set the Execution Log as well
         functionExecution = functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // Success
-        functionExecution.setResultState(FunctionResultStateEnum.ON.getId());
+        functionExecution = functionStateUpdater.updateFunctionExecution(FunctionResultStateEnum.ON);
         return true;
     }
 
@@ -83,7 +103,7 @@ public abstract class Process {
         // Function result state needs to be handled here - will not be communicated by arduino
         // This will automatically set the Execution Log as well
         functionExecution = functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // Success
-        functionExecution.setResultState(FunctionResultStateEnum.OFF.getId());
+        functionExecution = functionStateUpdater.updateFunctionExecution(FunctionResultStateEnum.OFF);
         return true;
     }
 }

@@ -1,6 +1,10 @@
 package com.gmail.raducaz.arduinomate;
 
+import android.util.Log;
+
+import com.gmail.raducaz.arduinomate.processes.TaskInterface;
 import com.gmail.raducaz.arduinomate.telnet.TelnetClient;
+import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
 
 import org.junit.Test;
 
@@ -20,21 +24,15 @@ import static junit.framework.TestCase.assertEquals;
 public class TestTelnetClientUnit {
     @Test
     public void TestSendMessage() {
-        assertEquals(4, 2 + 2);
 
-        try {
-            final TelnetClient telnetClient = new TelnetClient("192.168.100.100", 8080,
-                    "test", "test");
-            Map<String, Object> map = new HashMap<>();
-            String[] commands = new String[]{"[{\"?13\":0}]"};
-            long start = System.currentTimeMillis();
-            telnetClient.executeCommands(Arrays.asList(commands), map);
-            long end = System.currentTimeMillis();
-            NumberFormat formatter = new DecimalFormat("#0.00000");
-            System.out.println("Batch execution time is " + formatter.format((end - start) / 1000d) + " seconds");
-            System.out.println("Result =" + map);
-        }
-        catch (Exception exc)
-        {}
+        String command = "[{\"=6\":0,\"@\":500},{\"!\":2000},{\"=2\":0},{\"!\":1000},{\"=8\":1,\"@\":2000},{\"=7\":0,\"@\":500}]";
+
+        final TelnetClient telnetClient = new TelnetClient("192.168.100.100", 8080,
+                "test", "test");
+        Map<String, Object> map = new HashMap<>();
+        telnetClient.executeCommand(command, map);
+
+        Object result = map.get(command);
+        Log.d("Test", result == null ? "" : result.toString());
     }
 }

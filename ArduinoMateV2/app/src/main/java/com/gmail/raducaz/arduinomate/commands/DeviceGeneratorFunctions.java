@@ -18,6 +18,7 @@ public class DeviceGeneratorFunctions {
         arduinoCommander = new ArduinoCommander(deviceEntity.getIp(), deviceEntity.getPort());
     }
 
+    //TODO: This needs to be rewritten to get the value from the pin state history - the custom current value will not be the actual value of the pin
     public boolean isCurrentAbove(double threshold)
     {
         // Check AC current - if high then it's on
@@ -27,6 +28,28 @@ public class DeviceGeneratorFunctions {
             return true;
         else
             return false;
+    }
+
+    // Returns true if probe proves the pressure sensor is activated
+    public boolean testLongRun()
+    {
+        String TAG = "testLongRun";
+        try {
+
+            String command = "[{\"=6\":0,\"@\":500},{\"!\":1000},{\"=2\":0},{\"!\":1000},{\"=8\":1,\"@\":2000},{\"=7\":0,\"@\":500}]";
+            String result = arduinoCommander.SendCommand(command);
+
+            // Read command results
+            if(new Parser(result).getInt("#A4")==0)
+                return true;
+            else
+                return false;
+        }
+        catch (Exception exc)
+        {
+            Log.e(TAG,exc.getMessage());
+            return false;
+        }
     }
 
     // Returns true if probe proves the pressure sensor is activated
@@ -54,8 +77,6 @@ public class DeviceGeneratorFunctions {
         catch (Exception exc)
         {
             Log.e(TAG,exc.getMessage());
-        }
-        finally {
             return false;
         }
     }
@@ -74,8 +95,6 @@ public class DeviceGeneratorFunctions {
         catch (Exception exc)
         {
             Log.e(TAG,exc.getMessage());
-        }
-        finally {
             return false;
         }
     }
@@ -90,15 +109,14 @@ public class DeviceGeneratorFunctions {
             arduinoCommander.SendCommand(command);
 
             // Check AC current - if low then it stopped
-            return !isCurrentAbove(0.18);
+            return true; // TODO: Use when implemented correctly !isCurrentAbove(0.18);
         }
         catch (Exception exc)
         {
             Log.e(TAG,exc.getMessage());
-        }
-        finally {
             return false;
         }
+
     }
 
     // AC ON
@@ -110,15 +128,14 @@ public class DeviceGeneratorFunctions {
             String command = "[{\"=3\":0}]";
             arduinoCommander.SendCommand(command);
 
-            return isCurrentAbove(0.18);
+            return true; //TODO: Use when is correct isCurrentAbove(0.18);
         }
         catch (Exception exc)
         {
             Log.e(TAG,exc.getMessage());
-        }
-        finally {
             return false;
         }
+
     }
 
     // AC OFF
@@ -136,9 +153,8 @@ public class DeviceGeneratorFunctions {
         catch (Exception exc)
         {
             Log.e(TAG,exc.getMessage());
-        }
-        finally {
             return false;
         }
+
     }
 }

@@ -71,7 +71,7 @@ int getPin(const byte startIndex, const char* key)
   //return isAnalogPin ? (pinNo<2 ? pinNo+16 : pinNo+18) : pinNo;
   return isAnalogPin ? pinNo+14 : pinNo; //A0 is 14, A1 is 15...
 }
-JsonArray& parseCommand(String plainJson)
+void parseCommand(String plainJson, EthernetClient client)
 {
   // [
   //   {"=3":0.25,"@":2}, // for 2 ms and revert
@@ -82,8 +82,10 @@ JsonArray& parseCommand(String plainJson)
   // [{"=3":1,"@":2},{"?13":0},{"=13":0},{"?13":0},{"!":20}]
   // [set 3=1 for 2, get 13, set 13 to 0, get 13, wait 20]
     
-    static const int capacity = JSON_ARRAY_SIZE(10) + 10*JSON_OBJECT_SIZE(2) + 32;
-    StaticJsonBuffer<capacity> jb;
+    // static const int capacity = JSON_ARRAY_SIZE(10) + 10*JSON_OBJECT_SIZE(2) + 32;
+    // StaticJsonBuffer<capacity> jb;
+    DynamicJsonBuffer jb;
+
     // Parse JSON object
     JsonArray& arr = jb.parseArray(plainJson);
 
@@ -110,7 +112,7 @@ JsonArray& parseCommand(String plainJson)
                   else MyExecutor::setAnalogPinTemp(pin,p.value,obj["@"].as<float>());  
                 }
                 
-                obj[">"] = 1;
+                //obj[">"] = 1;
               }
               else // Cmd permanent set
               {
@@ -145,15 +147,16 @@ JsonArray& parseCommand(String plainJson)
         }
       }
 
-      return arr;
-
     } else {
       // parseObject() failed
       JsonArray& arr = jb.createArray();
       arr.add("Error parsing message");
       Logger::debugln("Deserialize received message failed.");
-      return arr;
     }
+
+    if(client)
+      arr.printTo(client);
+    arr.printTo(Serial);
 }
 void listenSerial()
 {
@@ -187,10 +190,8 @@ void listenSerial()
       //TODO: Test - this executes actual commands and blocks the thread until done
       if(endCmd)
       {
-        JsonArray& result = parseCommand(buffer);
+        parseCommand(buffer, 0);
         
-          result.printTo(Serial);
-
         buffer[0]=0;
         bufferSize=0;
       }
@@ -216,28 +217,18 @@ void listenEthernet()
     {
       Logger::debugln("Client connected");
 
-      if(DeviceState==0)
+      if (client.available()) 
       {
-        DeviceState=1;
-        if (client.available()) 
-        {
-          receivedText = client.readStringUntil(endChar);
-          Logger::debugln(receivedText);
-          Serial.println(receivedText);
+        receivedText = client.readStringUntil(endChar);
+        Logger::debugln(receivedText);
+        Serial.println(receivedText);
 
-          //TODO: Test - this executes actual commands and blocks the thread until done
-          JsonArray& result = parseCommand(receivedText);
-          
-            result.printTo(client);
-            result.printTo(Serial);
-        }
+        //!!! this executes actual commands and blocks the thread until done
+        // No other connections are permitted during this processing
+        parseCommand(receivedText, client);
+        
       }
-      else
-      {
-        arduinoClient.println("[\"Device is busy\"]");
-        arduinoClient.println("END");
-        Logger::debugln("[\"Device is busy\"]");
-      }
+      
     }
 
     Logger::debugln("");

@@ -62,6 +62,7 @@ public class TimerService implements Runnable {
         public void run() {
 
             Timer timer = new Timer();
+            // Start in 1 second and run repeatedly every 5s
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
@@ -70,6 +71,7 @@ public class TimerService implements Runnable {
 
                         // Check the pressure periodically by probing, if pressure low start generator and pump
                         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "192.168.100.100");
+
                         if(deviceGeneratorFunctions.isPressureLow())
                         {
                             try {
@@ -85,7 +87,7 @@ public class TimerService implements Runnable {
                         Log.e(TAG, exc.getMessage());
                     }
                 }
-            }, 1000, 5000);
+            }, 1000, 20000);
         }
     }
 }

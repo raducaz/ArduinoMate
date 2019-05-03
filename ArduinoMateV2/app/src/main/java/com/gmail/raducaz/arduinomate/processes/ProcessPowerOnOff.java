@@ -13,32 +13,26 @@ public class ProcessPowerOnOff extends Process {
         super(dataRepository, deviceIp, "PowerOnOff");
     }
 
+    public ProcessPowerOnOff(DataRepository dataRepository, long deviceId)
+    {
+        super(dataRepository, deviceId, "PowerOnOff");
+    }
+
     @Override
     protected boolean on() throws Exception {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 
-        try {
-            deviceGeneratorFunctions.powerON();
+        deviceGeneratorFunctions.powerON();
 
-            return super.on();
-        } catch (Exception exc) {
-            functionExecution.setResultState(FunctionResultStateEnum.ERROR.getId());
-            throw exc;
-        }
+        return super.on();
     }
 
     @Override
-    protected boolean off() throws Exception
-    {
+    protected boolean off() throws Exception {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
 
-        try {
-            deviceGeneratorFunctions.powerOFF();
+        deviceGeneratorFunctions.powerOFF();
 
-            return super.on();
-        } catch (Exception exc) {
-            functionExecution.setResultState(FunctionResultStateEnum.ERROR.getId());
-            throw exc;
-        }
+        return super.off();
     }
 }

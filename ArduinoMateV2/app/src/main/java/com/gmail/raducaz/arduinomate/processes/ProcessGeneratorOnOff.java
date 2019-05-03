@@ -32,6 +32,7 @@ public class ProcessGeneratorOnOff extends Process {
 
         ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, deviceEntity.getIp());
         pPump.execute(false, FunctionResultStateEnum.OFF);
+        //TODO; Solve this recursive call, this will call Gen.Off again inside Pump.off
 
         //deviceGeneratorFunctions.generatorOFF();
 

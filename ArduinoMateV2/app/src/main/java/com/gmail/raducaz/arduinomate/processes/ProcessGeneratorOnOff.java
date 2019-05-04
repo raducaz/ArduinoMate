@@ -34,6 +34,7 @@ public class ProcessGeneratorOnOff extends Process {
         // TODO: Maybe it is a good idea to implement an event driven mechanism that when ON a function to add also a handler for future OFF events from dependent processes
         ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, deviceEntity.getIp());
         pPump.execute(false, FunctionResultStateEnum.OFF);
+        //TODO; Solve this recursive call, this will call Gen.Off again inside Pump.off
 
         return super.off();
     }

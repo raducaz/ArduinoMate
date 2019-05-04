@@ -25,6 +25,7 @@ public class ExecutionLogEntity implements ExecutionLog {
     private long executionId;
     private Date date;
     private String log;
+    private String functionName;
 
     @Override
     public long getId() {
@@ -58,18 +59,28 @@ public class ExecutionLogEntity implements ExecutionLog {
         this.log = log;
     }
 
+    @Override
+    public String getFunctionName() {
+        return functionName;
+    }
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
+    }
+
     public ExecutionLogEntity() {
     }
 
-    public ExecutionLogEntity(long executionId, Date date, String log) {
+    public ExecutionLogEntity(long executionId, Date date, String log, String functionName) {
         this.executionId = executionId;
         this.date = date;
         this.log = log;
+        this.functionName = functionName;
     }
 
     public ExecutionLogEntity(ExecutionLog log) {
         this.executionId = log.getExecutionId();
         this.date = log.getDate();
         this.log = log.getLog();
+        this.functionName = log.getFunctionName();
     }
 }

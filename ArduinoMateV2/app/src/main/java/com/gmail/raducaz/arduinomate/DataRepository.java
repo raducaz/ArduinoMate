@@ -15,6 +15,7 @@ import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.Function;
+import com.gmail.raducaz.arduinomate.model.JoinExecutionXExecutionLog;
 import com.gmail.raducaz.arduinomate.model.PinState;
 
 import java.util.List;
@@ -115,6 +116,10 @@ public class DataRepository {
     public void updateFunction(FunctionEntity function) {
         mDatabase.functionDao().update(function);
     }
+    public void updateAllFunctionStates(int callState, int resultState)
+    {
+        mDatabase.functionDao().updateAllFunctionStates(callState, resultState);
+    }
     public void updateFunctionAutoEnabled(final long functionId, boolean isChecked) {
         mDatabase.functionDao().updateAutoEnabled(functionId, isChecked);
     }
@@ -128,6 +133,9 @@ public class DataRepository {
     public LiveData<FunctionExecutionEntity> loadLastFunctionExecution(final long functionId) {
         return mDatabase.functionExecutionDao().loadLastFunctionExecution(functionId);
     }
+    public FunctionExecutionEntity loadLastFunctionExecutionSync(final long functionId) {
+        return mDatabase.functionExecutionDao().loadLastFunctionExecutionSync(functionId);
+    }
     public FunctionExecutionEntity loadLastUnfinishedFunctionExecution(final long functionId) {
         return mDatabase.functionExecutionDao().loadLastUnfinishedFunctionExecutionSync(functionId);
     }
@@ -135,7 +143,16 @@ public class DataRepository {
     public void deleteFunctionExecutions(final long functionId) {
         mDatabase.functionExecutionDao().deleteFunctionExecution(functionId);
     }
+    public void deleteAllFunctionExecutions() {
+        mDatabase.functionExecutionDao().deleteAllFunctionExecution();
+    }
     public long insertFunctionExecution(FunctionExecutionEntity execution) {
+        long functionId = execution.getFunctionId();
+        int callState = execution.getCallState();
+        int resultState = execution.getResultState();
+
+        mDatabase.functionDao().updateStates(functionId, callState, resultState);
+
         return mDatabase.functionExecutionDao().insert(execution);
     }
     public void updateFunctionExecution(FunctionExecutionEntity execution) {
@@ -153,6 +170,9 @@ public class DataRepository {
     public LiveData<List<ExecutionLogEntity>> loadExecutionLog(final long executionId) {
         return mDatabase.executionLogDao().loadExecutionLogs(executionId);
     }
+    public LiveData<List<JoinExecutionXExecutionLog>> loadAllExecutionLog() {
+        return mDatabase.joinExecutionXExecutionLogDao().loadAllExecutionLogs();
+    }
     public long insertExecutionLog(ExecutionLogEntity log) {
         return mDatabase.executionLogDao().insert(log);
     }
@@ -161,6 +181,9 @@ public class DataRepository {
     }
     public void deleteExecutionLogs(final long functionId) {
         mDatabase.executionLogDao().deleteFunctionExecutionLogs(functionId);
+    }
+    public void deleteAllExecutionLogs() {
+        mDatabase.executionLogDao().deleteAllFunctionExecutionLogs();
     }
     //endregion ExecutionLog
 
@@ -197,6 +220,10 @@ public class DataRepository {
     public void deletePinStatesByFunction(long functionId)
     {
         mDatabase.pinStateDao().deletePinStatesByFunction(functionId);
+    }
+    public void deleteAllPinStates()
+    {
+        mDatabase.pinStateDao().deleteAllPinStates();
     }
     //endregion PinState
 

@@ -93,6 +93,7 @@ public class ActivityDetail extends AppCompatActivity {
                     TextView tv = findViewById(R.id.header);
                     tv.setVisibility(View.VISIBLE);
                 } else if(BottomSheetBehavior.STATE_DRAGGING == newState){
+                    fab.show();
                     TextView tv = findViewById(R.id.header);
                     tv.setVisibility(View.GONE);
 
@@ -106,6 +107,14 @@ public class ActivityDetail extends AppCompatActivity {
                 fab.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
             }
         });
+
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        TextView tv = findViewById(R.id.header);
+        tv.setVisibility(View.GONE);
+
+        tabs.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.VISIBLE);
+        fab.hide();
     }
 
     // Add Fragments to Tabs

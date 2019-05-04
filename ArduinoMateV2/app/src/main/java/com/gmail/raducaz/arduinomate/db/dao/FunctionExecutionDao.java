@@ -33,7 +33,7 @@ public interface FunctionExecutionDao {
     @Query("SELECT * FROM functionExecution " +
             "where functionId = :functionId " +
             "ORDER BY startDate DESC LIMIT 1")
-    List<FunctionExecutionEntity> loadLastFunctionExecutionSync(long functionId);
+    FunctionExecutionEntity loadLastFunctionExecutionSync(long functionId);
 
     @Query("SELECT * FROM functionExecution " +
             "where functionId = :functionId and endDate is null " +
@@ -53,6 +53,9 @@ public interface FunctionExecutionDao {
     @Query("DELETE FROM functionExecution " +
             "where functionId = :functionId ")
     void deleteFunctionExecution(long functionId);
+
+    @Query("DELETE FROM functionExecution ")
+    void deleteAllFunctionExecution();
 
 }
 

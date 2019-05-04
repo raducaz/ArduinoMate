@@ -8,6 +8,7 @@ import android.arch.lifecycle.MediatorLiveData;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
+import com.gmail.raducaz.arduinomate.model.JoinExecutionXExecutionLog;
 
 import java.util.List;
 
@@ -30,6 +31,23 @@ public class ExecutionLogListViewModel extends AndroidViewModel {
 
         LiveData<List<ExecutionLogEntity>> executionLogs =
                 ((ArduinoMateApp) getApplication()).getRepository().loadExecutionLog(executionId);
+
+        // observe the changes of the function from the database and forward them
+        mObservableExecutionLogs.addSource(executionLogs, mObservableExecutionLogs::setValue);
+
+        return mObservableExecutionLogs;
+    }
+
+    public LiveData<List<JoinExecutionXExecutionLog>> getAllExecutionLogs() {
+        // MediatorLiveData can observe other LiveData objects and react on their emissions.
+        MediatorLiveData<List<JoinExecutionXExecutionLog>> mObservableExecutionLogs;
+
+        mObservableExecutionLogs = new MediatorLiveData<>();
+        // set by default null, until we get data from the database.
+        mObservableExecutionLogs.setValue(null);
+
+        LiveData<List<JoinExecutionXExecutionLog>> executionLogs =
+                ((ArduinoMateApp) getApplication()).getRepository().loadAllExecutionLog();
 
         // observe the changes of the function from the database and forward them
         mObservableExecutionLogs.addSource(executionLogs, mObservableExecutionLogs::setValue);

@@ -28,6 +28,13 @@ public interface FunctionDao {
             "WHERE id = :id"
     )
     void updateStates(long id, int callState, int resultState);
+
+    @Query(
+            "UPDATE function SET " +
+                    "callState = :callState," +
+                    "resultState = :resultState ")
+    void updateAllFunctionStates(int callState, int resultState);
+
     @Query(
             "UPDATE function SET " +
                     "isAutoEnabled = :isChecked " +

@@ -31,18 +31,32 @@
                 android:contentDescription="@string/cd_function_name"
                 android:text="@{function.name}"/>
 
-            <TextView
-                android:id="@+id/card_text"
-                android:layout_width="match_parent"
+            <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/auto_checkbox"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/name"
-                android:text="@{function.description}"/>
+                android:enabled="false"
+                android:checked="@{function.isAutoEnabled}"/>
+            <!--<TextView-->
+                <!--android:id="@+id/card_text"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/name"-->
+                <!--android:text="@{function.description}"/>-->
+            <TextView
+                android:id="@+id/call_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/auto_checkbox"
+                android:text="@{function.callStateText}"/>
 
             <TextView
                 android:id="@+id/result_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/card_text"
+                android:layout_below="@id/call_state"
                 android:text="@{function.resultStateText}"/>
 
             <ImageButton

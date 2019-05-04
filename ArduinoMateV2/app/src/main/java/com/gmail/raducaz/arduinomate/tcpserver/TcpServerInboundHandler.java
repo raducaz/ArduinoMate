@@ -92,10 +92,11 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
             DeviceStateUpdater deviceStateUpdater = new DeviceStateUpdater(dataRepository, msg);
             deviceStateUpdater.updatePinStates();
 
-            FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(dataRepository, msg);
-            functionStateUpdater.insertExecutionLog();
-            //TODO: Get the FunctionCallState from the ResultState, result state can be Executing
-            functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // Success
+            // Function State is not received anymore
+//            FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(dataRepository, msg);
+//            functionStateUpdater.insertExecutionLog();
+//            //TODO: Get the FunctionCallState from the ResultState, result state can be Executing
+//            functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // Success
 
             Log.d(TAG, "ChannelRead0-MSG " + msg + " from " + incoming.remoteAddress());
 

@@ -129,10 +129,6 @@ public class FunctionStateUpdater {
 
         functionExecution.setCallState(callState.getId());
 
-        // Some calls to this function doesn't contain a fctState, in this case do not update
-        if(deviceStateInfo.getFunctionState() != FunctionResultStateEnum.NA)
-            functionExecution.setResultState(deviceStateInfo.getFunctionState().getId());
-
         if (callState.equals(FunctionCallStateEnum.READY)) {
             functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
             insertExecutionLog("Execution completed");

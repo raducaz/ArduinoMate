@@ -7,7 +7,7 @@ import org.json.JSONObject;
 public class Parser {
 
     JSONArray jsonArray;
-    public Parser(String result)
+    public Parser(String result) throws Exception
     {
         try {
             jsonArray = new JSONArray(result);
@@ -15,6 +15,7 @@ public class Parser {
         catch (Exception exc)
         {
             Log.e("Parser", exc.getMessage());
+            throw exc;
         }
     }
     public int getInt(String key)

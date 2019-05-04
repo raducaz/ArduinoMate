@@ -21,7 +21,7 @@ import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.databinding.FunctionViewItemBinding;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
-import com.gmail.raducaz.arduinomate.service.TaskFunctionReset;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
 import com.gmail.raducaz.arduinomate.viewmodel.FunctionViewModel;
 
 public class FragmentFunctionViewItem extends Fragment {

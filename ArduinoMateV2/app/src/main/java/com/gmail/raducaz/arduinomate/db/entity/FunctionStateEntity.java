@@ -5,7 +5,6 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.gmail.raducaz.arduinomate.model.DeviceState;
 import com.gmail.raducaz.arduinomate.model.FunctionState;
 
 import java.util.Date;

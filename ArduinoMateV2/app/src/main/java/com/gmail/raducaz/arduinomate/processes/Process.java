@@ -29,10 +29,6 @@ public abstract class Process {
         this.dataRepository = dataRepository;
         this.deviceEntity = dataRepository.loadDeviceSync(deviceIp);
         this.function = dataRepository.loadFunctionSync(deviceEntity.getId(), functionName);
-
-        functionExecution = new FunctionExecutionEntity();
-        functionExecution.setFunctionId(function.getId());
-        functionStateUpdater = new FunctionStateUpdater(dataRepository, "Function started ...",functionExecution);
     }
     public Process(DataRepository dataRepository, long deviceId, String functionName)
     {
@@ -41,39 +37,65 @@ public abstract class Process {
         this.deviceEntity = dataRepository.loadDeviceSync(deviceId);
         this.function = dataRepository.loadFunctionSync(deviceEntity.getId(), functionName);
 
-        functionExecution = new FunctionExecutionEntity();
-        functionExecution.setFunctionId(function.getId());
-        functionStateUpdater = new FunctionStateUpdater(dataRepository, "Function started ...",functionExecution);
-    }
-    public void updateFunctionResultState(FunctionResultStateEnum resultState)
-    {
-        functionStateUpdater.updateFunctionExecution(resultState);
     }
     public boolean execute(boolean isAutoExecution, FunctionResultStateEnum desiredResult) {
 
         try {
-            if (isAutoExecution && !function.getIsAutoEnabled()) {
-                functionStateUpdater.insertExecutionLog("Function is not auto enabled.Execution stopped");
-                functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY);
 
-                return false;
+            boolean isFunctionExecutionJustStarted = false;
+            // Get the current execution (previous) to insert this log to it
+            functionExecution = dataRepository.loadLastFunctionExecutionSync(function.getId());
+            if(functionExecution == null) {
+
+                startExecution();
+                isFunctionExecutionJustStarted = true;
+            }
+            else
+            {
+                functionStateUpdater = new FunctionStateUpdater(dataRepository, "Function started ...", functionExecution);
             }
 
-            // Automatically insert the log as well = Execution started...
-            functionStateUpdater.startFunctionExecution();
+            if(!isFunctionExecutionJustStarted && functionExecution.getCallState()==FunctionCallStateEnum.EXECUTING.getId())
+            {
+                functionStateUpdater.insertExecutionLog("try concurrent execution ...");
+                return true;
+            }
+            if (isAutoExecution && !function.getIsAutoEnabled()) {
+
+                functionStateUpdater.insertExecutionLog("Automatic execution is not enabled for this function.");
+                return true;
+            }
+            if(desiredResult.getId()==FunctionResultStateEnum.ON.getId() &&
+                    desiredResult.getId()==function.getResultState())
+            {
+                functionStateUpdater.insertExecutionLog("already ON...");
+                return true;
+            }
+
+            // From this point on - Start new execution - Automatically insert the log as well = Execution started...
+            startExecution();
+
 
             if (desiredResult == FunctionResultStateEnum.OFF) {
-                return off(); //Redo the off command - should not be a problem
-            } else if (desiredResult == FunctionResultStateEnum.ON) {
-                if(function.getResultState()==FunctionResultStateEnum.ON.getId())
-                    //throw new Exception("Function already ON. Reset function and retry.");
-                    return true; // don't do it again, it may break things (generator is already started..)
+                //Redo the off command - should not be a problem
+                // Also this may solve problems like status is outdated but process is actually running
+                // In this case it would be impossible to stop
+                return off();
 
+            } else if (desiredResult == FunctionResultStateEnum.ON) {
+
+                // Double check - should not get here
+                if(function.getResultState()==FunctionResultStateEnum.ON.getId()) {
+                    return true; // don't do it again, it may break things (generator is already started..)
                     //TODO: Test if there is better to automatically run off before each on function ?
+                }
 
                 return on();
+
             } else {
-                if(function.getResultState()==FunctionResultStateEnum.ON.getId())
+                if(function.getResultState()==FunctionResultStateEnum.ON.getId()
+                        || function.getResultState()==FunctionResultStateEnum.NA.getId()
+                        || function.getResultState()==FunctionResultStateEnum.ERROR.getId())
                     return off();
                 else
                     return on();
@@ -84,7 +106,6 @@ public abstract class Process {
             Log.e(functionName, exc.getMessage());
             functionStateUpdater.insertExecutionLog(exc);
             functionExecution = functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.ERROR);
-            //functionExecution = functionStateUpdater.updateFunctionExecution(FunctionResultStateEnum.ERROR);
             return false;
         }
     }
@@ -105,5 +126,15 @@ public abstract class Process {
         functionExecution = functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.READY); // Success
         functionExecution = functionStateUpdater.updateFunctionExecution(FunctionResultStateEnum.OFF);
         return true;
+    }
+
+    private void startExecution()
+    {
+        functionExecution = new FunctionExecutionEntity();
+
+        functionStateUpdater = new FunctionStateUpdater(dataRepository, "Function started ...", functionExecution);
+        functionExecution.setFunctionId(function.getId());
+        functionExecution.setName(function.getName());
+        functionStateUpdater.startFunctionExecution();
     }
 }

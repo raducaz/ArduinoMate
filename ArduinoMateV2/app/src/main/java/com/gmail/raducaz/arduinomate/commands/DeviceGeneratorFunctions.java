@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
+import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,8 +14,8 @@ public class DeviceGeneratorFunctions {
     DataRepository dataRepository;
     DeviceEntity deviceEntity;
 
-    public DeviceGeneratorFunctions(DataRepository dataRepository, String deviceIp) {
-        this.deviceEntity = dataRepository.loadDeviceSync(deviceIp);
+    public DeviceGeneratorFunctions(DataRepository dataRepository, String deviceName) {
+        this.deviceEntity = dataRepository.loadDeviceByNameSync(deviceName);
         arduinoCommander = new ArduinoCommander(deviceEntity.getIp(), deviceEntity.getPort());
     }
 
@@ -44,11 +45,17 @@ public class DeviceGeneratorFunctions {
         String command = "[{\"=6\":0,\"@\":500},{\"!\":1000},{\"=2\":0},{\"!\":1000},{\"=8\":1,\"@\":2000},{\"=7\":0,\"@\":500}]";
         String result = arduinoCommander.SendCommand(command);
 
-        // Read command results
-        if (new Parser(result).getInt("#A4") == 0)
-            return true;
-        else
+        try {
+            // Read command results
+            if (new Parser(result).getInt("#A4") == 0)
+                return true;
+            else
+                return false;
+        }
+        catch (Exception e)
+        {
             return false;
+        }
     }
 
     // Returns true if probe proves the pressure sensor is activated
@@ -99,6 +106,27 @@ public class DeviceGeneratorFunctions {
 
     }
 
+    public FunctionResultStateEnum getGeneratorState()
+    {
+        String TAG = "generatorState";
+
+        // query State - weak validation but base on contact only
+        // TODO: find a stronger method to determine if generator is OFF
+        String command = "[{\"?2\":0}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        try {
+            // Read command results
+            if (new Parser(result).getInt("?2") == 0)
+                return FunctionResultStateEnum.ON;
+            else
+                return FunctionResultStateEnum.OFF;
+        }
+        catch (Exception e) {
+            return FunctionResultStateEnum.ERROR;
+        }
+    }
+
     // AC ON
     public boolean powerON()
     {
@@ -124,5 +152,25 @@ public class DeviceGeneratorFunctions {
             // Check AC current - if low then it's off
             return !isCurrentAbove(0.18);
 
+    }
+
+    public FunctionResultStateEnum getPowerState()
+    {
+        String TAG = "powerState";
+
+        // query Power State
+        String command = "[{\"?3\":0}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        try {
+            // Read command results
+            if (new Parser(result).getInt("?3") == 0)
+                return FunctionResultStateEnum.ON;
+            else
+                return FunctionResultStateEnum.OFF;
+        }
+        catch (Exception e) {
+            return FunctionResultStateEnum.ERROR;
+        }
     }
 }

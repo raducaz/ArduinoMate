@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="executionLog"
-            type="com.gmail.raducaz.arduinomate.model.JoinExecutionXExecutionLog"/>
+            type="com.gmail.raducaz.arduinomate.model.ExecutionLog"/>
         <variable name="callback"
             type="com.gmail.raducaz.arduinomate.ui.ClickCallbackAllExecutionLog"/>
     </data>
@@ -28,12 +28,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="FunctionName"
-                android:text="@{executionLog.name}"/>
+                android:text="@{executionLog.functionName}"/>
             <TextView
                 android:id="@+id/log"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="Log"
+                android:layout_below="@id/function_name"
                 android:text="@{executionLog.log}"/>
 
             <TextView

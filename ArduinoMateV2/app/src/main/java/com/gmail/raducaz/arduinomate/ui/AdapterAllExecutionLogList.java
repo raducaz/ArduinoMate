@@ -11,13 +11,12 @@ import android.view.ViewGroup;
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.databinding.AllExecutionLogListItemBinding;
 import com.gmail.raducaz.arduinomate.model.ExecutionLog;
-import com.gmail.raducaz.arduinomate.model.JoinExecutionXExecutionLog;
 
 import java.util.List;
 
 public class AdapterAllExecutionLogList extends RecyclerView.Adapter<AdapterAllExecutionLogList.ExecutionLogViewHolder> {
 
-    List<? extends JoinExecutionXExecutionLog> mExecutionLogList;
+    List<? extends ExecutionLog> mExecutionLogList;
 
     @Nullable
     private final ClickCallbackAllExecutionLog mExecutionLogClickCallback;
@@ -26,7 +25,7 @@ public class AdapterAllExecutionLogList extends RecyclerView.Adapter<AdapterAllE
         mExecutionLogClickCallback = clickCallback;
     }
 
-    public void setExecutionLogList(final List<? extends JoinExecutionXExecutionLog> executionLogList) {
+    public void setExecutionLogList(final List<? extends ExecutionLog> executionLogList) {
         if (executionLogList == null) {
             mExecutionLogList = executionLogList;
             notifyItemRangeInserted(0, 0);
@@ -50,11 +49,11 @@ public class AdapterAllExecutionLogList extends RecyclerView.Adapter<AdapterAllE
 
                 @Override
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    JoinExecutionXExecutionLog newExecutionLog = executionLogList.get(newItemPosition);
-                    JoinExecutionXExecutionLog oldExecutionLog = mExecutionLogList != null ? mExecutionLogList.get(oldItemPosition):null;
+                    ExecutionLog newExecutionLog = executionLogList.get(newItemPosition);
+                    ExecutionLog oldExecutionLog = mExecutionLogList != null ? mExecutionLogList.get(oldItemPosition):null;
                     return newExecutionLog.getId() == oldExecutionLog.getId() &&
                             newExecutionLog.getLog() == oldExecutionLog.getLog() &&
-                            newExecutionLog.getName() == oldExecutionLog.getName();
+                            newExecutionLog.getFunctionName() == oldExecutionLog.getFunctionName();
                 }
             });
             mExecutionLogList = executionLogList;

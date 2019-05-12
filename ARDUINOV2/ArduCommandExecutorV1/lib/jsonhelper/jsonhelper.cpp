@@ -32,7 +32,7 @@ class JSONSerializer
         JsonObject& _root = _buffer.createObject();
         if(strcmp(msg,"") != 0)
             _root[MSG] = msg;
-        _root[IP] = "192.168.100.100";//ipToString(deviceIp);
+        _root[IP] = "192.168.2.200";//ipToString(deviceIp);
         _root[DEVICESTATE] = deviceState;
 
         JsonArray& psArr = _root.createNestedArray(pinType==0?DIGITAL:ANALOG);

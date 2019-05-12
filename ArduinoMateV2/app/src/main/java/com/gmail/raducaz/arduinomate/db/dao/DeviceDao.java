@@ -40,4 +40,7 @@ public interface DeviceDao {
 
     @Query("select * from device where ip = :deviceIp")
     DeviceEntity loadDeviceSync(String deviceIp);
+
+    @Query("select * from device where name = :deviceName LIMIT 1")
+    DeviceEntity loadDeviceByNameSync(String deviceName);
 }

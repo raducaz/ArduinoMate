@@ -8,7 +8,7 @@
 
 class JSONSerializer
 {
-    ACS712 sensor(ACS712_30A, A5);
+    ACS712 sensor(ACS712_30A, A1);
 
     public: static JsonObject& constructPinStatesJSON(const byte* deviceIp,
                                     const byte deviceState,

@@ -8,9 +8,9 @@ import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 public class ProcessPowerOnOff extends Process {
 
-    public ProcessPowerOnOff(DataRepository dataRepository, String deviceIp)
+    public ProcessPowerOnOff(DataRepository dataRepository, String deviceName)
     {
-        super(dataRepository, deviceIp, "PowerOnOff");
+        super(dataRepository, deviceName, "PowerOnOff");
     }
 
     public ProcessPowerOnOff(DataRepository dataRepository, long deviceId)
@@ -20,7 +20,7 @@ public class ProcessPowerOnOff extends Process {
 
     @Override
     protected boolean on() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
 
         deviceGeneratorFunctions.powerON();
 
@@ -29,7 +29,7 @@ public class ProcessPowerOnOff extends Process {
 
     @Override
     protected boolean off() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getIp());
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
 
         deviceGeneratorFunctions.powerOFF();
 

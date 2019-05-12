@@ -15,7 +15,6 @@ import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.Function;
-import com.gmail.raducaz.arduinomate.model.JoinExecutionXExecutionLog;
 import com.gmail.raducaz.arduinomate.model.PinState;
 
 import java.util.List;
@@ -65,6 +64,9 @@ public class DataRepository {
     }
     public DeviceEntity loadDeviceSync(final long deviceId) {
         return mDatabase.deviceDao().loadDeviceSync(deviceId);
+    }
+    public DeviceEntity loadDeviceByNameSync(final String deviceName) {
+        return mDatabase.deviceDao().loadDeviceByNameSync(deviceName);
     }
     public LiveData<DeviceEntity> loadDevice(final String deviceIp) {
         return mDatabase.deviceDao().loadDevice(deviceIp);
@@ -170,8 +172,8 @@ public class DataRepository {
     public LiveData<List<ExecutionLogEntity>> loadExecutionLog(final long executionId) {
         return mDatabase.executionLogDao().loadExecutionLogs(executionId);
     }
-    public LiveData<List<JoinExecutionXExecutionLog>> loadAllExecutionLog() {
-        return mDatabase.joinExecutionXExecutionLogDao().loadAllExecutionLogs();
+    public LiveData<List<ExecutionLogEntity>> loadAllExecutionLog() {
+        return mDatabase.executionLogDao().loadAllExecutionLogs();
     }
     public long insertExecutionLog(ExecutionLogEntity log) {
         return mDatabase.executionLogDao().insert(log);

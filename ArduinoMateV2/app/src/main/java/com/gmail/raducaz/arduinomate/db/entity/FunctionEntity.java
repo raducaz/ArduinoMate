@@ -7,6 +7,7 @@ package com.gmail.raducaz.arduinomate.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
@@ -125,6 +126,7 @@ public class FunctionEntity implements Function {
     public FunctionEntity() {
     }
 
+    @Ignore
     public FunctionEntity(long id, long deviceId, String name, String log, int resultState,int callState, Date dateSample) {
         this.id = id;
         this.deviceId = deviceId;
@@ -135,6 +137,7 @@ public class FunctionEntity implements Function {
         this.dateSample = dateSample;
     }
 
+    @Ignore
     public FunctionEntity(Function function) {
         this.id = function.getId();
         this.deviceId = function.getDeviceId();

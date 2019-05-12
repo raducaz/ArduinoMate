@@ -2,6 +2,7 @@ package com.gmail.raducaz.arduinomate.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
@@ -97,6 +98,7 @@ public class FunctionExecutionEntity implements FunctionExecution {
     public FunctionExecutionEntity() {
     }
 
+    @Ignore
     public FunctionExecutionEntity(long id, long functionId, String name, int callState, int resultState, Date startDate, Date endDate) {
         this.id = id;
         this.functionId = functionId;
@@ -107,6 +109,7 @@ public class FunctionExecutionEntity implements FunctionExecution {
         this.endDate = endDate;
     }
 
+    @Ignore
     public FunctionExecutionEntity(FunctionExecution execution) {
         this.id = execution.getId();
         this.functionId = execution.getFunctionId();

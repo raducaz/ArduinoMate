@@ -22,12 +22,21 @@ public abstract class Process {
     FunctionStateUpdater functionStateUpdater;
     DataRepository dataRepository;
 
+    public FunctionResultStateEnum getFunctionResultState()
+    {
+        return FunctionResultStateEnum.forInt(function.getResultState());
+    }
 
-    public Process(DataRepository dataRepository, String deviceIp, String functionName)
+    public FunctionCallStateEnum getFunctionCallState()
+    {
+        return FunctionCallStateEnum.forInt(function.getCallState());
+    }
+
+    public Process(DataRepository dataRepository, String deviceName, String functionName)
     {
         this.functionName = functionName;
         this.dataRepository = dataRepository;
-        this.deviceEntity = dataRepository.loadDeviceSync(deviceIp);
+        this.deviceEntity = dataRepository.loadDeviceByNameSync(deviceName);
         this.function = dataRepository.loadFunctionSync(deviceEntity.getId(), functionName);
     }
     public Process(DataRepository dataRepository, long deviceId, String functionName)

@@ -21,16 +21,16 @@ public class DataGenerator {
         DeviceEntity device = new DeviceEntity();
         device.setIp("192.168.1.100");
         device.setPort(8080);
-        device.setName("TEST - Generator");
-        device.setDescription("Controllerul de pornire/oprire generator si control pompa - TEST");
+        device.setName("Generator");
+        device.setDescription("Controllerul de pornire/oprire generator si control pompa - PROD");
         device.setId(1);
         devices.add(device);
 
         device = new DeviceEntity();
         device.setIp("192.168.1.200");
         device.setPort(8080);
-        device.setName("PROD - Generator");
-        device.setDescription("Controllerul de pornire/oprire generator si control pompa - PROD");
+        device.setName("Test - Generator");
+        device.setDescription("Controllerul de pornire/oprire generator si control pompa - TEST");
         device.setId(2);
         devices.add(device);
 
@@ -91,22 +91,22 @@ public class DataGenerator {
         // Device Generator - TEST
 
         // Device Generator - PROD
-        device = devices.get(1);
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("GeneratorOnOff");
-        function.setDescription("Start/Stop Generator" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("PowerOnOff");
-        function.setDescription("Start/Stop 220V supply" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
+//        device = devices.get(1);
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("GeneratorOnOff");
+//        function.setDescription("Start/Stop Generator" + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("PowerOnOff");
+//        function.setDescription("Start/Stop 220V supply" + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
 
 //        Random rnd = new Random();
 //

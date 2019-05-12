@@ -13,7 +13,6 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
-import com.gmail.raducaz.arduinomate.model.JoinExecutionXExecutionLog;
 
 import java.util.List;
 
@@ -32,6 +31,9 @@ public interface ExecutionLogDao {
 
     @Query("SELECT * FROM executionLog where executionId = :executionId")
     List<ExecutionLogEntity> loadExecutionLogsSync(long executionId);
+
+    @Query("SELECT * FROM executionLog ")
+    LiveData<List<ExecutionLogEntity>> loadAllExecutionLogs();
 
     @Query("DELETE FROM executionLog " +
             "WHERE executionId IN (" +

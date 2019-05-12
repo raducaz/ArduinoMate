@@ -2,17 +2,15 @@ package com.gmail.raducaz.arduinomate.processes;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
-import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
-import com.gmail.raducaz.arduinomate.service.FunctionStateUpdater;
 
-public class ProcessPumpOnOff extends Process {
+public class ProcessGardenWaterOnOff extends Process {
 
-    public ProcessPumpOnOff(DataRepository dataRepository, String deviceName)
+    public ProcessGardenWaterOnOff(DataRepository dataRepository, String deviceName)
     {
         super(dataRepository, deviceName, "PumpOnOff");
     }
-    public ProcessPumpOnOff(DataRepository dataRepository, long deviceId)
+    public ProcessGardenWaterOnOff(DataRepository dataRepository, long deviceId)
     {
         super(dataRepository, deviceId, "PumpOnOff");
     }

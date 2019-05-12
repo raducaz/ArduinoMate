@@ -15,7 +15,6 @@ import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.databinding.RecyclerViewBinding;
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.model.ExecutionLog;
-import com.gmail.raducaz.arduinomate.model.JoinExecutionXExecutionLog;
 import com.gmail.raducaz.arduinomate.viewmodel.ExecutionLogListViewModel;
 
 import java.util.List;
@@ -51,9 +50,9 @@ public class FragmentAllExecutionLogList extends Fragment {
 
     private void subscribeUi(ExecutionLogListViewModel viewModel) {
 
-        viewModel.getAllExecutionLogs().observe(this, new Observer<List<JoinExecutionXExecutionLog>>() {
+        viewModel.getAllExecutionLogs().observe(this, new Observer<List<ExecutionLogEntity>>() {
             @Override
-            public void onChanged(@Nullable List<JoinExecutionXExecutionLog> allExecutionLogs) {
+            public void onChanged(@Nullable List<ExecutionLogEntity> allExecutionLogs) {
                 if (allExecutionLogs != null) {
 //                    mBinding.setIsLoading(false);
                     mExecutionLogAdapter.setExecutionLogList(allExecutionLogs);
@@ -70,7 +69,7 @@ public class FragmentAllExecutionLogList extends Fragment {
 
     private final ClickCallbackAllExecutionLog mExecutionLogClickCallback = new ClickCallbackAllExecutionLog() {
         @Override
-        public void onClick(JoinExecutionXExecutionLog executionLog) {
+        public void onClick(ExecutionLog executionLog) {
 
 //            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
 //                Context context = getContext();

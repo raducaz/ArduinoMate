@@ -71,6 +71,7 @@ public class ExecutionLogEntity implements ExecutionLog {
     public ExecutionLogEntity() {
     }
 
+    @Ignore
     public ExecutionLogEntity(long executionId, Date date, String log, String functionName) {
         this.executionId = executionId;
         this.date = date;
@@ -78,6 +79,7 @@ public class ExecutionLogEntity implements ExecutionLog {
         this.functionName = functionName;
     }
 
+    @Ignore
     public ExecutionLogEntity(ExecutionLog log) {
         this.executionId = log.getExecutionId();
         this.date = log.getDate();

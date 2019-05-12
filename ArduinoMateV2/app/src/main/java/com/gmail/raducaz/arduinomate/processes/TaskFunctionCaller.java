@@ -14,7 +14,7 @@ public class TaskFunctionCaller implements TaskInterface {
 
     private String TAG = "TaskFunctionCaller";
 
-    private String deviceIp = null;
+    private String deviceName = null;
     private String functionName;
 
     private DeviceEntity device;
@@ -36,8 +36,8 @@ public class TaskFunctionCaller implements TaskInterface {
     }
 
     // Use this constructor to state the desired FunctionResultState after the execution
-    public TaskFunctionCaller(DataRepository dataRepository, String deviceIp, String functionName, FunctionResultStateEnum desiredFunctionResult) {
-        this.deviceIp = deviceIp;
+    public TaskFunctionCaller(DataRepository dataRepository, String deviceName, String functionName, FunctionResultStateEnum desiredFunctionResult) {
+        this.deviceName = deviceName;
         this.functionName = functionName;
 
         mRepository = dataRepository;
@@ -47,21 +47,21 @@ public class TaskFunctionCaller implements TaskInterface {
 
     public void execute() {
         try {
-            if(deviceIp == null) {
+            if(deviceName == null) {
                 device = mRepository.loadDeviceSync(function.getDeviceId());
-                deviceIp = device.getIp();
+                deviceName = device.getName();
             }
 
             switch (functionName)
             {
                 case "GeneratorOnOff":
-                    new ProcessGeneratorOnOff(mRepository, deviceIp).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessGeneratorOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
                 break;
                 case "PowerOnOff":
-                    new ProcessPowerOnOff(mRepository, deviceIp).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessPowerOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
                     break;
                 case "PumpOnOff":
-                    new ProcessPumpOnOff(mRepository, deviceIp).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessPumpOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
                     break;
                 default:
 

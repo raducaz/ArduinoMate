@@ -2,6 +2,7 @@ package com.gmail.raducaz.arduinomate.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.icu.util.TimeUnit;
@@ -106,6 +107,7 @@ public class PinStateEntity implements PinState {
     public PinStateEntity() {
     }
 
+    @Ignore
     public PinStateEntity(long id, long deviceId, String name, int state, Date fromDate, Date toDate) {
         this.id = id;
         this.deviceId = deviceId;
@@ -115,6 +117,7 @@ public class PinStateEntity implements PinState {
         this.toDate = toDate;
     }
 
+    @Ignore
     public PinStateEntity(FunctionState state) {
         this.id = state.getId();
         this.deviceId = state.getDeviceId();

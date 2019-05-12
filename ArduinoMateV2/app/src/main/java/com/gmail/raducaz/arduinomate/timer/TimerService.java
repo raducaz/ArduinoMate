@@ -70,12 +70,12 @@ public class TimerService implements Runnable {
                     try {
 
                         // Check the pressure periodically by probing, if pressure low start generator and pump
-                        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "192.168.100.100");
+                        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
                         if(deviceGeneratorFunctions.isPressureLow())
                         {
                             try {
-                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "192.168.100.100", "PumpOnOff", FunctionResultStateEnum.ON);
+                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "Generator", "PumpOnOff", FunctionResultStateEnum.ON);
                                 new TaskExecutor().execute(functionCaller);
                             }
                             catch (Exception exc) {

@@ -27,7 +27,7 @@ public class TestTelnetClientUnit {
 
         String command = "[{\"=6\":0,\"@\":500},{\"!\":2000},{\"=2\":0},{\"!\":1000},{\"=8\":1,\"@\":2000},{\"=7\":0,\"@\":500}]";
 
-        final TelnetClient telnetClient = new TelnetClient("192.168.100.100", 8080,
+        final TelnetClient telnetClient = new TelnetClient("192.168.1.100", 8080,
                 "test", "test");
         Map<String, Object> map = new HashMap<>();
         telnetClient.executeCommand(command, map);

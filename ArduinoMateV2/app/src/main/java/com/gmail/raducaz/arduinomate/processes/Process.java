@@ -70,14 +70,13 @@ public abstract class Process {
                 return true;
             }
             if (isAutoExecution && !function.getIsAutoEnabled()) {
-
-                functionStateUpdater.insertExecutionLog("Automatic execution is not enabled for this function.");
+                endExecution(FunctionCallStateEnum.READY, "Automatic execution is not enabled for this function.");
                 return true;
             }
             if(desiredResult.getId()==FunctionResultStateEnum.ON.getId() &&
                     desiredResult.getId()==function.getResultState())
             {
-                functionStateUpdater.insertExecutionLog("already ON...");
+                endExecution(FunctionCallStateEnum.READY, "already ON...");
                 return true;
             }
 
@@ -118,7 +117,11 @@ public abstract class Process {
             return false;
         }
     }
-
+    private void endExecution(FunctionCallStateEnum callState, String logMessage)
+    {
+        functionStateUpdater.insertExecutionLog(logMessage);
+        functionStateUpdater.updateFunctionExecution(callState);
+    }
     protected boolean on() throws Exception
     {
         // Function result state needs to be handled here - will not be communicated by arduino

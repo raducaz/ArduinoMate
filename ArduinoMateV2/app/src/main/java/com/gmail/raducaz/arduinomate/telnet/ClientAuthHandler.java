@@ -1,12 +1,15 @@
 package com.gmail.raducaz.arduinomate.telnet;
 
+import android.util.Log;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
+import java.text.Format;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
@@ -21,7 +24,7 @@ public class ClientAuthHandler extends SimpleChannelInboundHandler<ByteBuf> {
         ERROR
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(ClientAuthHandler.class);
+//    private static final Logger LOG = LoggerFactory.getLogger(ClientAuthHandler.class);
     private static final byte req_1[] = {
             (byte) 0xff, (byte) 0xfd, 0x18, (byte) 0xff, (byte) 0xfd, 0x20, (byte) 0xff, (byte) 0xfd,
             0x23, (byte) 0xff, (byte) 0xfd, 0x27};
@@ -76,7 +79,7 @@ public class ClientAuthHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
         byte[] networkBytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(networkBytes);
-        LOG.debug("Got message bytes {} and line {}", networkBytes, byteBuf);
+        Log.d("AuthHandler", "Got message bytes {"+networkBytes+"} and line {"+byteBuf+"}");
 
         // First step of handshake
         if (handShakeCounter == 0 && Arrays.equals(networkBytes, req_1)) {
@@ -122,7 +125,7 @@ public class ClientAuthHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOG.error("Error {}", cause);
+        Log.e("AuthHandler", "Error {}", cause);
         ctx.close();
     }
 
@@ -130,7 +133,7 @@ public class ClientAuthHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private boolean auth(ChannelHandlerContext ctx, String msg) {
         String response = null;
         boolean result = false;
-        LOG.info("Auth steps. got msg {}", msg);
+        Log.i("Auth steps. got msg {}", msg);
         if ("login".equals(msg)) {
             response = user + "\r\n";
         } else if ("password".equals(msg)) {
@@ -138,7 +141,7 @@ public class ClientAuthHandler extends SimpleChannelInboundHandler<ByteBuf> {
             result = true;
         }
         if (response != null) {
-            LOG.debug("Send to server {}", response);
+            Log.d("Send to server {}", response);
             ctx.writeAndFlush(response);
         }
         return result;

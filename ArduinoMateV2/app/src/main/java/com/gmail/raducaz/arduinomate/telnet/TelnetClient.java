@@ -9,8 +9,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 public final class TelnetClient {
 
     public static final int DEFAULT_COMMAND_TIMEOUT = 20000;
-    private static final Logger LOG = LoggerFactory.getLogger(TelnetClient.class);
+//    private static final Logger LOG = LoggerFactory.getLogger(TelnetClient.class);
     private final String host;
     private final int port;
     private final String user;
@@ -69,9 +69,9 @@ public final class TelnetClient {
             responseContext.put(command, commandOutput);
             lastWriteFuture.sync();
         } catch (InterruptedException ex) {
-            LOG.error("Exception was caught {}", ex.getMessage());
+            Log.e("Exception was caught {}", ex.getMessage());
         } catch (Exception generalExc) {
-            LOG.error("Exception was caught {}", generalExc.getMessage());
+            Log.e("Exception was caught {}", generalExc.getMessage());
             throw generalExc;
         }
         finally {
@@ -97,7 +97,7 @@ public final class TelnetClient {
                 lastWriteFuture.sync();
             }
         } catch (InterruptedException ex) {
-            LOG.error("Exception was caught {}", ex.getMessage());
+            Log.e("Exception was caught {}", ex.getMessage());
         } finally {
             closeConnecton();
         }
@@ -123,7 +123,7 @@ public final class TelnetClient {
 //                throw new RuntimeException("Authorization issue");
 //            }
         } catch (InterruptedException ex) {
-            LOG.error("Exception was caught {}", ex.getMessage());
+            Log.e("Exception was caught {}", ex.getMessage());
         }
         return result;
     }

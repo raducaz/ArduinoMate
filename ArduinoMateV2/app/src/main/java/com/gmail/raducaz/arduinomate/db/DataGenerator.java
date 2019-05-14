@@ -19,18 +19,18 @@ public class DataGenerator {
 
         List<DeviceEntity> devices = new ArrayList<>(3);
         DeviceEntity device = new DeviceEntity();
-        device.setIp("192.168.1.100");
+        device.setIp("192.168.100.100");
         device.setPort(8080);
         device.setName("Generator");
-        device.setDescription("Controllerul de pornire/oprire generator si control pompa - PROD");
+        device.setDescription("Generator, pompa, senzor curent si presiune");
         device.setId(1);
         devices.add(device);
 
         device = new DeviceEntity();
-        device.setIp("192.168.1.200");
+        device.setIp("192.168.100.100");
         device.setPort(8080);
-        device.setName("Test - Generator");
-        device.setDescription("Controllerul de pornire/oprire generator si control pompa - TEST");
+        device.setName("Tap");
+        device.setDescription("Robineti");
         device.setId(2);
         devices.add(device);
 
@@ -54,7 +54,6 @@ public class DataGenerator {
 
         List<FunctionEntity> functions = new ArrayList<>();
 
-        // Device Generator - TEST
         Device device = devices.get(0);
         FunctionEntity function = new FunctionEntity();
         function.setDeviceId(device.getId());
@@ -88,39 +87,31 @@ public class DataGenerator {
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
-        // Device Generator - TEST
+        device = devices.get(1);
 
-        // Device Generator - PROD
-//        device = devices.get(1);
-//        function = new FunctionEntity();
-//        function.setDeviceId(device.getId());
-//        function.setName("GeneratorOnOff");
-//        function.setDescription("Start/Stop Generator" + device.getName());
-//        function.setDateSample(new Date(System.currentTimeMillis()
-//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-//        functions.add(function);
-//
-//        function = new FunctionEntity();
-//        function.setDeviceId(device.getId());
-//        function.setName("PowerOnOff");
-//        function.setDescription("Start/Stop 220V supply" + device.getName());
-//        function.setDateSample(new Date(System.currentTimeMillis()
-//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-//        functions.add(function);
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("WaterSupplyTapOnOff");
+        function.setDescription("WaterSupplyTapOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
 
-//        Random rnd = new Random();
-//
-//        for (Product product : products) {
-//            int commentsNumber = rnd.nextInt(5) + 1;
-//            for (int i = 0; i < commentsNumber; i++) {
-//                CommentEntity comment = new CommentEntity();
-//                comment.setProductId(product.getId());
-//                comment.setText(COMMENTS[i] + " for " + product.getName());
-//                comment.setPostedAt(new Date(System.currentTimeMillis()
-//                        - TimeUnit.DAYS.toMillis(commentsNumber - i) + TimeUnit.HOURS.toMillis(i)));
-//                comments.add(comment);
-//            }
-//        }
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("HouseWaterOnOff");
+        function.setDescription("HouseWaterOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("GardenWaterOnOff");
+        function.setDescription("GardenWaterOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
 
         return functions;
     }

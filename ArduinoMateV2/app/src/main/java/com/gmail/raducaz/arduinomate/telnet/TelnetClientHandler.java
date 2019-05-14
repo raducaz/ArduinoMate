@@ -1,10 +1,11 @@
 package com.gmail.raducaz.arduinomate.telnet;
 
+import android.util.Log;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.util.TimerTask;
 import java.util.concurrent.*;
@@ -15,7 +16,7 @@ import java.util.concurrent.*;
 @Sharable
 public class TelnetClientHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TelnetClientHandler.class);
+//    private static final Logger LOG = LoggerFactory.getLogger(TelnetClientHandler.class);
     private static final int DEFAULT_REFRESH_TIMER = 300;
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
     private final BlockingQueue<String> queue;
@@ -35,7 +36,7 @@ public class TelnetClientHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOG.error("Error ", cause);
+        Log.e("Error ", cause.getMessage(), cause);
         ctx.close();
     }
 
@@ -45,7 +46,7 @@ public class TelnetClientHandler extends SimpleChannelInboundHandler<String> {
         scheduledExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
         super.channelInactive(ctx);
         scheduledExecutor.shutdownNow();
-        LOG.debug("Deactivated channel successfully");
+        Log.d("channelInactive", "Deactivated channel successfully");
     }
 
     public void updateTimer() {
@@ -59,7 +60,7 @@ public class TelnetClientHandler extends SimpleChannelInboundHandler<String> {
                     queue.offer(outputBuilder.toString(), 1, TimeUnit.SECONDS);
                     outputBuilder = new StringBuilder();
                 } catch (InterruptedException ex) {
-                    LOG.warn("Interrupted task. Exception {}", ex.getMessage());
+                    Log.w("updateTimer", "Interrupted task. Exception {}", ex);
                 }
             }
         }, DEFAULT_REFRESH_TIMER, TimeUnit.MILLISECONDS);

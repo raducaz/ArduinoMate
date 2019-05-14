@@ -117,7 +117,7 @@ public class FunctionStateUpdater {
 
         functionExecution.setCallState(FunctionCallStateEnum.EXECUTING.getId());
         functionExecution.setStartDate(DateConverter.toDate(System.currentTimeMillis()));
-        //functionExecution.setResultState(FunctionResultStateEnum.NA.getId());
+        functionExecution.setResultState(FunctionResultStateEnum.NA.getId());
         long executionId = dataRepository.insertFunctionExecution(functionExecution);
         functionExecution.setId(executionId);
 

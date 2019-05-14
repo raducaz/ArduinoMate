@@ -63,6 +63,9 @@ public class TaskFunctionCaller implements TaskInterface {
                 case "PumpOnOff":
                     new ProcessPumpOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
                     break;
+                case "HouseWaterOnOff":
+                    new ProcessHouseWaterOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
+                    break;
                 default:
 
             }

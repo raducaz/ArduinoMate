@@ -8,28 +8,28 @@ public class ProcessGardenWaterOnOff extends Process {
 
     public ProcessGardenWaterOnOff(DataRepository dataRepository, String deviceName)
     {
-        super(dataRepository, deviceName, "PumpOnOff");
+        super(dataRepository, deviceName, "GardenWaterOnOff");
     }
     public ProcessGardenWaterOnOff(DataRepository dataRepository, long deviceId)
     {
-        super(dataRepository, deviceId, "PumpOnOff");
+        super(dataRepository, deviceId, "GardenWaterOnOff");
     }
 
     @Override
     protected boolean on() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
+        ProcessWaterSupplyTapOnOff pWaterSupplyTap = new ProcessWaterSupplyTapOnOff(dataRepository, deviceEntity.getName());
+        ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, deviceEntity.getName());
 
-        // Don't want to validate the children process as long as the parent is AutoEnabled
-        ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getName());
-        ProcessPowerOnOff pPower = new ProcessPowerOnOff(dataRepository, deviceEntity.getName());
+        if(pWaterSupplyTap.execute(false, FunctionResultStateEnum.ON)) {
+            if (!pPump.execute(false, FunctionResultStateEnum.ON)) {
 
-        if (pGen.execute(false, FunctionResultStateEnum.ON)) {
-            if (!pPower.execute(false, FunctionResultStateEnum.ON)) {
-                //TODO: This can be avoided by PinStateChanged event which will sense no current and stop the generator automatically
-                // Stop generator if no consumption
-                // pGen.execute(false, FunctionResultStateEnum.OFF);
-                throw new Exception("No current consumption after Pump started.");
+                throw new Exception("Problem starting pump.");
+
             }
+        }
+        else
+        {
+            throw new Exception("Water supply tap is not Opened.");
         }
 
         return super.on();
@@ -37,16 +37,23 @@ public class ProcessGardenWaterOnOff extends Process {
 
     @Override
     protected boolean off() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
+        ProcessWaterSupplyTapOnOff pWaterSupplyTap = new ProcessWaterSupplyTapOnOff(dataRepository, deviceEntity.getName());
+        ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, deviceEntity.getName());
 
-        // Don't want to validate the children process as long as the parent is AutoEnabled
-        ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getName());
-        ProcessPowerOnOff pPower = new ProcessPowerOnOff(dataRepository, deviceEntity.getName());
+        //Ensure the tap is Close so the pressure is increased before the pump will automatically
+        //be closed (because no current is consumed)
+        if(pWaterSupplyTap.execute(false, FunctionResultStateEnum.OFF)) {
+            // Wait for pump to be automatically be stopped
+        }
+        else
+        {
+            // Stop the pump in case the tap is not closed successfully
+            if (!pPump.execute(false, FunctionResultStateEnum.OFF)) {
 
-        pPower.execute(false, FunctionResultStateEnum.OFF);
+                throw new Exception("Problem starting pump.");
 
-        if (!pGen.execute(false, FunctionResultStateEnum.OFF)) {
-            throw new Exception("Generator couldn't be stopped. Retry.");
+            }
+            throw new Exception("Water supply tap is not Closed.");
         }
 
         return super.off();

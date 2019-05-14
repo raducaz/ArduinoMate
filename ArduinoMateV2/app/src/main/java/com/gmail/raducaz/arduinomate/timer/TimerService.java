@@ -75,13 +75,16 @@ public class TimerService implements Runnable {
                         if(deviceGeneratorFunctions.isPressureLow())
                         {
                             try {
-                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "Generator", "PumpOnOff", FunctionResultStateEnum.ON);
+                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "Tap", "HouseWaterOnOff", FunctionResultStateEnum.ON);
                                 new TaskExecutor().execute(functionCaller);
                             }
                             catch (Exception exc) {
                                 Log.e(TAG, exc.getMessage());
                             }
                         }
+
+                        //TODO: Check Level of water in garden tanks: if is maximum then Close Main Tap => close pump and generator automatically
+
                     }
                     catch (Exception exc) {
                         Log.e(TAG, exc.getMessage());

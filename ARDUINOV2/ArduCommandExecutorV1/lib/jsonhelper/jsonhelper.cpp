@@ -2,7 +2,7 @@
 #include <ArduinoJson.h>
 
 const char PIN[4] = "pin";
-const char IP[3] = "ip";
+const char NAME[5] = "name";
 const char DEVICESTATE[6] = "state";
 const char VALUE[6] =     "value";
 const char FCTNAME[8] =   "fctName";
@@ -14,7 +14,7 @@ const char ANALOG[11] = "analogPins";
 class JSONSerializer
 {
     public: static JsonObject& constructPinStatesJSON(
-                                    const byte* deviceIp,
+                                    const char* deviceName,
                                     const byte deviceState,
                                     byte pinType, 
                                     float* pinStates, byte size)
@@ -22,7 +22,7 @@ class JSONSerializer
         return constructPinStatesJSON(deviceIp, deviceState, pinType, pinStates, size, "");
     }
     public: static JsonObject& constructPinStatesJSON(
-                                    const byte* deviceIp,
+                                    const char* deviceName,
                                     const byte deviceState,
                                     byte pinType, 
                                     const float* pinStates, byte size, 
@@ -32,7 +32,7 @@ class JSONSerializer
         JsonObject& _root = _buffer.createObject();
         if(strcmp(msg,"") != 0)
             _root[MSG] = msg;
-        _root[IP] = "192.168.2.200";//ipToString(deviceIp);
+        _root[NAME] = deviceName;
         _root[DEVICESTATE] = deviceState;
 
         JsonArray& psArr = _root.createNestedArray(pinType==0?DIGITAL:ANALOG);

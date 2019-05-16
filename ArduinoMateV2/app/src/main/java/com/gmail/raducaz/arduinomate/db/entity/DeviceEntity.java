@@ -35,6 +35,19 @@ public class DeviceEntity implements Device {
     public void setPort(int port) {
         this.port = port;
     }
+    @Override
+    public String getPortText() {
+        return Integer.toString(port);
+    }
+    public void setPortText(String port) {
+        try {
+            this.port = Integer.parseInt(port);
+        }
+        catch (Exception exc)
+        {
+            this.port = 8080;
+        }
+    }
 
     @Override
     public long getId() {

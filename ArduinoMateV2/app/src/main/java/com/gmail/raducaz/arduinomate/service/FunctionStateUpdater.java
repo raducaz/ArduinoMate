@@ -35,9 +35,9 @@ public class FunctionStateUpdater {
         this.deviceStateInfo = new DeviceStateInfo(msg);
 
         String fctName = deviceStateInfo.getFunctionName();
-        String devIp = deviceStateInfo.getDeviceIp();
-        if(devIp != null && fctName != null) {
-            DeviceEntity deviceEntity = this.dataRepository.loadDeviceSync(devIp);
+        String devName = deviceStateInfo.getDeviceName();
+        if(devName != null && fctName != null) {
+            DeviceEntity deviceEntity = this.dataRepository.loadDeviceByNameSync(devName);
             if(deviceEntity != null) {
                 FunctionEntity functionEntity = this.dataRepository.loadFunctionSync(deviceEntity.getId(), fctName);
 

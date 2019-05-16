@@ -306,7 +306,7 @@ void clientThreadCallback()
     {
         digitalPinStates[i] = digitalRead(i);
     }
-    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(ip, 0, 0, digitalPinStates, 14),arduinoClient);
+    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(arduinoName, 0, 0, digitalPinStates, 14),arduinoClient);
 
     float analogPinStates[6];
     for(byte i=0;i<=5;i++)
@@ -316,7 +316,7 @@ void clientThreadCallback()
     
     analogPinStates[1] = sensor.getCurrentAC()-zeroCurrent;
 
-    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(ip, 0, 1, analogPinStates, 6),arduinoClient);
+    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(arduinoName, 0, 1, analogPinStates, 6),arduinoClient);
     MyExecutor::sendToServer("END",arduinoClient);
   }
 }

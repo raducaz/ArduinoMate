@@ -9,6 +9,7 @@ public interface Device {
     long getId();
     String getIp();
     int getPort();
+    String getPortText();
     String getName();
     String getDescription();
     void setDescription(String description);

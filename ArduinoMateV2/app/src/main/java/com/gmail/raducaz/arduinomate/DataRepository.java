@@ -13,6 +13,7 @@ import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
+import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.Function;
 import com.gmail.raducaz.arduinomate.model.PinState;
@@ -68,7 +69,7 @@ public class DataRepository {
     public DeviceEntity loadDeviceByNameSync(final String deviceName) {
         return mDatabase.deviceDao().loadDeviceByNameSync(deviceName);
     }
-    public LiveData<DeviceEntity> loadDevice(final String deviceIp) {
+    public LiveData<DeviceEntity> loadDeviceByIp(final String deviceIp) {
         return mDatabase.deviceDao().loadDevice(deviceIp);
     }
     public DeviceEntity loadDeviceSync(final String deviceIp) {
@@ -226,6 +227,34 @@ public class DataRepository {
     public void deleteAllPinStates()
     {
         mDatabase.pinStateDao().deleteAllPinStates();
+    }
+    //endregion PinState
+
+    //region MockPinState
+
+    public List<MockPinStateEntity> loadMockDevicePinsStateSync(final String deviceName) {
+        return mDatabase.mockPinStateDao().loadDevicePinsStateSync(deviceName);
+    }
+    public MockPinStateEntity loadMockDevicePinStateSync(final String deviceName, final int pinNo) {
+        return mDatabase.mockPinStateDao().loadDevicePinStateSync(deviceName, pinNo);
+    }
+
+    public void insertMockPinState(MockPinStateEntity pinState) {
+        mDatabase.mockPinStateDao().insert(pinState);
+    }
+    public void updateMockPinState(MockPinStateEntity pinStateEntity) {
+        mDatabase.mockPinStateDao().update(pinStateEntity);
+    }
+    public void updateMockPinStateById(long id, double state) {
+        mDatabase.mockPinStateDao().updateById(id, state);
+    }
+    public void deleteMockPinStatesByDevice(String deviceName)
+    {
+        mDatabase.mockPinStateDao().deletePinStatesByDevice(deviceName);
+    }
+    public void deleteAllMockPinStates()
+    {
+        mDatabase.mockPinStateDao().deleteAllPinStates();
     }
     //endregion PinState
 

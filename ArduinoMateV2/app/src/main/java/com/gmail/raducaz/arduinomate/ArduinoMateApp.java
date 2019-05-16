@@ -3,6 +3,7 @@ package com.gmail.raducaz.arduinomate;
 import android.app.Application;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
+import com.gmail.raducaz.arduinomate.mocks.MockArduinoServerService;
 import com.gmail.raducaz.arduinomate.tcpserver.TcpServerService;
 import com.gmail.raducaz.arduinomate.timer.TimerService;
 
@@ -15,6 +16,10 @@ import java.util.concurrent.ExecutorService;
  */
 
 public class ArduinoMateApp extends Application {
+
+    //MOCK
+    private MockArduinoServerService mockArduinoServerService;
+    //MOCK
 
     private AppExecutors mAppExecutors;
     private TcpServerService tcpServerService;
@@ -42,6 +47,22 @@ public class ArduinoMateApp extends Application {
             this.getNetworkExecutor().execute(timerService);
         }
         catch (IOException exc)
+        {
+            //TODO: handle it somehow
+        }
+
+        // Start the arduino mocks
+        try {
+
+            //mockArduinoServerService = MockArduinoServerService.getInstance(this.getRepository(), 8080, "Generator");
+            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8080, "Generator");
+            this.getNetworkExecutor().execute(mockArduinoServerService);
+
+//            mockArduinoServerService = MockArduinoServerService.getInstance(this.getRepository(), 8081, "Tap");
+            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8081, "Tap");
+            this.getNetworkExecutor().execute(mockArduinoServerService);
+        }
+        catch (Exception exc)
         {
             //TODO: handle it somehow
         }

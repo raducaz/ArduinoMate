@@ -6,6 +6,7 @@ import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
+import com.gmail.raducaz.arduinomate.mocks.MockArduinoClient;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
@@ -69,19 +70,26 @@ public class TimerService implements Runnable {
 
                     try {
 
+                        //MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK
+                        MockArduinoClient arduinoClient = new MockArduinoClient(dataRepository, "127.0.0.1", 9090);
+                        arduinoClient.SendMockPinStates("Generator");
+                        arduinoClient.SendMockPinStates("Tap");
+                        //MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK
+
+
                         // Check the pressure periodically by probing, if pressure low start generator and pump
                         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
-                        if(deviceGeneratorFunctions.isPressureLow())
-                        {
-                            try {
-                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "Tap", "HouseWaterOnOff", FunctionResultStateEnum.ON);
-                                new TaskExecutor().execute(functionCaller);
-                            }
-                            catch (Exception exc) {
-                                Log.e(TAG, exc.getMessage());
-                            }
-                        }
+//                        if(deviceGeneratorFunctions.isPressureLow())
+//                        {
+//                            try {
+//                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "Tap", "HouseWaterOnOff", FunctionResultStateEnum.ON);
+//                                new TaskExecutor().execute(functionCaller);
+//                            }
+//                            catch (Exception exc) {
+//                                Log.e(TAG, exc.getMessage());
+//                            }
+//                        }
 
                         //TODO: Check Level of water in garden tanks: if is maximum then Close Main Tap => close pump and generator automatically
 
@@ -90,7 +98,7 @@ public class TimerService implements Runnable {
                         Log.e(TAG, exc.getMessage());
                     }
                 }
-            }, 1000, 20000);
+            }, 1000, 5000);
         }
     }
 }

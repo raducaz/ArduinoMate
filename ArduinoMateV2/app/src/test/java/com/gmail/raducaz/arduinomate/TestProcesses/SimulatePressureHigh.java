@@ -15,7 +15,7 @@ public class SimulatePressureHigh {
 
         String command = "[{\"~A4\":1}]";
 
-        ArduinoCommander arduinoCommander = new ArduinoCommander("192.168.100.100", 8080);
+        ArduinoCommander arduinoCommander = new ArduinoCommander("192.168.100.12", 8080);
         String result = arduinoCommander.SendCommand(command);
     }
 }

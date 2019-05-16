@@ -40,11 +40,11 @@ public class DeviceStateUpdater {
     }
 
     public DeviceEntity getDeviceEntity() {
-        String ip = deviceStateInfo.getDeviceIp();
-        if (ip == null)
+        String name = deviceStateInfo.getDeviceName();
+        if (name == null)
             return null;
 
-        return dataRepository.loadDeviceSync(ip);
+        return dataRepository.loadDeviceByNameSync(name);
     }
     public DeviceEntity getDeviceEntity(long id) {
 

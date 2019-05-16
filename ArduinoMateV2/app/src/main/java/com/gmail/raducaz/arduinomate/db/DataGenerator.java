@@ -3,6 +3,7 @@ package com.gmail.raducaz.arduinomate.db;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.model.Device;
+import com.gmail.raducaz.arduinomate.model.MockPinState;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +20,7 @@ public class DataGenerator {
 
         List<DeviceEntity> devices = new ArrayList<>(3);
         DeviceEntity device = new DeviceEntity();
-        device.setIp("192.168.100.100");
+        device.setIp("127.0.0.1");
         device.setPort(8080);
         device.setName("Generator");
         device.setDescription("Generator, pompa, senzor curent si presiune");
@@ -27,8 +28,8 @@ public class DataGenerator {
         devices.add(device);
 
         device = new DeviceEntity();
-        device.setIp("192.168.100.100");
-        device.setPort(8080);
+        device.setIp("127.0.0.1");
+        device.setPort(8081);
         device.setName("Tap");
         device.setDescription("Robineti");
         device.setId(2);
@@ -115,4 +116,5 @@ public class DataGenerator {
 
         return functions;
     }
+
 }

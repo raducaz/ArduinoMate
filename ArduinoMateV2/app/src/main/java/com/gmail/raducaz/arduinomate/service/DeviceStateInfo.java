@@ -34,11 +34,11 @@ public class DeviceStateInfo {
         }
     }
 
-    public String getDeviceIp()
+    public String getDeviceName()
     {
         try {
-            if (_messageData != null && _messageData.has("ip")) {
-                return _messageData.getString("ip");
+            if (_messageData != null && _messageData.has("name")) {
+                return _messageData.getString("name");
             } else
                 return null;
         }

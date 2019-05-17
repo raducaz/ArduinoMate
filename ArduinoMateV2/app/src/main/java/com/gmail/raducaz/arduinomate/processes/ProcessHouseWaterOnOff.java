@@ -41,7 +41,7 @@ public class ProcessHouseWaterOnOff extends Process {
         ProcessWaterSupplyTapOnOff pWaterSupplyTap = new ProcessWaterSupplyTapOnOff(dataRepository, deviceEntity.getName());
         ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, "Generator");
 
-        //Endure the tap is Close so the pressure is maintained
+        //Ensure the tap is Close so the pressure is maintained
         if(pWaterSupplyTap.execute(false, FunctionResultStateEnum.OFF)) {
             if (!pPump.execute(false, FunctionResultStateEnum.OFF)) {
 

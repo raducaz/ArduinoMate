@@ -9,13 +9,13 @@ import org.junit.Test;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-public class SimulateCurrentLow {
+public class SimulateTapOpen {
     @Test
     public void TestSendMessage() {
 
-        String command = "[{\"=A1\":0}]";
+        String command = "[{\"=6\":0}]";
 
-        ArduinoCommander arduinoCommander = new ArduinoCommander("192.168.100.12", 8080);
+        ArduinoCommander arduinoCommander = new ArduinoCommander("192.168.100.12", 8081);
         String result = arduinoCommander.SendCommand(command);
     }
 }

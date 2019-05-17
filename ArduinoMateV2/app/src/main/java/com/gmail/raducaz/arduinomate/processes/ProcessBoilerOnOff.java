@@ -25,7 +25,6 @@ public class ProcessBoilerOnOff extends Process {
         ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getName());
         pGen.execute(false, FunctionResultStateEnum.ON);
 
-        //TODO: Test if after Boiler is ready the power consumption stops.
 
 
         return super.on();

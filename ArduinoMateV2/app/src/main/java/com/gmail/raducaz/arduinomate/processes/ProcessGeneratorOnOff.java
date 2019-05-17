@@ -22,6 +22,17 @@ public class ProcessGeneratorOnOff extends Process {
     protected boolean on() throws Exception {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
 
+        // Ensure the generator is OFF
+        deviceGeneratorFunctions.generatorOFF();
+        if(deviceGeneratorFunctions.getGeneratorState()==FunctionResultStateEnum.ON)
+        {
+            throw new Exception("Contact still ON, stop it manually !");
+        }
+//        if(deviceGeneratorFunctions.isCurrentAbove(0.7))
+//        {
+//            throw new Exception("Generator CANNOT BE STOPPED !!!");
+//        }
+
         deviceGeneratorFunctions.generatorON();
 
         return super.on();
@@ -34,11 +45,22 @@ public class ProcessGeneratorOnOff extends Process {
         // This ensures also stopping all dependent processes ...
         // TODO: Maybe it is a good idea to implement an event driven mechanism that when ON a function to add also a handler for future OFF events from dependent processes
         if(deviceGeneratorFunctions.getPowerState()==FunctionResultStateEnum.ON) {
+            ProcessHouseWaterOnOff pWater = new ProcessHouseWaterOnOff(dataRepository, "Tap");
+            pWater.execute(false, FunctionResultStateEnum.OFF);
+
             ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, deviceEntity.getName());
             pPump.execute(false, FunctionResultStateEnum.OFF);
             //TODO; SOLVED Solve this recursive call, this will call Gen.Off again inside Pump.off
         }
         deviceGeneratorFunctions.generatorOFF();
+        if(deviceGeneratorFunctions.getGeneratorState()==FunctionResultStateEnum.ON)
+        {
+            throw new Exception("Contact still ON, stop it manually !");
+        }
+//        if(deviceGeneratorFunctions.isCurrentAbove(0.7))
+//        {
+//            throw new Exception("Generator CANNOT BE STOPPED !!!");
+//        }
 
         return super.off();
     }

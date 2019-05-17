@@ -97,12 +97,12 @@ public class DeviceGeneratorFunctions {
     {
         String TAG = "generatorOFF";
 
-            // Priza OFF, Wait 2s, Contact OFF
-            String command = "[{\"=3\":1},{\"!\":2000},{\"=2\":1}]";
-            arduinoCommander.SendCommand(command);
+        // Priza OFF, Wait 2s, Contact OFF
+        String command = "[{\"=3\":1},{\"!\":2000},{\"=2\":1}]";
+        arduinoCommander.SendCommand(command);
 
-            // Check AC current - if low then it stopped
-            return true; // TODO: Use when implemented correctly !isCurrentAbove(0.18);
+        // Check AC current - if low then it stopped
+        return true; // TODO: Use when implemented correctly !isCurrentAbove(0.18);
 
     }
 

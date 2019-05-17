@@ -27,11 +27,13 @@ public class DeviceStateChangeEvent {
         // TODO: Handle changes here
 
         try {
-            // if current is below a threshold generator must be stopped
-            if (newPinStates.containsKey("A1") && (newPinStates.get("A1")<0.07)
-                && oldPinStates.containsKey("A1") && (oldPinStates.get("A1")>0.07)) {
-                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, deviceEntity.getName(), "GeneratorOnOff", FunctionResultStateEnum.OFF);
-                new TaskExecutor().execute(functionCaller);
+            if(deviceEntity.getName().equals("Generator")) {
+                // if current is below a threshold generator must be stopped
+                if (newPinStates.containsKey("A1") && (newPinStates.get("A1") < 0.07)
+                        && oldPinStates.containsKey("A1") && (oldPinStates.get("A1") > 0.07)) {
+                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, deviceEntity.getName(), "GeneratorOnOff", FunctionResultStateEnum.OFF);
+                    new TaskExecutor().execute(functionCaller);
+                }
             }
         }
         catch (Exception exc) {

@@ -80,16 +80,16 @@ public class TimerService implements Runnable {
                         // Check the pressure periodically by probing, if pressure low start generator and pump
                         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
-//                        if(deviceGeneratorFunctions.isPressureLow())
-//                        {
-//                            try {
-//                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "Tap", "HouseWaterOnOff", FunctionResultStateEnum.ON);
-//                                new TaskExecutor().execute(functionCaller);
-//                            }
-//                            catch (Exception exc) {
-//                                Log.e(TAG, exc.getMessage());
-//                            }
-//                        }
+                        if(deviceGeneratorFunctions.isPressureLow())
+                        {
+                            try {
+                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "Tap", "HouseWaterOnOff", FunctionResultStateEnum.ON);
+                                new TaskExecutor().execute(functionCaller);
+                            }
+                            catch (Exception exc) {
+                                Log.e(TAG, exc.getMessage());
+                            }
+                        }
 
                         //TODO: Check Level of water in garden tanks: if is maximum then Close Main Tap => close pump and generator automatically
 

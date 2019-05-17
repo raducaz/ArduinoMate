@@ -32,7 +32,8 @@ public interface ExecutionLogDao {
     @Query("SELECT * FROM executionLog where executionId = :executionId")
     List<ExecutionLogEntity> loadExecutionLogsSync(long executionId);
 
-    @Query("SELECT * FROM executionLog ")
+    @Query("SELECT * FROM executionLog " +
+            "ORDER BY Date DESC")
     LiveData<List<ExecutionLogEntity>> loadAllExecutionLogs();
 
     @Query("DELETE FROM executionLog " +

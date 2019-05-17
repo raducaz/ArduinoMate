@@ -20,13 +20,22 @@ public class ProcessWaterSupplyTapOnOff extends Process {
     protected boolean on() throws Exception {
         DeviceTapFunctions deviceGeneratorFunctions = new DeviceTapFunctions(dataRepository, deviceEntity.getName());
 
-        return deviceGeneratorFunctions.tapOPEN() && super.on();
+        if(!deviceGeneratorFunctions.tapOPEN())
+        {
+            //throw new Exception("Problem opening tap.");
+        }
+
+        return super.on();
     }
 
     @Override
     protected boolean off() throws Exception {
         DeviceTapFunctions deviceGeneratorFunctions = new DeviceTapFunctions(dataRepository, deviceEntity.getName());
 
-        return deviceGeneratorFunctions.tapCLOSE() && super.off();
+        if(!deviceGeneratorFunctions.tapCLOSE())
+        {
+            //throw new Exception("Problem closing tap.");
+        }
+        return super.off();
     }
 }

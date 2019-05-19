@@ -47,7 +47,7 @@ public class FunctionStateUpdater {
                         functionExecution = new FunctionExecutionEntity();
                         functionExecution.setFunctionId(functionEntity.getId());
                         functionExecution.setName(functionEntity.getName());
-                        this.startFunctionExecution();
+                        this.startFunctionExecution("no reason");
                     }
                 }
             }
@@ -111,7 +111,7 @@ public class FunctionStateUpdater {
         log.setFunctionName(functionExecution.getName());
         return dataRepository.insertExecutionLog(log);
     }
-    public long startFunctionExecution(){
+    public long startFunctionExecution(String reason){
         if(functionExecution == null)
             return -1;
 
@@ -122,7 +122,7 @@ public class FunctionStateUpdater {
         functionExecution.setId(executionId);
 
         // Automatically insert log as well
-        insertExecutionLog("Starting execution ... ");
+        insertExecutionLog("Starting execution ... because " + reason);
 
         return executionId;
     }

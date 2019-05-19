@@ -61,6 +61,9 @@ public class ArduinoMateApp extends Application {
 //            mockArduinoServerService = MockArduinoServerService.getInstance(this.getRepository(), 8081, "Tap");
             mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8081, "Tap");
             this.getNetworkExecutor().execute(mockArduinoServerService);
+
+            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8082, "Boiler");
+            this.getNetworkExecutor().execute(mockArduinoServerService);
         }
         catch (Exception exc)
         {

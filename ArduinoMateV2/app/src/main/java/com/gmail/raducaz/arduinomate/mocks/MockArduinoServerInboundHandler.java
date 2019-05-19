@@ -174,7 +174,7 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
                     {
                         pin = getPin(1, key);
                         if (key.startsWith("#")) { // get digital
-                            getDigitalPinState(pin, pin>13);
+                            obj.put(key, getDigitalPinState(pin, pin>13));
                         }
                         else {
                             obj.put(key, pin<=13 ? getDigitalPinState(pin, false) : getAnalogPinState(pin));
@@ -184,7 +184,10 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
                     {
                         Thread.sleep(obj.getInt(key));
                     }
-
+                    if (key.equals("F1")) // Cmd function
+                    {
+                        obj.put(key,getAnalogPinState(15));
+                    }
 
                 }
 

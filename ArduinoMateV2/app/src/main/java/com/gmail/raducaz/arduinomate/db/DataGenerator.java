@@ -20,18 +20,26 @@ public class DataGenerator {
 
         List<DeviceEntity> devices = new ArrayList<>(3);
         DeviceEntity device = new DeviceEntity();
-        device.setIp("127.0.0.1");
+        device.setIp("192.168.100.12");
         device.setPort(8080);
         device.setName("Generator");
         device.setDescription("Generator, pompa, senzor curent si presiune");
+        device.setId(0);
+        devices.add(device);
+
+        device = new DeviceEntity();
+        device.setIp("192.168.100.12");
+        device.setPort(8081);
+        device.setName("Tap");
+        device.setDescription("Robineti");
         device.setId(1);
         devices.add(device);
 
         device = new DeviceEntity();
-        device.setIp("127.0.0.1");
-        device.setPort(8081);
-        device.setName("Tap");
-        device.setDescription("Robineti");
+        device.setIp("192.168.100.12");
+        device.setPort(8082);
+        device.setName("Boiler");
+        device.setDescription("Boiler si prize casa");
         device.setId(2);
         devices.add(device);
 
@@ -80,14 +88,6 @@ public class DataGenerator {
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("BoilerOnOff");
-        function.setDescription("Start/Stop generator for Boiler circuit " + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
         device = devices.get(1);
 
         function = new FunctionEntity();
@@ -110,6 +110,15 @@ public class DataGenerator {
         function.setDeviceId(device.getId());
         function.setName("GardenWaterOnOff");
         function.setDescription("GardenWaterOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        device = devices.get(2);
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("BoilerOnOff");
+        function.setDescription("Start/Stop generator for Boiler circuit " + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

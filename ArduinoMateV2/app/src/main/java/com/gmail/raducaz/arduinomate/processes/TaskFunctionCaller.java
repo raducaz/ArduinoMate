@@ -20,8 +20,10 @@ public class TaskFunctionCaller implements TaskInterface {
     private DeviceEntity device;
     private FunctionEntity function;
     private final DataRepository mRepository;
-    private  FunctionResultStateEnum desiredFunctionResult;
+    private FunctionResultStateEnum desiredFunctionResult;
     private boolean isAutoExecution;
+    private boolean isOnDemand;
+    private String reasonDetails;
 
     // This is used by the UI
     public TaskFunctionCaller(DataRepository dataRepository, FunctionEntity function) {
@@ -31,18 +33,21 @@ public class TaskFunctionCaller implements TaskInterface {
         mRepository = dataRepository;
         this.desiredFunctionResult = FunctionResultStateEnum.NA;
         isAutoExecution = false;
-
+        isOnDemand = true;
+        reasonDetails = "On demand execution";
         // Do not add code to access data base here, as this contructor is called directly from UI
     }
 
     // Use this constructor to state the desired FunctionResultState after the execution
-    public TaskFunctionCaller(DataRepository dataRepository, String deviceName, String functionName, FunctionResultStateEnum desiredFunctionResult) {
+    public TaskFunctionCaller(DataRepository dataRepository, String deviceName, String functionName, FunctionResultStateEnum desiredFunctionResult, String reasonDetails) {
         this.deviceName = deviceName;
         this.functionName = functionName;
 
         mRepository = dataRepository;
         this.desiredFunctionResult = desiredFunctionResult;
         isAutoExecution = true;
+        isOnDemand = false;
+        this.reasonDetails = reasonDetails;
     }
 
     public void execute() {
@@ -55,16 +60,25 @@ public class TaskFunctionCaller implements TaskInterface {
             switch (functionName)
             {
                 case "GeneratorOnOff":
-                    new ProcessGeneratorOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessGeneratorOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                 break;
                 case "PowerOnOff":
-                    new ProcessPowerOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessPowerOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                     break;
                 case "PumpOnOff":
-                    new ProcessPumpOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessPumpOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                     break;
                 case "HouseWaterOnOff":
-                    new ProcessHouseWaterOnOff(mRepository, deviceName).execute(isAutoExecution, desiredFunctionResult);
+                    new ProcessHouseWaterOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                    break;
+                case "GardenWaterOnOff":
+                    new ProcessGardenWaterOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                    break;
+                case "WaterSupplyTapOnOff":
+                    new ProcessWaterSupplyTapOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                    break;
+                case "BoilerOnOff":
+                    new ProcessBoilerOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                     break;
                 default:
 

@@ -24,9 +24,9 @@ public class DeviceGeneratorFunctions {
     {
         try {
             // Check AC current - if high then it's on
-            String command = "[{\"?A1\":0}]";
+            String command = "[{\"F1\":0}]";
             String result = arduinoCommander.SendCommand(command);
-            if (new Parser(result).getDouble("?A1") >= threshold)
+            if (new Parser(result).getDouble("F1") >= threshold)
                 return true;
             else
                 return false;

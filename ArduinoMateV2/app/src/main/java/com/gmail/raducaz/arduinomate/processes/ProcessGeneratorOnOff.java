@@ -9,6 +9,7 @@ import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionStateUpdater;
 
 public class ProcessGeneratorOnOff extends Process {
+
     public ProcessGeneratorOnOff(DataRepository dataRepository, String deviceName)
     {
         super(dataRepository, deviceName, "GeneratorOnOff");
@@ -19,49 +20,58 @@ public class ProcessGeneratorOnOff extends Process {
     }
 
     @Override
-    protected boolean on() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
+    protected boolean on(boolean isOnDemand) throws Exception {
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
-        // Ensure the generator is OFF
-        deviceGeneratorFunctions.generatorOFF();
+        // Do not close generator because it is possible that there are other consumers
+
+        logInfo("Check if generator contact is already ON");
         if(deviceGeneratorFunctions.getGeneratorState()==FunctionResultStateEnum.ON)
         {
-            throw new Exception("Contact still ON, stop it manually !");
+            logInfo("Contact still ON");
+            logInfo("Check current consumption");
+            if (!deviceGeneratorFunctions.isCurrentAbove(0.7)) {
+                logInfo("NO current consumption consider stopping it");
+            }
         }
-//        if(deviceGeneratorFunctions.isCurrentAbove(0.7))
-//        {
-//            throw new Exception("Generator CANNOT BE STOPPED !!!");
-//        }
-
-        deviceGeneratorFunctions.generatorON();
-
-        return super.on();
+        else {
+            logInfo("Contact is OFF, START generator");
+            deviceGeneratorFunctions.generatorON();
+        }
+        return super.on(isOnDemand);
     }
 
     @Override
-    protected boolean off() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
+    protected boolean off(boolean isOnDemand) throws Exception {
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
         // This ensures also stopping all dependent processes ...
         // TODO: Maybe it is a good idea to implement an event driven mechanism that when ON a function to add also a handler for future OFF events from dependent processes
+        logInfo("Check power state is ON");
         if(deviceGeneratorFunctions.getPowerState()==FunctionResultStateEnum.ON) {
             ProcessHouseWaterOnOff pWater = new ProcessHouseWaterOnOff(dataRepository, "Tap");
-            pWater.execute(false, FunctionResultStateEnum.OFF);
+            logInfo("Power state is ON, STOP HouseWater");
+            pWater.execute(false,isOnDemand, FunctionResultStateEnum.OFF, "Generator is stopping");
 
-            ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, deviceEntity.getName());
-            pPump.execute(false, FunctionResultStateEnum.OFF);
+
+            ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, "Generator");
+            logInfo("STOP pump");
+            pPump.execute(false, isOnDemand, FunctionResultStateEnum.OFF, "Generator is stopping");
             //TODO; SOLVED Solve this recursive call, this will call Gen.Off again inside Pump.off
         }
+        logInfo("STOP generator");
         deviceGeneratorFunctions.generatorOFF();
+
+        logInfo("Check if generator contact is still ON");
         if(deviceGeneratorFunctions.getGeneratorState()==FunctionResultStateEnum.ON)
         {
             throw new Exception("Contact still ON, stop it manually !");
         }
-//        if(deviceGeneratorFunctions.isCurrentAbove(0.7))
-//        {
-//            throw new Exception("Generator CANNOT BE STOPPED !!!");
-//        }
+        if(deviceGeneratorFunctions.isCurrentAbove(0.7))
+        {
+            throw new Exception("Generator CANNOT BE STOPPED !!!");
+        }
 
-        return super.off();
+        return super.off(isOnDemand);
     }
 }

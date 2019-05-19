@@ -83,7 +83,11 @@ public class TimerService implements Runnable {
                         if(deviceGeneratorFunctions.isPressureLow())
                         {
                             try {
-                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository, "Tap", "HouseWaterOnOff", FunctionResultStateEnum.ON);
+                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository,
+                                        "Tap",
+                                        "HouseWaterOnOff",
+                                        FunctionResultStateEnum.ON,
+                                        "Pressure is LOW");
                                 new TaskExecutor().execute(functionCaller);
                             }
                             catch (Exception exc) {

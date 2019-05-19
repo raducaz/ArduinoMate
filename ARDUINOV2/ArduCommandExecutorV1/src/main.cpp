@@ -202,7 +202,7 @@ void listenSerial()
 void listenEthernet()
 {
   //Serial.println("Start Server to listen clients...");
-  EthernetServer server = EthernetServer(8080);
+  EthernetServer server = EthernetServer(arduinoPort);
   server.begin();
 
   EthernetClient client = server.available();

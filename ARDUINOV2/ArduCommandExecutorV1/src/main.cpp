@@ -12,8 +12,6 @@
 #include <configuration.h>
 #include "logger.h"
 #include <jsonhelper.cpp>
-// #include <tcpclient.h>
-// #include <tcpserver.h>
 #include <executor.h>
 
 volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
@@ -47,6 +45,10 @@ void calibrateCurrentSensor()
     delay(100);
   }
   zeroCurrent = c / 10.0;
+}
+float f1()
+{
+  return sensor.getCurrentAC()-zeroCurrent;
 }
 
 // This is the callback for the Timer
@@ -111,8 +113,6 @@ void parseCommand(String plainJson, EthernetClient client)
                   if(pin<=13) MyExecutor::setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
                   else MyExecutor::setAnalogPinTemp(pin,p.value,obj["@"].as<float>());  
                 }
-                
-                //obj[">"] = 1;
               }
               else // Cmd permanent set
               {
@@ -125,8 +125,6 @@ void parseCommand(String plainJson, EthernetClient client)
                   if(pin<=13) MyExecutor::setDigitalPin(pin, p.value.as<int>());
                   else MyExecutor::setAnalogPin(pin, p.value.as<float>());
                 }
-                
-                obj[">"] = 1;
               }
             }
             if(strncmp(p.key,"?",1)==0 || 
@@ -140,10 +138,13 @@ void parseCommand(String plainJson, EthernetClient client)
             }
             if(strcmp(p.key,"!")==0){ // Cmd wait
               MyExecutor::wait(p.value);
-              obj[">"] = 1;
+            }
+            if(strcmp(p.key,"F1")==0){ // Cmd function
+              obj[p.key] = f1();
             }
           }
          
+          obj[">"] = 1;
         }
       }
 
@@ -314,7 +315,9 @@ void clientThreadCallback()
         analogPinStates[i] = analogRead(i+14);
     }
     
-    analogPinStates[1] = sensor.getCurrentAC()-zeroCurrent;
+    //--------DEVICE SPECIFIC---------------------------
+    analogPinStates[1] = f1();
+    //--------DEVICE SPECIFIC---------------------------
 
     MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(arduinoName, 0, 1, analogPinStates, 6),arduinoClient);
     MyExecutor::sendToServer("END",arduinoClient);
@@ -359,15 +362,10 @@ void setup() {
   setupThread();
 }
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  
   delay(500);
   //Start the Thread in loop
   threadsController.run();
   delay(500);
 
-  delay(2000);
-  Serial.println(sensor.getCurrentAC()-zeroCurrent);
-  
-  //serverRun();
 }

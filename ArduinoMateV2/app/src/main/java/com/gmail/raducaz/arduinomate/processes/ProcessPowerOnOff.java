@@ -19,20 +19,22 @@ public class ProcessPowerOnOff extends Process {
     }
 
     @Override
-    protected boolean on() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
+    protected boolean on(boolean isOnDemand) throws Exception {
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
+        logInfo("START power.");
         deviceGeneratorFunctions.powerON();
 
-        return super.on();
+        return super.on(isOnDemand);
     }
 
     @Override
-    protected boolean off() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
+    protected boolean off(boolean isOnDemand) throws Exception {
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
+        logInfo("STOP power");
         deviceGeneratorFunctions.powerOFF();
 
-        return super.off();
+        return super.off(isOnDemand);
     }
 }

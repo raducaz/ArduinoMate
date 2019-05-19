@@ -26,7 +26,7 @@ public class DeviceTapFunctions {
         String TAG = "tapOpen";
 
         // Open selected pin -- cannot send the wait command now, because tap will open in 45s
-        String command = "[{\"=2\":0}]";
+        String command = "[{\"=7\":0}]";
         String result = arduinoCommander.SendCommand(command);
 
         if(isContactOn()) {
@@ -51,7 +51,7 @@ public class DeviceTapFunctions {
             return true;
         else {
             // Open selected pin -- cannot send the wait command now, because tap will open in 45s
-            String command = "[{\"=2\":1}]";
+            String command = "[{\"=7\":1}]";
             String result = arduinoCommander.SendCommand(command);
 
             if (!isContactOn()) {
@@ -72,7 +72,7 @@ public class DeviceTapFunctions {
     public boolean isContactOn()
     {
         try{
-            return !isPinOn("2");
+            return !isPinOn("7");
         }
         catch (Exception exc)
         {
@@ -98,11 +98,11 @@ public class DeviceTapFunctions {
         String TAG = "tapOpenState";
 
             // Send probe and see if contact is ON => tap is OPEN
-            String command = "[{\"=7\":1},{\"!\":500},{\"?6\":0},{\"=7\":0}]"; // 6 is receiver
+            String command = "[{\"~A3\":0},{\"#A4\":0},{\"~A3\":1}]"; // A4 is receiver
             String result = arduinoCommander.SendCommand(command);
 
             try {
-                if (new Parser(result).getInt("?6") == 0)
+                if (new Parser(result).getInt("#A4") == 0)
                     return FunctionResultStateEnum.ON;
                 else
                     return FunctionResultStateEnum.OFF;

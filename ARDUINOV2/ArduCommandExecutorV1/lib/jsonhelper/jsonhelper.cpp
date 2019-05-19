@@ -19,7 +19,7 @@ class JSONSerializer
                                     byte pinType, 
                                     float* pinStates, byte size)
     {
-        return constructPinStatesJSON(deviceIp, deviceState, pinType, pinStates, size, "");
+        return constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
     }
     public: static JsonObject& constructPinStatesJSON(
                                     const char* deviceName,

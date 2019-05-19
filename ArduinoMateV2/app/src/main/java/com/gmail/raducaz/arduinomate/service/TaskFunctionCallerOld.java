@@ -43,7 +43,7 @@ public class TaskFunctionCallerOld implements TaskInterface {
 
         try {
             // Automatically insert the log as well = Execution started...
-            functionStateUpdater.startFunctionExecution();
+            functionStateUpdater.startFunctionExecution("no reason");
 
             DeviceEntity device = mRepository.loadDeviceSync(function.getDeviceId());
 

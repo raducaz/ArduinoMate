@@ -20,18 +20,23 @@ public class ProcessPumpOnOff extends Process {
     }
 
     @Override
-    protected boolean on() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
+    protected boolean on(boolean isOnDemand) throws Exception {
+        String currentReason = "Pump is starting";
+
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
         // Don't want to validate the children process as long as the parent is AutoEnabled
-        ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getName());
-        ProcessPowerOnOff pPower = new ProcessPowerOnOff(dataRepository, deviceEntity.getName());
+        ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, "Generator");
+        ProcessPowerOnOff pPower = new ProcessPowerOnOff(dataRepository, "Generator");
 
-        if (pGen.execute(false, FunctionResultStateEnum.ON)) {
+        logInfo("START generator");
+        if (pGen.execute(false, isOnDemand, FunctionResultStateEnum.ON, currentReason)) {
+            logInfo("Wait 1 sec before start power");
             // Wait for one second before starting pump to give time to generator to run properly
             TimeUnit.SECONDS.sleep(1);
 
-            if (!pPower.execute(false, FunctionResultStateEnum.ON)) {
+            logInfo("START power");
+            if (!pPower.execute(false, isOnDemand, FunctionResultStateEnum.ON, currentReason)) {
                 //TODO: This can be avoided by PinStateChanged event which will sense no current and stop the generator automatically
                 // Stop generator if no consumption
                 // pGen.execute(false, FunctionResultStateEnum.OFF);
@@ -39,24 +44,29 @@ public class ProcessPumpOnOff extends Process {
             }
         }
 
-        return super.on();
+        return super.on(isOnDemand);
     }
 
     @Override
-    protected boolean off() throws Exception {
-        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, deviceEntity.getName());
+    protected boolean off(boolean isOnDemand) throws Exception {
+        String currentReason = "Pump is stopping";
+
+        DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
         // Don't want to validate the children process as long as the parent is AutoEnabled
-        ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, deviceEntity.getName());
-        ProcessPowerOnOff pPower = new ProcessPowerOnOff(dataRepository, deviceEntity.getName());
+        ProcessGeneratorOnOff pGen = new ProcessGeneratorOnOff(dataRepository, "Generator");
+        ProcessPowerOnOff pPower = new ProcessPowerOnOff(dataRepository, "Generator");
 
+        logInfo("Check if generator Contact is ON");
         if(deviceGeneratorFunctions.getPowerState()==FunctionResultStateEnum.ON) {
-            pPower.execute(false, FunctionResultStateEnum.OFF);
+            logInfo("Contact on, start power");
+            pPower.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason);
 
-            if (!pGen.execute(false, FunctionResultStateEnum.OFF)) {
+            logInfo("STOP generator");
+            if (!pGen.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason)) {
                 throw new Exception("Generator couldn't be stopped. Retry.");
             }
         }
-        return super.off();
+        return super.off(isOnDemand);
     }
 }

@@ -72,7 +72,7 @@ public class ActivityDetail extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
         /* Add the other tabs needed except the first tab */
         tabs.addTab(tabs.newTab().setText("Executions"));
-        tabs.addTab(tabs.newTab().setText("Logs"));
+        tabs.addTab(tabs.newTab().setText("Pins"));
         tabs.addOnTabSelectedListener(onTabSelectedListener(viewPager));
 
 
@@ -133,8 +133,8 @@ public class ActivityDetail extends AppCompatActivity {
 
         /* Use the root fragment so it can be reused for the other tabs in the TabLayout */
         RootFragment initialFragment = new RootFragment();
-        initialFragment.setReplacementFragment(new FragmentPinStateList());
-        adapter.addFragment(initialFragment, "Pins");
+        initialFragment.setReplacementFragment(new FragmentExecutionLogList());
+        adapter.addFragment(initialFragment, "Logs");
 
         viewPager.setAdapter(adapter);
 //        viewPager.setCurrentItem(0);
@@ -161,11 +161,11 @@ public class ActivityDetail extends AppCompatActivity {
                  * "root_fragment.xml" as the reference to replace fragment
                  */
                 if(tab.getPosition()==0)
-                    trans.replace(R.id.root_frame, new FragmentPinStateList());
+                    trans.replace(R.id.root_frame, new FragmentExecutionLogList());
                 if(tab.getPosition()==1)
                     trans.replace(R.id.root_frame, new FragmentFunctionExecutionList());
                 if(tab.getPosition()==2)
-                    trans.replace(R.id.root_frame, new FragmentExecutionLogList());
+                    trans.replace(R.id.root_frame, new FragmentPinStateList());
 
                 /*
                  * IMPORTANT: The following lines allow us to add the fragment

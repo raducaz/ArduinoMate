@@ -47,7 +47,7 @@ public abstract class Process {
         this.function = dataRepository.loadFunctionSync(deviceEntity.getId(), functionName);
 
     }
-    public boolean execute(boolean isAutoExecution, FunctionResultStateEnum desiredResult) {
+    public boolean execute(boolean isAutoExecution, boolean isOnDemand, FunctionResultStateEnum desiredResult, String reasonDetails) {
 
         try {
 
@@ -56,12 +56,13 @@ public abstract class Process {
             functionExecution = dataRepository.loadLastFunctionExecutionSync(function.getId());
             if(functionExecution == null) {
 
-                startExecution();
+                startExecution(reasonDetails);
                 isFunctionExecutionJustStarted = true;
             }
             else
             {
                 functionStateUpdater = new FunctionStateUpdater(dataRepository, "Function started ...", functionExecution);
+                functionStateUpdater.insertExecutionLog("retry execution Because:" + reasonDetails);
             }
 
             if(!isFunctionExecutionJustStarted && functionExecution.getCallState()==FunctionCallStateEnum.EXECUTING.getId())
@@ -79,16 +80,21 @@ public abstract class Process {
                 endExecution(FunctionCallStateEnum.READY, "already ON...");
                 return true;
             }
+            if(!isOnDemand && functionExecution.getCallState()==FunctionCallStateEnum.ERROR.getId())
+            {
+                endExecution(FunctionCallStateEnum.ERROR, "Function in error state, only on demand execution is permitted");
+                return true;
+            }
 
             // From this point on - Start new execution - Automatically insert the log as well = Execution started...
-            startExecution();
+            startExecution(reasonDetails);
 
 
             if (desiredResult == FunctionResultStateEnum.OFF) {
                 //Redo the off command - should not be a problem
                 // Also this may solve problems like status is outdated but process is actually running
                 // In this case it would be impossible to stop
-                return off();
+                return off(isOnDemand);
 
             } else if (desiredResult == FunctionResultStateEnum.ON) {
 
@@ -98,15 +104,15 @@ public abstract class Process {
                     //TODO: Test if there is better to automatically run off before each on function ?
                 }
 
-                return on();
+                return on(isOnDemand);
 
             } else {
                 if(function.getResultState()==FunctionResultStateEnum.ON.getId()
                         || function.getResultState()==FunctionResultStateEnum.NA.getId()
                         || function.getResultState()==FunctionResultStateEnum.ERROR.getId())
-                    return off();
+                    return off(isOnDemand);
                 else
-                    return on();
+                    return on(isOnDemand);
             }
 
         } catch (Exception exc) {
@@ -122,7 +128,12 @@ public abstract class Process {
         functionStateUpdater.insertExecutionLog(logMessage);
         functionStateUpdater.updateFunctionExecution(callState);
     }
-    protected boolean on() throws Exception
+    protected void logInfo(String logMessage)
+    {
+        if(functionStateUpdater!= null)
+            functionStateUpdater.insertExecutionLog(logMessage);
+    }
+    protected boolean on(boolean isOnDemand) throws Exception
     {
         // Function result state needs to be handled here - will not be communicated by arduino
         // This will automatically set the Execution Log as well
@@ -131,7 +142,7 @@ public abstract class Process {
         return true;
     }
 
-    protected boolean off() throws Exception
+    protected boolean off(boolean isOnDemand) throws Exception
     {
         // Function result state needs to be handled here - will not be communicated by arduino
         // This will automatically set the Execution Log as well
@@ -140,13 +151,18 @@ public abstract class Process {
         return true;
     }
 
-    private void startExecution()
+    private void startExecution(String reasonDetails)
     {
         functionExecution = new FunctionExecutionEntity();
 
         functionStateUpdater = new FunctionStateUpdater(dataRepository, "Function started ...", functionExecution);
         functionExecution.setFunctionId(function.getId());
         functionExecution.setName(function.getName());
-        functionStateUpdater.startFunctionExecution();
+        functionStateUpdater.startFunctionExecution(reasonDetails);
+    }
+    public void setFunctionAuto(boolean enabled)
+    {
+        function.setIsAutoEnabled(enabled);
+        dataRepository.updateFunction(function);
     }
 }

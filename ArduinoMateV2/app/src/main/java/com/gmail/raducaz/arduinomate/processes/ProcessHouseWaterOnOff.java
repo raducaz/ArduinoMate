@@ -16,13 +16,17 @@ public class ProcessHouseWaterOnOff extends Process {
     }
 
     @Override
-    protected boolean on() throws Exception {
+    protected boolean on(boolean isOnDemand) throws Exception {
 
-        ProcessWaterSupplyTapOnOff pWaterSupplyTap = new ProcessWaterSupplyTapOnOff(dataRepository, deviceEntity.getName());
+        String currentReason = "House water is starting";
+
+        ProcessWaterSupplyTapOnOff pWaterSupplyTap = new ProcessWaterSupplyTapOnOff(dataRepository, "Tap");
         ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, "Generator");
 
-        if(pWaterSupplyTap.execute(false, FunctionResultStateEnum.OFF)) {
-            if (!pPump.execute(false, FunctionResultStateEnum.ON)) {
+        logInfo("CLOSE main tap");
+        if(pWaterSupplyTap.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason)) {
+            logInfo("START pump");
+            if (!pPump.execute(false, isOnDemand, FunctionResultStateEnum.ON, currentReason)) {
 
                 throw new Exception("Problem starting pump.");
 
@@ -33,17 +37,22 @@ public class ProcessHouseWaterOnOff extends Process {
             throw new Exception("Water supply tap is not Closed.");
         }
 
-        return super.on();
+        return super.on(isOnDemand);
     }
 
     @Override
-    protected boolean off() throws Exception {
-        ProcessWaterSupplyTapOnOff pWaterSupplyTap = new ProcessWaterSupplyTapOnOff(dataRepository, deviceEntity.getName());
+    protected boolean off(boolean isOnDemand) throws Exception {
+
+        String currentReason = "House water is stopping";
+
+        ProcessWaterSupplyTapOnOff pWaterSupplyTap = new ProcessWaterSupplyTapOnOff(dataRepository, "Tap");
         ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, "Generator");
 
         //Ensure the tap is Close so the pressure is maintained
-        if(pWaterSupplyTap.execute(false, FunctionResultStateEnum.OFF)) {
-            if (!pPump.execute(false, FunctionResultStateEnum.OFF)) {
+        logInfo("CLOSE main tap");
+        if(pWaterSupplyTap.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason)) {
+            logInfo("STOP pump");
+            if (!pPump.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason)) {
 
                 throw new Exception("Problem stopping pump.");
 
@@ -54,6 +63,6 @@ public class ProcessHouseWaterOnOff extends Process {
             throw new Exception("Water supply tap is not Closed.");
         }
 
-        return super.off();
+        return super.off(isOnDemand);
     }
 }

@@ -20,7 +20,7 @@ public class DataGenerator {
 
         List<DeviceEntity> devices = new ArrayList<>(3);
         DeviceEntity device = new DeviceEntity();
-        device.setIp("192.168.100.12");
+        device.setIp("192.168.1.100");
         device.setPort(8080);
         device.setName("Generator");
         device.setDescription("Generator, pompa, senzor curent si presiune");
@@ -28,7 +28,7 @@ public class DataGenerator {
         devices.add(device);
 
         device = new DeviceEntity();
-        device.setIp("192.168.100.12");
+        device.setIp("192.168.1.101");
         device.setPort(8081);
         device.setName("Tap");
         device.setDescription("Robineti");
@@ -36,7 +36,7 @@ public class DataGenerator {
         devices.add(device);
 
         device = new DeviceEntity();
-        device.setIp("192.168.100.12");
+        device.setIp("192.168.1.102");
         device.setPort(8082);
         device.setName("Boiler");
         device.setDescription("Boiler si prize casa");

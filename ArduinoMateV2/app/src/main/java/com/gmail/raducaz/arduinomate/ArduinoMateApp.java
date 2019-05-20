@@ -54,16 +54,14 @@ public class ArduinoMateApp extends Application {
         // Start the arduino mocks
         try {
 
-            //mockArduinoServerService = MockArduinoServerService.getInstance(this.getRepository(), 8080, "Generator");
-            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8080, "Generator");
-            this.getNetworkExecutor().execute(mockArduinoServerService);
-
-//            mockArduinoServerService = MockArduinoServerService.getInstance(this.getRepository(), 8081, "Tap");
-            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8081, "Tap");
-            this.getNetworkExecutor().execute(mockArduinoServerService);
-
-            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8082, "Boiler");
-            this.getNetworkExecutor().execute(mockArduinoServerService);
+//            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8080, "Generator");
+//            this.getNetworkExecutor().execute(mockArduinoServerService);
+//
+//            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8081, "Tap");
+//            this.getNetworkExecutor().execute(mockArduinoServerService);
+//
+//            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8082, "Boiler");
+//            this.getNetworkExecutor().execute(mockArduinoServerService);
         }
         catch (Exception exc)
         {

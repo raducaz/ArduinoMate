@@ -38,6 +38,10 @@ public class ProcessGeneratorOnOff extends Process {
             logInfo("Contact is OFF, START generator");
             deviceGeneratorFunctions.generatorON();
         }
+
+        FunctionEntity socOnOff = dataRepository.loadFunctionSync(deviceEntity.getId(),"SocOnOff");
+        socOnOff.setResultState(FunctionResultStateEnum.OFF.getId());
+
         return super.on(isOnDemand);
     }
 
@@ -71,6 +75,9 @@ public class ProcessGeneratorOnOff extends Process {
         {
             throw new Exception("Generator CANNOT BE STOPPED !!!");
         }
+
+        FunctionEntity socOnOff = dataRepository.loadFunctionSync(deviceEntity.getId(),"SocOnOff");
+        socOnOff.setResultState(FunctionResultStateEnum.OFF.getId());
 
         return super.off(isOnDemand);
     }

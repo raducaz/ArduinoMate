@@ -59,6 +59,12 @@ public class TaskFunctionCaller implements TaskInterface {
 
             switch (functionName)
             {
+                case "SocOnOff":
+                    new ProcessSocOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                    break;
+                case "IgnitionOnOff":
+                    new ProcessIgnitionOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                    break;
                 case "GeneratorOnOff":
                     new ProcessGeneratorOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                 break;

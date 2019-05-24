@@ -333,7 +333,7 @@ void setupThread()
 	clientThread.setInterval(5000);
 
   threadsController.add(&serverThread);
-  //threadsController.add(&clientThread);
+  threadsController.add(&clientThread);
 
   // Timer1.initialize(20000); // in useconds
 	// Timer1.attachInterrupt(timerCallback);

@@ -80,11 +80,63 @@ public class DeviceGeneratorFunctions {
 
     }
 
+    // Set Soc On sequence
+    public boolean socON() {
+        String TAG = "socON";
+
+        // Soc ON
+        String command = "[{\"=6\":0,\"@\":500}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
+    // Set Soc On sequence
+    public boolean socOFF() {
+        String TAG = "socOFF";
+
+        // Soc OFF
+        String command = "[{\"=7\":0,\"@\":500}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
+
+    // Set Soc On sequence
+    public boolean contactON() {
+        String TAG = "contactON";
+
+        // Soc ON
+        String command = "[{\"=2\":0}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
+    // Set Soc On sequence
+    public boolean contactOFF() {
+        String TAG = "contactOFF";
+
+        // Soc ON
+        String command = "[{\"=2\":1}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
+    // Set Soc On sequence
+    public boolean ignition() {
+        String TAG = "ignitionON";
+
+        // ignition ON
+        String command = "[{\"=8\":1,\"@\":3500}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
+
     // Start Generator sequence
     public boolean generatorON() {
         String TAG = "generatorON";
 
-        // Soc ON for .5s, Wait 1s, Contact ON, Demarare ON for 2s, Soc OFF for .5s,
+        // Soc ON , Wait 1s, Contact ON, Demarare ON for 2s, Soc OFF for .5s,
         String command = "[{\"=6\":0,\"@\":500},{\"!\":1000},{\"=2\":0},{\"!\":1000},{\"=8\":1,\"@\":2000},{\"=7\":0,\"@\":500}]";
         String result = arduinoCommander.SendCommand(command);
 

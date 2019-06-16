@@ -18,6 +18,7 @@ public interface Function {
 
     int getResultState();
     String getResultStateText();
+    int getStateColor();
     int getCallState();
     String getCallStateText();
 }

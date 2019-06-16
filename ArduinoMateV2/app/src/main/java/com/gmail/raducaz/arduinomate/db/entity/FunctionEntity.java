@@ -10,6 +10,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.graphics.Color;
 
 import com.gmail.raducaz.arduinomate.model.Function;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
@@ -90,6 +91,30 @@ public class FunctionEntity implements Function {
         this.resultState = resultState;
     }
     @Override
+    public int getStateColor() {
+        if(callState == FunctionCallStateEnum.READY.getId()) {
+            if (resultState == FunctionResultStateEnum.OFF.getId())
+                return Color.argb(100, 250,250,250);
+            else if (resultState == FunctionResultStateEnum.ON.getId()) {
+                return Color.argb(100, 98, 229, 118);
+            } else if(resultState == FunctionResultStateEnum.ERROR.getId()){
+                return Color.argb(100, 239, 138, 124);
+            }
+            else
+            {
+                return Color.argb(100, 242, 243, 244);
+            }
+        }
+        else if(callState == FunctionCallStateEnum.EXECUTING.getId())
+        {
+            return Color.argb(100, 239, 255, 66);
+        }
+        else
+        {
+            return Color.argb(100, 239, 138, 124);
+        }
+    }
+    @Override
     public String getResultStateText() {
         return String.valueOf(FunctionResultStateEnum.forInt(resultState));
     }
@@ -102,7 +127,12 @@ public class FunctionEntity implements Function {
     }
     @Override
     public String getCallStateText() {
-        return String.valueOf(FunctionCallStateEnum.forInt(callState));
+        if(callState==FunctionCallStateEnum.EXECUTING.getId())
+            return "EXEC..";
+        else if(isAutoEnabled)
+            return "AUTO";
+        else
+            return String.valueOf(FunctionCallStateEnum.forInt(callState));
     }
 
     @Override

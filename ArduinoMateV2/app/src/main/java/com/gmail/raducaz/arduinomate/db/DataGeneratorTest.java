@@ -86,6 +86,22 @@ public class DataGeneratorTest {
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("SocOnOff");
+        function.setDescription("Used for initial generator start");
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("IgnitionOnOff");
+        function.setDescription("Used for initial generator start");
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
         device = devices.get(1);
 
         function = new FunctionEntity();

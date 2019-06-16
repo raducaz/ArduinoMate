@@ -39,8 +39,10 @@ public class ProcessGeneratorOnOff extends Process {
             deviceGeneratorFunctions.generatorON();
         }
 
+        logInfo("Mark SOC function OFF");
         FunctionEntity socOnOff = dataRepository.loadFunctionSync(deviceEntity.getId(),"SocOnOff");
         socOnOff.setResultState(FunctionResultStateEnum.OFF.getId());
+        dataRepository.updateFunction(socOnOff);
 
         return super.on(isOnDemand);
     }
@@ -76,8 +78,10 @@ public class ProcessGeneratorOnOff extends Process {
             throw new Exception("Generator CANNOT BE STOPPED !!!");
         }
 
+        logInfo("Mark SOC function OFF");
         FunctionEntity socOnOff = dataRepository.loadFunctionSync(deviceEntity.getId(),"SocOnOff");
         socOnOff.setResultState(FunctionResultStateEnum.OFF.getId());
+        dataRepository.updateFunction(socOnOff);
 
         return super.off(isOnDemand);
     }

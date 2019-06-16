@@ -4,8 +4,9 @@
 // //--------DEVICE SPECIFIC---------------------------
 
 // const int PrizaDreapta = 3; // controleaza releul pentru priza dreapta (cu senzor de curent) 
+// const int SDCard = 4;
 // const int PrizaStanga = 5; // controleaza releul pentru priza stanga (fara senzor de curent) 
-// const int CurrentSensor = A1;
+// const int CurrentSensor = Aa;
 
 // bool Configuration::isDebug()
 // {
@@ -18,12 +19,14 @@
 // void Configuration::setupPins()
 // {
 //   // OUTPUT PINS
+// pinMode(SDCard, OUTPUT);
 //   pinMode(PrizaDreapta, OUTPUT);
 //   pinMode(PrizaStanga, OUTPUT);
 //   pinMode(CurrentSensor, INPUT);
 // }
 // void Configuration::initializePins()
 // {  
+    // digitalWrite(SDCard, HIGH); // Disable SD Card 
 //   digitalWrite(PrizaDreapta, HIGH); // Decuplat
 //   digitalWrite(PrizaStanga, HIGH); // Decuplat 
 // }

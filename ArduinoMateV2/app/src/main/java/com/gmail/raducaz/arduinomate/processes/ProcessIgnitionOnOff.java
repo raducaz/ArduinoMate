@@ -20,12 +20,21 @@ public class ProcessIgnitionOnOff extends Process {
     protected boolean on(boolean isOnDemand) throws Exception {
         DeviceGeneratorFunctions deviceGeneratorFunctions = new DeviceGeneratorFunctions(dataRepository, "Generator");
 
+        FunctionEntity generatorOnOffFunction = dataRepository.loadFunctionSync(deviceEntity.getId(),"GeneratorOnOff");
+        // Block this function while generator is ON (or Error)
+        if(generatorOnOffFunction.getResultState()==FunctionResultStateEnum.ON.getId() ||
+                generatorOnOffFunction.getResultState()==FunctionResultStateEnum.ERROR.getId())
+        {
+            throw new Exception("Cannot activate IGNITION while generator is not in OFF state");
+        }
+
         logInfo("Contact OFF to stop if ON");
         deviceGeneratorFunctions.contactOFF();
 
         logInfo("Mark GeneratorOnOff function state to OFF");
         FunctionEntity generatorOnOff = dataRepository.loadFunctionSync(deviceEntity.getId(),"GeneratorOnOff");
         generatorOnOff.setResultState(FunctionResultStateEnum.OFF.getId());
+        dataRepository.updateFunction(generatorOnOff);
 
         logInfo("Contact ON");
         deviceGeneratorFunctions.contactON();
@@ -34,6 +43,7 @@ public class ProcessIgnitionOnOff extends Process {
 
         logInfo("Mark GeneratorOnOff function state to ON");
         generatorOnOff.setResultState(FunctionResultStateEnum.ON.getId());
+        dataRepository.updateFunction(generatorOnOff);
 
         return super.on(isOnDemand);
     }
@@ -44,6 +54,11 @@ public class ProcessIgnitionOnOff extends Process {
 
         logInfo("Contact OFF");
         deviceGeneratorFunctions.contactOFF();
+
+        logInfo("Mark GeneratorOnOff function state to OFF");
+        FunctionEntity generatorOnOff = dataRepository.loadFunctionSync(deviceEntity.getId(),"GeneratorOnOff");
+        generatorOnOff.setResultState(FunctionResultStateEnum.OFF.getId());
+        dataRepository.updateFunction(generatorOnOff);
 
         return super.off(isOnDemand);
     }

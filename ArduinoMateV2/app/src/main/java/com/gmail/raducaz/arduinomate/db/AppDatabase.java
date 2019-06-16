@@ -25,9 +25,6 @@ import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
-import com.gmail.raducaz.arduinomate.model.ExecutionLog;
-import com.gmail.raducaz.arduinomate.model.FunctionState;
-import com.gmail.raducaz.arduinomate.model.MockPinState;
 
 import java.util.List;
 

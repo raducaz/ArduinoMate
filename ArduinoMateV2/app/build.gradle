@@ -19,12 +19,12 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
-    /* For lambda in DataGenerator */
+    /* For lambda in DataGeneratorProd */
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    /* For lambda in DataGenerator */
+    /* For lambda in DataGeneratorProd */
     dataBinding {
         enabled = true
     }

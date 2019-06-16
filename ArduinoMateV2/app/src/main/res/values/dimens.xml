@@ -12,8 +12,8 @@
     <dimen name="avator_size">40dp</dimen>
     <dimen name="card_title_height">40dp</dimen>
     <dimen name="article_titles">20sp</dimen>
-    <dimen name="cards_button_width">48dp</dimen>
-    <dimen name="cards_button_height">48dp</dimen>
+    <dimen name="cards_button_width">32dp</dimen>
+    <dimen name="cards_button_height">32dp</dimen>
     <dimen name="article_subheading">16sp</dimen>
     <dimen name="card_image_height">200dp</dimen>
     <dimen name="list_body">14sp</dimen>
@@ -21,7 +21,7 @@
 
 
     <dimen name="item_horizontal_margin">8dp</dimen>
-    <dimen name="device_item_min_height">100dp</dimen>
+    <dimen name="device_item_min_height">50dp</dimen>
     <dimen name="function_horizontal_margin">16dp</dimen>
     <dimen name="function_padding">8dp</dimen>
     <dimen name="function_minHeight">64dp</dimen>

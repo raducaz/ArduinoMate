@@ -13,7 +13,7 @@ public class SimulateTapClosed {
     @Test
     public void TestSendMessage() {
 
-        String command = "[{\"=6\":1}]";
+        String command = "[{\"~A4\":1}]";
 
         ArduinoCommander arduinoCommander = new ArduinoCommander("192.168.100.12", 8081);
         String result = arduinoCommander.SendCommand(command);

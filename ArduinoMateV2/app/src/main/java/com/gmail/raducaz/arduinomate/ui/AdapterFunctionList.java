@@ -11,9 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.databinding.FunctionListItemBinding;
+import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.model.Function;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,12 +24,14 @@ import java.util.Objects;
 public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionList.FunctionViewHolder> {
 
     List<? extends Function> mFunctionList;
+    ArduinoMateApp application;
 
     @Nullable
     private final ClickCallbackFunction mFunctionClickCallback;
 
-    public AdapterFunctionList(@Nullable ClickCallbackFunction clickCallback) {
+    public AdapterFunctionList(@Nullable ClickCallbackFunction clickCallback, ArduinoMateApp application) {
         mFunctionClickCallback = clickCallback;
+        this.application = application;
     }
 
     public void setFunctionList(final List<? extends Function> functionList) {
@@ -73,7 +78,7 @@ public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionLis
                 .inflate(LayoutInflater.from(parent.getContext()), R.layout.function_list_item,
                         parent, false);
         binding.setCallback(mFunctionClickCallback);
-        return new FunctionViewHolder(binding);
+        return new FunctionViewHolder(binding, application);
     }
 
     @Override
@@ -90,17 +95,22 @@ public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionLis
     static class FunctionViewHolder extends RecyclerView.ViewHolder {
 
         final FunctionListItemBinding binding;
+        final ArduinoMateApp application;
 
-        public FunctionViewHolder(FunctionListItemBinding binding) {
+        public FunctionViewHolder(FunctionListItemBinding binding, ArduinoMateApp application) {
             super(binding.getRoot());
             this.binding = binding;
+            this.application = application;
 
-            ImageButton shareImageButton = itemView.findViewById(R.id.execute_button);
-            shareImageButton.setOnClickListener(new View.OnClickListener() {
+            ImageButton executeButton = itemView.findViewById(R.id.execute_button);
+            executeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Snackbar.make(v, "Share " + binding.getFunction().getName(),
-                            Snackbar.LENGTH_LONG).show();
+//                    Snackbar.make(v, "Share " + binding.getFunction().getName(),
+//                            Snackbar.LENGTH_LONG).show();
+
+                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(application.getRepository(), (FunctionEntity) binding.getFunction());
+                    new TaskExecutor().execute(functionCaller);
                 }
             });
         }

@@ -51,9 +51,9 @@ public class ArduinoMateApp extends Application {
             //TODO: handle it somehow
         }
 
-        // Start the arduino mocks
-        try {
-
+//        // MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK  Start the arduino mocks
+//        try {
+//
 //            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8080, "Generator");
 //            this.getNetworkExecutor().execute(mockArduinoServerService);
 //
@@ -62,11 +62,12 @@ public class ArduinoMateApp extends Application {
 //
 //            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8082, "Boiler");
 //            this.getNetworkExecutor().execute(mockArduinoServerService);
-        }
-        catch (Exception exc)
-        {
-            //TODO: handle it somehow
-        }
+//        }
+//        catch (Exception exc)
+//        {
+//            //TODO: handle it somehow
+//        }
+//        // MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK
     }
 
     public Executor getDbExecutor()

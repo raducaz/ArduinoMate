@@ -7,11 +7,11 @@ const int ContactGenerator = 2; // controleaza releul pentru contact generator (
 const int ContactRetea220V = 3; // controleaza releul porneste priza de 220V (default DECUPLAT - trebuie CUPLAT pentru functionare pompa)- ATENTIE PERICOL DE ELECTROCUTARE !!!!
 const int SDCard = 4;
 
-const int ContactDemaror12V = 8; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
-
 // Atentie, default Borna rosie = -, Borna neagra = -; Daca se cupleaza ambele relee ambele borne vor fi pe + !!!
 const int ActuatorNormal = 6; // (fir portocaliu) controleaza releul 1 actuator (contact + la +) => Borna rosie = +, Borna neagra = -
 const int ActuatorInversat = 7; // (fir mov) controleaza releul 2 actuator (contact + la -) => Borna neagra = +, Borna rosie = -
+
+const int ContactDemaror12V = 8; // controleaza releul de 12V pentru contact demaror (default DECUPLAT - trebuie CUPLAT pentru demarare) - ATENTIE CONTACTUL NU TREBUIE SA DUREZE
 
 const int PresostatProbeSender = A3;
 const int PresostatProbeReceiver = A4;
@@ -34,6 +34,7 @@ void Configuration::setupPins()
   pinMode(ActuatorInversat, OUTPUT);
   pinMode(ContactRetea220V, OUTPUT);
   pinMode(ContactDemaror12V, OUTPUT);
+  pinMode(WatchDog, OUTPUT);
   pinMode(PresostatProbeSender, OUTPUT);
   pinMode(PresostatProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
   pinMode(CurrentSensor, INPUT);
@@ -46,6 +47,7 @@ void Configuration::initializePins()
   digitalWrite(ActuatorInversat, HIGH); // Decuplat
   digitalWrite(ContactRetea220V, HIGH); // Decuplat
   digitalWrite(ContactDemaror12V, LOW); // Decuplat
+  digitalWrite(WatchDog, LOW); // Initial state
   digitalWrite(PresostatProbeSender, HIGH); // This will be our ground when probing, until then let it HIGH
 }
 

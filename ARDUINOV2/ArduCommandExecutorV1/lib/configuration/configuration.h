@@ -9,6 +9,7 @@ class Configuration
     
 
     public:
+        static const int WatchDog = 9;
         static bool isDebug();
         static bool useEthernet();
         static void setupPins();

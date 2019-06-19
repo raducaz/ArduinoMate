@@ -366,6 +366,10 @@ void loop() {
   delay(500);
   //Start the Thread in loop
   threadsController.run();
+
+  // Send ImAlive to WatchDog
+  Logger::logln("I'm alive !");
+  digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
   delay(500);
 
 }

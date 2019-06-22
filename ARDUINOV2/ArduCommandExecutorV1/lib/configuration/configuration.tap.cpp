@@ -35,7 +35,7 @@
 // }
 // void Configuration::initializePins()
 // {  
-    // digitalWrite(SDCard, HIGH); // Disable SD Card 
+//     digitalWrite(SDCard, HIGH); // Disable SD Card 
 //   digitalWrite(Priza8, HIGH); 
 //   digitalWrite(Priza7, HIGH); 
 //   digitalWrite(Priza6, HIGH); 

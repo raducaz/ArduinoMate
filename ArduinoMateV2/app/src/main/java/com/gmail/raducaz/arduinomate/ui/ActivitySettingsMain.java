@@ -23,22 +23,25 @@ import com.gmail.raducaz.arduinomate.R;
 /**
  * Provides UI for the config main screen.
  */
-public class ActivityConfigMain extends AppCompatActivity {
+public class ActivitySettingsMain extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_config_main);
+        setContentView(R.layout.activity_settings_main);
 
         // Adding Toolbar to Main screen
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Setting ViewPager for each Tabs
-        ViewPager viewPager = findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
+        FragmentSettingsEditItem settingsFragment = FragmentSettingsEditItem.getInstance();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .addToBackStack("device")
+                .replace(R.id.fragment_container,
+                        settingsFragment, null).commit();
 
         // Create Navigation drawer and inlfate layout
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -69,9 +72,9 @@ public class ActivityConfigMain extends AppCompatActivity {
                             Intent intent = new Intent(getBaseContext(), ActivityMain.class);
                             startActivity(intent);
                         }
-                        if(menuItem.getTitle().equals("Settings"))
+                        if(menuItem.getTitle().equals("Config"))
                         {
-                            Intent intent = new Intent(getBaseContext(), ActivitySettingsMain.class);
+                            Intent intent = new Intent(getBaseContext(), ActivityConfigMain.class);
                             startActivity(intent);
                         }
 
@@ -80,25 +83,6 @@ public class ActivityConfigMain extends AppCompatActivity {
                         return true;
                     }
                 });
-
-        // Adding Floating Action Button to bottom right of main view
-        FloatingActionButton fab = findViewById(R.id.addButton);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Snackbar.make(v, "Hello Snackbar!",
-                        Snackbar.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    // Add Fragments to Tabs
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        FragmentDeviceList fragment = new FragmentDeviceList();
-        adapter.addFragment(fragment, "Devices");
-
-        viewPager.setAdapter(adapter);
     }
 
     @Override

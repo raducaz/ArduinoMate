@@ -15,6 +15,7 @@ import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
+import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
 import com.gmail.raducaz.arduinomate.model.Function;
 import com.gmail.raducaz.arduinomate.model.PinState;
 
@@ -83,6 +84,15 @@ public class DataRepository {
         mDatabase.deviceDao().update(device);
     }
     //endregion Device
+
+    //region Settings
+    public LiveData<SettingsEntity> getSettings() {
+        return mDatabase.settingsDao().getSettings();
+    }
+    public void updateSettings(SettingsEntity settings) {
+        mDatabase.settingsDao().update(settings);
+    }
+    //endregion Settings
 
     //region Function
     /**

@@ -2,8 +2,10 @@ package com.gmail.raducaz.arduinomate.db;
 
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
+import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
 import com.gmail.raducaz.arduinomate.model.Device;
 import com.gmail.raducaz.arduinomate.model.MockPinState;
+import com.gmail.raducaz.arduinomate.model.Settings;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +17,14 @@ import java.util.concurrent.TimeUnit;
  * Generates data to pre-populate the database
  */
 public class DataGenerator {
+
+    public static SettingsEntity generateSettings() {
+        SettingsEntity settings = new SettingsEntity();
+        settings.setIsController(true);
+        settings.setPermitRemoteControl(false);
+
+        return settings;
+    }
 
     public static List<DeviceEntity> generateDevices() {
 

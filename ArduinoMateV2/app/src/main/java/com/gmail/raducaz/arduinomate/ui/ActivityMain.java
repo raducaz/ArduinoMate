@@ -78,6 +78,11 @@ public class ActivityMain extends AppCompatActivity {
                             Intent intent = new Intent(getBaseContext(), ActivityConfigMain.class);
                             startActivity(intent);
                         }
+                        if(menuItem.getTitle().equals("Settings"))
+                        {
+                            Intent intent = new Intent(getBaseContext(), ActivitySettingsMain.class);
+                            startActivity(intent);
+                        }
 
                         // Closing drawer on item click
                         mDrawerLayout.closeDrawers();

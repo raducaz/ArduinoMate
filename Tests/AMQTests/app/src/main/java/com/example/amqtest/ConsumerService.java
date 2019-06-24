@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ConsumerService implements Runnable {
+import static com.example.amqtest.MyApplication.AmqConnection;
+import static com.example.amqtest.MyApplication.EXCHANGE_NAME;
 
-    private static final String EXCHANGE_NAME = "states";
-    String uri = "amqp://lttjuzsi:pjSXi8zN4wT8Pljaq14lIEAVWpQddzxS@bulldog.rmq.cloudamqp.com/lttjuzsi";
+public class ConsumerService implements Runnable {
 
     private String TAG = "ConsumerService";
 
@@ -52,47 +52,41 @@ public class ConsumerService implements Runnable {
 
         public void run() {
 
-            Connection connection = null;
             try {
-                String EXCHANGE_NAME = "states";
 
-                ConnectionFactory factory = new ConnectionFactory();
-                factory.setUri(uri);
-
-                //Recommended settings
-                factory.setRequestedHeartbeat(30);
-                factory.setConnectionTimeout(30000);
-
-                connection = factory.newConnection();
-                final Channel channel = connection.createChannel();
+                final Channel channel = AmqConnection.createChannel();
+                channel.basicQos(1);
 
                 channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
                 String queueName = channel.queueDeclare().getQueue();
                 channel.queueBind(queueName, EXCHANGE_NAME, "");
 
-//                boolean autoAck = false;
-//                channel.basicConsume(queueName, autoAck, "a-consumer-tag",
-//                        new DefaultConsumer(channel) {
-//                            @Override
-//                            public void handleDelivery(String consumerTag,
-//                                                       Envelope envelope,
-//                                                       AMQP.BasicProperties properties,
-//                                                       byte[] body)
-//                                    throws IOException
-//                            {
-//                                long deliveryTag = envelope.getDeliveryTag();
-//
-//                                String message = new String(body);
-//                                Log.i("ConsumerService", message);
-//
-//                                // positively acknowledge a single delivery, the message will
-//                                // be discarded
-//                                channel.basicAck(deliveryTag, false);
-//                            }
-//
-//                        }
-//
-//                        );
+                boolean autoAck = false;
+                channel.basicConsume(queueName, autoAck, "a-consumer-tag",
+                        new DefaultConsumer(channel) {
+                            @Override
+                            public void handleDelivery(String consumerTag,
+                                                       Envelope envelope,
+                                                       AMQP.BasicProperties properties,
+                                                       byte[] body)
+                                    throws IOException
+                            {
+                                long deliveryTag = envelope.getDeliveryTag();
+
+                                String message = new String(body);
+                                Log.i("ConsumerService", message);
+
+                                // positively acknowledge a single delivery, the message will
+                                // be discarded
+                                if(message.contains("1"))
+                                    channel.basicAck(deliveryTag, false);
+                                else
+                                    channel.basicReject(deliveryTag, false);
+                            }
+
+                        }
+
+                        );
 
 
 //                QueueingConsumer consumer = new QueueingConsumer(channel);

@@ -9,4 +9,5 @@ public interface Settings {
     long getId();
     boolean getIsController();
     boolean getPermitRemoteControl();
+    boolean getIsTestingMode();
 }

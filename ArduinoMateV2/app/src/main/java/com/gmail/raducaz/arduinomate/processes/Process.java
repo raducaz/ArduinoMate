@@ -123,16 +123,6 @@ public abstract class Process {
             return false;
         }
     }
-    private void endExecution(FunctionCallStateEnum callState, String logMessage)
-    {
-        functionStateUpdater.insertExecutionLog(logMessage);
-        functionStateUpdater.updateFunctionExecution(callState);
-    }
-    protected void logInfo(String logMessage)
-    {
-        if(functionStateUpdater!= null)
-            functionStateUpdater.insertExecutionLog(logMessage);
-    }
     protected boolean on(boolean isOnDemand) throws Exception
     {
         // Function result state needs to be handled here - will not be communicated by arduino
@@ -159,6 +149,16 @@ public abstract class Process {
         functionExecution.setFunctionId(function.getId());
         functionExecution.setName(function.getName());
         functionStateUpdater.startFunctionExecution(reasonDetails);
+    }
+    private void endExecution(FunctionCallStateEnum callState, String logMessage)
+    {
+        functionStateUpdater.insertExecutionLog(logMessage);
+        functionStateUpdater.updateFunctionExecution(callState);
+    }
+    protected void logInfo(String logMessage)
+    {
+        if(functionStateUpdater!= null)
+            functionStateUpdater.insertExecutionLog(logMessage);
     }
     public void setFunctionAuto(boolean enabled)
     {

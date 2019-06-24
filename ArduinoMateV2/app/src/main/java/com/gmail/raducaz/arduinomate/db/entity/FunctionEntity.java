@@ -16,6 +16,7 @@ import com.gmail.raducaz.arduinomate.model.Function;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "function",
@@ -26,7 +27,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "deviceId")
         })
-public class FunctionEntity implements Function {
+public class FunctionEntity implements Function, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;

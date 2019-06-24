@@ -10,8 +10,10 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.Device;
 
+import java.io.Serializable;
+
 @Entity(tableName = "device")
-public class DeviceEntity implements Device {
+public class DeviceEntity implements Device, Serializable {
     @PrimaryKey
     private long id;
     private String ip;

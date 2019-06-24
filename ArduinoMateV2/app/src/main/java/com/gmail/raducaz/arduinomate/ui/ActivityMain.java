@@ -180,6 +180,9 @@ public class ActivityMain extends AppCompatActivity {
             ArduinoMateApp application = (ArduinoMateApp) getApplication();
             TaskFunctionReset functionReset = new TaskFunctionReset(application);
             new TaskExecutor().execute(functionReset);
+        }else if (id==R.id.action_sync_all)
+        {
+            // TODO: Send command to controller to send all data
         }
         else if (id == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);

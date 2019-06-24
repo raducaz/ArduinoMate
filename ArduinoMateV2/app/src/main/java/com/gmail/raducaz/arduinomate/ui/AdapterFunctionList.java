@@ -109,7 +109,9 @@ public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionLis
 //                    Snackbar.make(v, "Share " + binding.getFunction().getName(),
 //                            Snackbar.LENGTH_LONG).show();
 
-                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(application.getRepository(), (FunctionEntity) binding.getFunction());
+                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(
+                            application.getRepository(),
+                            (FunctionEntity) binding.getFunction());
                     new TaskExecutor().execute(functionCaller);
                 }
             });

@@ -9,6 +9,7 @@ import android.arch.persistence.room.PrimaryKey;
 import com.gmail.raducaz.arduinomate.model.DeviceLog;
 import com.gmail.raducaz.arduinomate.model.ExecutionLog;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "executionLog",
@@ -19,7 +20,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "executionId")
         })
-public class ExecutionLogEntity implements ExecutionLog {
+public class ExecutionLogEntity implements ExecutionLog, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;

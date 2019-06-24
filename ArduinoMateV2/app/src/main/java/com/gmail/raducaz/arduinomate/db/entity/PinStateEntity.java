@@ -11,6 +11,7 @@ import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
 import com.gmail.raducaz.arduinomate.model.FunctionState;
 import com.gmail.raducaz.arduinomate.model.PinState;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "pinState",
@@ -21,7 +22,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "deviceId")
         })
-public class PinStateEntity implements PinState {
+public class PinStateEntity implements PinState, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;

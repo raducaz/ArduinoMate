@@ -22,6 +22,7 @@ public class DataGenerator {
         SettingsEntity settings = new SettingsEntity();
         settings.setIsController(true);
         settings.setPermitRemoteControl(false);
+        settings.setIsTestingMode(false);
 
         return settings;
     }

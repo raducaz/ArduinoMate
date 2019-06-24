@@ -11,12 +11,15 @@ import android.arch.persistence.room.PrimaryKey;
 import com.gmail.raducaz.arduinomate.model.Device;
 import com.gmail.raducaz.arduinomate.model.Settings;
 
+import java.io.Serializable;
+
 @Entity(tableName = "settings")
-public class SettingsEntity implements Settings {
+public class SettingsEntity implements Settings, Serializable {
     @PrimaryKey
     private long id;
 
     private boolean isController;
+    private boolean isTestingMode;
     private boolean permitRemoteControl;
 
     @Override
@@ -25,6 +28,14 @@ public class SettingsEntity implements Settings {
     }
     public void setId(long id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean getIsTestingMode() {
+        return isTestingMode;
+    }
+    public void setIsTestingMode(boolean isTestingMode) {
+        this.isTestingMode = isTestingMode;
     }
 
     @Override

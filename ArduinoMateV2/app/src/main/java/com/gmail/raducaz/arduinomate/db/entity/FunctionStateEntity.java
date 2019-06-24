@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.FunctionState;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "functionState",
@@ -17,7 +18,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "deviceId")
         })
-public class FunctionStateEntity implements FunctionState {
+public class FunctionStateEntity implements FunctionState, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;

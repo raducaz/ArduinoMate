@@ -11,10 +11,11 @@ import com.gmail.raducaz.arduinomate.model.FunctionState;
 import com.gmail.raducaz.arduinomate.model.MockPinState;
 import com.gmail.raducaz.arduinomate.model.PinState;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "mockPinState")
-public class MockPinStateEntity implements MockPinState {
+public class MockPinStateEntity implements MockPinState, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;

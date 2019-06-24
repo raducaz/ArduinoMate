@@ -16,10 +16,12 @@ import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
-import com.gmail.raducaz.arduinomate.model.Function;
-import com.gmail.raducaz.arduinomate.model.PinState;
+import com.gmail.raducaz.arduinomate.remote.RemoteStateUpdate;
+import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
 
 import java.util.List;
+
+import static com.gmail.raducaz.arduinomate.ArduinoMateApp.AmqConnection;
 
 /**
  * Repository handling the work with devices and functions.
@@ -39,9 +41,16 @@ public class DataRepository {
     }
 
     private final AppDatabase mDatabase;
+    StateFromControllerPublisher remoteStateSender;
+
     private DataRepository(final AppDatabase database) {
         mDatabase = database;
 
+        SettingsEntity settings = this.getSettingsSync();
+        if(settings.getIsController() && settings.getPermitRemoteControl()) {
+            remoteStateSender = new StateFromControllerPublisher(AmqConnection,
+                    ArduinoMateApp.STATES_EXCHANGE);
+        }
     }
 
     //region Device
@@ -88,6 +97,9 @@ public class DataRepository {
     //region Settings
     public LiveData<SettingsEntity> getSettings() {
         return mDatabase.settingsDao().getSettings();
+    }
+    public SettingsEntity getSettingsSync() {
+        return mDatabase.settingsDao().getSettingsSync();
     }
     public void updateSettings(SettingsEntity settings) {
         mDatabase.settingsDao().update(settings);
@@ -218,6 +230,9 @@ public class DataRepository {
     }
     public void insertPinState(PinStateEntity pinState) {
         mDatabase.pinStateDao().insert(pinState);
+
+        if(remoteStateSender != null)
+            remoteStateSender.SendState(new RemoteStateUpdate(pinState, "insertPinState"));
     }
     public void updatePinState(PinStateEntity pinStateEntity) {
         mDatabase.pinStateDao().update(pinStateEntity);
@@ -225,10 +240,22 @@ public class DataRepository {
     public void updatePinStateToDate(long id)
     {
         mDatabase.pinStateDao().updateToDate(id, DateConverter.toDate(System.currentTimeMillis()));
+
+        if(remoteStateSender != null) {
+            PinStateEntity pinState = new PinStateEntity();
+            pinState.setToDate(DateConverter.toDate(System.currentTimeMillis()));
+            remoteStateSender.SendState(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
+        }
     }
     public void updatePinStateLastUpdate(long id)
     {
         mDatabase.pinStateDao().updateLastUpdate(id, DateConverter.toDate(System.currentTimeMillis()));
+
+        if(remoteStateSender != null) {
+            PinStateEntity pinState = new PinStateEntity();
+            pinState.setLastUpdate(DateConverter.toDate(System.currentTimeMillis()));
+            remoteStateSender.SendState(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
+        }
     }
     public void deletePinStatesByFunction(long functionId)
     {

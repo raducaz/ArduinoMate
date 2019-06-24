@@ -1,73 +1,186 @@
 package com.gmail.raducaz.arduinomate;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
+import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
+import com.gmail.raducaz.arduinomate.remote.CommandToControllerConsumerService;
+import com.gmail.raducaz.arduinomate.remote.StateFromControllerConsumerService;
 import com.gmail.raducaz.arduinomate.mocks.MockArduinoServerService;
 import com.gmail.raducaz.arduinomate.tcpserver.TcpServerService;
 import com.gmail.raducaz.arduinomate.timer.TimerService;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.Method;
+import com.rabbitmq.client.ShutdownListener;
+import com.rabbitmq.client.ShutdownSignalException;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Created by Radu.Cazacu on 11/27/2017.
  */
 
 public class ArduinoMateApp extends Application {
+    private String TAG = "ArduinoMateApp";
 
-    //MOCK
-    private MockArduinoServerService mockArduinoServerService;
-    //MOCK
+    private SettingsEntity settings;
+
+    public static final String STATES_EXCHANGE = "states";
+    public static final String COMMAND_QUEUE = "commands";
+    public static Connection AmqConnection;
+    String uri = "amqp://lttjuzsi:pjSXi8zN4wT8Pljaq14lIEAVWpQddzxS@bulldog.rmq.cloudamqp.com/lttjuzsi";
 
     private AppExecutors mAppExecutors;
-    private TcpServerService tcpServerService;
     private TimerService timerService;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
         mAppExecutors = new AppExecutors();
 
-        // Start the tcp server
         try {
-            tcpServerService = TcpServerService.getInstance(this.getRepository());
-            this.getNetworkExecutor().execute(tcpServerService);
+            ExecutorService executor = mAppExecutors.networkIO();
+            Callable<SettingsEntity> callable = new Callable<SettingsEntity>() {
+                @Override
+                public SettingsEntity call() {
+                    return getRepository().getSettingsSync();
+                }
+            };
+            Future<SettingsEntity> future = executor.submit(callable);
+            settings = future.get();
         }
-        catch (IOException exc)
+        catch (Exception exc)
         {
-            //TODO: handle it somehow
+            Log.e(TAG, exc.getMessage());
         }
 
-        // Start the timer trigger
         try {
-            timerService = TimerService.getInstance(this.getRepository());
-            this.getNetworkExecutor().execute(timerService);
+
+            ExecutorService executor = mAppExecutors.networkIO();
+            Callable<Connection> callable = new Callable<Connection>() {
+                @Override
+                public Connection call() throws Exception{
+                    ConnectionFactory factory = new ConnectionFactory();
+                    factory.setUri(uri);
+                    //Recommended settings
+                    factory.setRequestedHeartbeat(30);
+                    factory.setConnectionTimeout(30000);
+
+                    return factory.newConnection();
+                }
+            };
+            Future<Connection> future = executor.submit(callable);
+            AmqConnection = future.get();
+
+            AmqConnection.addShutdownListener(
+                    new ShutdownListener() {
+                        @Override
+                        public void shutdownCompleted(ShutdownSignalException cause) {
+                            if(cause.isHardError()) {
+                                Connection conn = (Connection) cause.getReference();
+                                if (!cause.isInitiatedByApplication()) {
+                                    Method reason = cause.getReason();
+                                }
+                            }
+                            else
+                            {
+                                Channel ch = (Channel)cause.getReference();
+                            }
+
+                            Log.e("InitAMQConnection", "", cause);
+                        }
+                    }
+            );
         }
-        catch (IOException exc)
+        catch (Exception exc)
         {
-            //TODO: handle it somehow
+            Log.e("InitAMQConnection", "", exc);
+        }
+//        // Start the tcp server or AMQ state consumer and Mocks service - More complicated way
+//        TaskServerServiceInitializer serviceInitializer = new TaskServerServiceInitializer(this);
+//        new TaskExecutor().execute();
+
+
+        if(!settings.getIsController()) {
+
+            // Start AMQ state consumer
+            try
+            {
+                StateFromControllerConsumerService consumerService = StateFromControllerConsumerService.getInstance(getRepository(),
+                        AmqConnection, STATES_EXCHANGE);
+                this.getNetworkExecutor().execute(consumerService);
+            }
+            catch (Exception exc)
+            {
+                Log.e("StartStateConsumer", "", exc);
+            }
+        }
+        else
+        {
+            // Start tcp service server
+            try {
+                TcpServerService tcpServerService = TcpServerService.getInstance(getRepository());
+                this.getNetworkExecutor().execute(tcpServerService);
+            }
+            catch (IOException exc)
+            {
+                Log.e("StartTcpServer", "", exc);
+            }
+
+            // If controller that permits remote control
+            if(settings.getPermitRemoteControl()) {
+
+                // Start AMQ remote command consumer
+                try {
+                    CommandToControllerConsumerService consumerService = CommandToControllerConsumerService.getInstance(AmqConnection,
+                            STATES_EXCHANGE, getRepository());
+                    this.getNetworkExecutor().execute(consumerService);
+                } catch (Exception exc) {
+                    Log.e("StartCommandConsumer", "", exc);
+                }
+            }
+
+            // Start the timer trigger
+            try {
+                timerService = TimerService.getInstance(this.getRepository());
+                this.getNetworkExecutor().execute(timerService);
+            }
+            catch (IOException exc)
+            {
+                Log.e("StartTimer", exc.getMessage());
+            }
+
+            if(settings.getIsTestingMode())
+            {
+                // MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK  Start the arduino mocks
+                try {
+
+                    MockArduinoServerService mockArduinoServerService = new MockArduinoServerService(getRepository(), 8080, "Generator");
+                    this.getNetworkExecutor().execute(mockArduinoServerService);
+
+                    mockArduinoServerService = new MockArduinoServerService(getRepository(), 8081, "Tap");
+                    this.getNetworkExecutor().execute(mockArduinoServerService);
+
+                    mockArduinoServerService = new MockArduinoServerService(getRepository(), 8082, "Boiler");
+                    this.getNetworkExecutor().execute(mockArduinoServerService);
+                }
+                catch (Exception exc)
+                {
+                    Log.e("StartMocks", "", exc);
+                }
+                // MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK  Start the arduino mocks
+            }
         }
 
-//        // MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK  Start the arduino mocks
-//        try {
-//
-//            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8080, "Generator");
-//            this.getNetworkExecutor().execute(mockArduinoServerService);
-//
-//            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8081, "Tap");
-//            this.getNetworkExecutor().execute(mockArduinoServerService);
-//
-//            mockArduinoServerService = new MockArduinoServerService(this.getRepository(), 8082, "Boiler");
-//            this.getNetworkExecutor().execute(mockArduinoServerService);
-//        }
-//        catch (Exception exc)
-//        {
-//            //TODO: handle it somehow
-//        }
-//        // MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK
+
+
     }
 
     public Executor getDbExecutor()
@@ -85,4 +198,6 @@ public class ArduinoMateApp extends Application {
     public DataRepository getRepository() {
         return DataRepository.getInstance(getDatabase());
     }
+
+
 }

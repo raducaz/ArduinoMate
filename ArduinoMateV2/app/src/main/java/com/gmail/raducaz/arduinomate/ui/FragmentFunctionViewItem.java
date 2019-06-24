@@ -59,7 +59,9 @@ public class FragmentFunctionViewItem extends Fragment {
             public void onClick(View b) {
 
                 ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionCaller functionCaller = new TaskFunctionCaller(application.getRepository(), model.function.get());
+                TaskFunctionCaller functionCaller = new TaskFunctionCaller(
+                        application.getRepository(),
+                        model.function.get());
                 new TaskExecutor().execute(functionCaller);
             }
         });

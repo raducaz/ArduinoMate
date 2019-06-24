@@ -20,27 +20,27 @@ public class CommandToControllerConsumerService implements Runnable {
     private String TAG = "CommandToControllerConsumerService";
 
     private Connection connection;
-    private String exchangeName;
+    private String queueName;
     private DataRepository mRepository;
 
     private static CommandToControllerConsumerService sInstance;
     private boolean isRunning;
     private final ExecutorService pool;
 
-    private CommandToControllerConsumerService(Connection amqConnection, String exchangeName, DataRepository repository) {
+    private CommandToControllerConsumerService(Connection amqConnection, String queueName, DataRepository repository) {
 
         // Initialize a dynamic pool that starts the required no of threads according to the no of tasks submitted
         pool = Executors.newFixedThreadPool(1);
 
         this.connection = amqConnection;
-        this.exchangeName = exchangeName;
+        this.queueName = queueName;
         this.mRepository = repository;
     }
-    public static CommandToControllerConsumerService getInstance(Connection amqConnection, String exchangeName, DataRepository repository) throws IOException {
+    public static CommandToControllerConsumerService getInstance(Connection amqConnection, String queueName, DataRepository repository) throws IOException {
         if (sInstance == null) {
             synchronized (CommandToControllerConsumerServiceHandler.class) {
                 if (sInstance == null) {
-                    sInstance = new CommandToControllerConsumerService(amqConnection, exchangeName, repository);
+                    sInstance = new CommandToControllerConsumerService(amqConnection, queueName, repository);
                 }
             }
         }
@@ -50,7 +50,7 @@ public class CommandToControllerConsumerService implements Runnable {
     public void run() {
 
         if(!isRunning) {
-            pool.execute(new CommandToControllerConsumerServiceHandler(connection, exchangeName, mRepository));
+            pool.execute(new CommandToControllerConsumerServiceHandler(connection, queueName, mRepository));
             isRunning = true;
         }
     }
@@ -58,13 +58,13 @@ public class CommandToControllerConsumerService implements Runnable {
     public class CommandToControllerConsumerServiceHandler implements Runnable {
 
         private Connection connection;
-        private String exchangeName;
+        private String queueName;
         private DataRepository mRepository;
 
-        public CommandToControllerConsumerServiceHandler(Connection amqConnection, String exchangeName, DataRepository repository)
+        public CommandToControllerConsumerServiceHandler(Connection amqConnection, String queueName, DataRepository repository)
         {
             this.connection = amqConnection;
-            this.exchangeName = exchangeName;
+            this.queueName = queueName;
             this.mRepository = repository;
         }
 
@@ -73,13 +73,12 @@ public class CommandToControllerConsumerService implements Runnable {
             try {
 
                 final Channel channel = connection.createChannel();
+                channel.basicQos(1); // process one at a time
 
-                channel.exchangeDeclare(exchangeName, "fanout");
-                String queueName = channel.queueDeclare().getQueue();
-                channel.queueBind(queueName, exchangeName, "");
+                channel.queueDeclare(queueName, false, false, false, null);
 
                 boolean autoAck = false;
-                channel.basicConsume(queueName, autoAck, "a-consumer-tag",
+                channel.basicConsume(queueName, autoAck,
                         new DefaultConsumer(channel) {
                             @Override
                             public void handleDelivery(String consumerTag,

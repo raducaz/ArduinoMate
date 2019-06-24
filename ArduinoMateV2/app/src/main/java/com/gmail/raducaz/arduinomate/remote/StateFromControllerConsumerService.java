@@ -72,6 +72,7 @@ public class StateFromControllerConsumerService implements Runnable {
             try {
 
                 final Channel channel = connection.createChannel();
+                channel.basicQos(1); // process one at a time
 
                 channel.exchangeDeclare(exchangeName, "fanout");
                 String queueName = channel.queueDeclare().getQueue();

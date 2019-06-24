@@ -107,6 +107,8 @@ public class CommandToControllerConsumerService implements Runnable {
                                             command.functionName,
                                             command.desiredFunctionState,
                                             "Remote on demand");
+                                    functionCaller.setAutoExecution(false);
+                                    functionCaller.setOnDemand(true);
                                     new TaskExecutor().execute(functionCaller);
                                 }
                                 catch (Exception exc) {

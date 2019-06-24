@@ -79,7 +79,7 @@ public class StateFromControllerConsumerService implements Runnable {
                 channel.queueBind(queueName, exchangeName, "");
 
                 boolean autoAck = false;
-                channel.basicConsume(queueName, autoAck, "a-consumer-tag",
+                channel.basicConsume(queueName, autoAck,
                         new DefaultConsumer(channel) {
                             @Override
                             public void handleDelivery(String consumerTag,
@@ -133,70 +133,70 @@ public class StateFromControllerConsumerService implements Runnable {
 
         public void ProcessState(RemoteStateUpdate stateUpdate)
         {
-            if(stateUpdate.methodName == "updateFunction")
+            if(stateUpdate.methodName.equals("updateFunction"))
             {
                 FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
                 mRepository.updateFunction(entity);
             }
-            if(stateUpdate.methodName == "updateAllFunctionStates")
+            if(stateUpdate.methodName.equals("updateAllFunctionStates"))
             {
                 FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
                 mRepository.updateAllFunctionStates(entity.getCallState(), entity.getResultState());
             }
-            if(stateUpdate.methodName == "deleteFunctionExecutions")
+            if(stateUpdate.methodName.equals("deleteFunctionExecutions"))
             {
                 FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
                 mRepository.deleteFunctionExecutions(entity.getId());
             }
-            if(stateUpdate.methodName == "deleteAllFunctionExecutions")
+            if(stateUpdate.methodName.equals("deleteAllFunctionExecutions"))
             {
                 mRepository.deleteAllFunctionExecutions();
             }
-            if(stateUpdate.methodName == "insertFunctionExecution")
+            if(stateUpdate.methodName.equals("insertFunctionExecution"))
             {
                 FunctionExecutionEntity entity = (FunctionExecutionEntity)stateUpdate.entity;
                 mRepository.insertFunctionExecution(entity);
             }
-            if(stateUpdate.methodName == "updateFunctionExecution")
+            if(stateUpdate.methodName.equals("updateFunctionExecution"))
             {
                 FunctionExecutionEntity entity = (FunctionExecutionEntity) stateUpdate.entity;
                 mRepository.updateFunctionExecution(entity);
             }
-            if(stateUpdate.methodName == "insertExecutionLog")
+            if(stateUpdate.methodName.equals("insertExecutionLog"))
             {
                 ExecutionLogEntity entity = (ExecutionLogEntity) stateUpdate.entity;
                 mRepository.insertExecutionLog(entity);
             }
-            if(stateUpdate.methodName == "deleteExecutionLogs")
+            if(stateUpdate.methodName.equals("deleteExecutionLogs"))
             {
                 FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
                 mRepository.deleteExecutionLogs(entity.getId());
             }
-            if(stateUpdate.methodName == "deleteAllExecutionLogs")
+            if(stateUpdate.methodName.equals("deleteAllExecutionLogs"))
             {
                 mRepository.deleteAllExecutionLogs();
             }
-            if(stateUpdate.methodName == "insertPinState")
+            if(stateUpdate.methodName.equals("insertPinState"))
             {
                 PinStateEntity pinState = (PinStateEntity) stateUpdate.entity;
                 mRepository.insertPinState(pinState);
             }
-            if(stateUpdate.methodName == "updatePinStateToDate")
+            if(stateUpdate.methodName.equals("updatePinStateToDate"))
             {
                 PinStateEntity pinState = (PinStateEntity) stateUpdate.entity;
                 mRepository.updatePinStateToDate(pinState.getId());
             }
-            if(stateUpdate.methodName == "updatePinStateLastUpdate")
+            if(stateUpdate.methodName.equals("updatePinStateLastUpdate"))
             {
                 PinStateEntity pinState = (PinStateEntity) stateUpdate.entity;
                 mRepository.updatePinStateLastUpdate(pinState.getId());
             }
-            if(stateUpdate.methodName == "deletePinStatesByFunction")
+            if(stateUpdate.methodName.equals("deletePinStatesByFunction"))
             {
                 FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
                 mRepository.deletePinStatesByFunction(entity.getId());
             }
-            if(stateUpdate.methodName == "deleteAllPinStates")
+            if(stateUpdate.methodName.equals("deleteAllPinStates"))
             {
                 mRepository.deleteAllPinStates();
             }

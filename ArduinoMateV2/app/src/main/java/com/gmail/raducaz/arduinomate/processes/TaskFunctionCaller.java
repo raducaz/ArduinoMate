@@ -23,7 +23,17 @@ public class TaskFunctionCaller implements TaskInterface {
     private FunctionEntity function;
     private final DataRepository mRepository;
     private FunctionResultStateEnum desiredFunctionResult;
+
+    public void setAutoExecution(boolean autoExecution) {
+        isAutoExecution = autoExecution;
+    }
+
     private boolean isAutoExecution;
+
+    public void setOnDemand(boolean onDemand) {
+        isOnDemand = onDemand;
+    }
+
     private boolean isOnDemand;
     private String reasonDetails;
 

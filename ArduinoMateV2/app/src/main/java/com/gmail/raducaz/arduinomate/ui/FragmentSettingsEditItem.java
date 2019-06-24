@@ -68,6 +68,9 @@ public class FragmentSettingsEditItem extends Fragment {
                 CheckBox permitRemoteChk = mBinding.getRoot().findViewById(R.id.remote_checkbox);
                 settingsEntity.setPermitRemoteControl(permitRemoteChk.isChecked());
 
+                CheckBox isTestingChk = mBinding.getRoot().findViewById(R.id.testing_checkbox);
+                settingsEntity.setIsTestingMode(isTestingChk.isChecked());
+
                 application.getDbExecutor().execute(new DbUpdater(settingsEntity));
 
                 Snackbar.make(b, "Settings saved.", Snackbar.LENGTH_LONG).show();

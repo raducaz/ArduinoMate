@@ -178,8 +178,8 @@ public class DataRepository {
     public void deleteFunctionExecutions(final long functionId) {
         mDatabase.functionExecutionDao().deleteFunctionExecution(functionId);
 
-        FunctionExecutionEntity fe = new FunctionExecutionEntity();
-        fe.setFunctionId(functionId);
+        FunctionEntity fe = new FunctionEntity();
+        fe.setId(functionId);
         SendStateToRemoteClients(new RemoteStateUpdate(fe, "deleteFunctionExecutions"));
     }
     public void deleteAllFunctionExecutions() {

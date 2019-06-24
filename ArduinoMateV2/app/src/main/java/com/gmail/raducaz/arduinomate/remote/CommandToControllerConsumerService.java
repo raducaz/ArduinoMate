@@ -3,7 +3,7 @@ import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
-import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -99,17 +99,29 @@ public class CommandToControllerConsumerService implements Runnable {
                                 Log.i(TAG, message);
 
                                 try {
-                                    RemoteCommand command = (RemoteCommand) SerializerDeserializerUtility.Deserialize(body);
+                                    Object bodyObject = SerializerDeserializerUtility.Deserialize(body);
 
-                                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(
-                                            mRepository,
-                                            command.deviceName,
-                                            command.functionName,
-                                            command.desiredFunctionState,
-                                            "Remote on demand");
-                                    functionCaller.setAutoExecution(false);
-                                    functionCaller.setOnDemand(true);
-                                    new TaskExecutor().execute(functionCaller);
+                                    if(bodyObject instanceof RemoteFunctionCommand) {
+                                        RemoteFunctionCommand command = (RemoteFunctionCommand)bodyObject;
+                                        TaskFunctionCaller functionCaller = new TaskFunctionCaller(
+                                                mRepository,
+                                                command.deviceName,
+                                                command.functionName,
+                                                command.desiredFunctionState,
+                                                "Remote on demand");
+                                        functionCaller.setAutoExecution(false);
+                                        functionCaller.setOnDemand(true);
+                                        new TaskExecutor().execute(functionCaller);
+                                    }
+                                    if(bodyObject instanceof RemoteResetCommand)
+                                    {
+                                        RemoteResetCommand command = (RemoteResetCommand)bodyObject;
+                                        TaskFunctionReset functionReset = new TaskFunctionReset(
+                                                mRepository,
+                                                command.function);
+
+                                        new TaskExecutor().execute(functionReset);
+                                    }
                                 }
                                 catch (Exception exc) {
                                     Log.e(TAG, exc.getMessage());

@@ -178,7 +178,7 @@ public class ActivityMain extends AppCompatActivity {
         }else if (id==R.id.action_reset_all)
         {
             ArduinoMateApp application = (ArduinoMateApp) getApplication();
-            TaskFunctionReset functionReset = new TaskFunctionReset(application);
+            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository());
             new TaskExecutor().execute(functionReset);
         }else if (id==R.id.action_sync_all)
         {

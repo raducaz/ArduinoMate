@@ -90,10 +90,15 @@ public class DataRepository {
     }
 
     public void insertDevice(DeviceEntity device) {
-        mDatabase.deviceDao().insert(device);
+        long id = mDatabase.deviceDao().insert(device);
+        device.setId(id);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(device, "insertDevice"));
     }
     public void updateDevice(DeviceEntity device) {
         mDatabase.deviceDao().update(device);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(device, "updateDevice"));
     }
     //endregion Device
 
@@ -139,7 +144,10 @@ public class DataRepository {
         return mDatabase.functionDao().loadFunctionSync(deviceId, functionName);
     }
     public void insertFunction(FunctionEntity function) {
-        mDatabase.functionDao().insert(function);
+        long id = mDatabase.functionDao().insert(function);
+        function.setId(id);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(function, "insertFunction"));
     }
     public void updateFunction(FunctionEntity function) {
         mDatabase.functionDao().update(function);
@@ -194,11 +202,12 @@ public class DataRepository {
 
         mDatabase.functionDao().updateStates(functionId, callState, resultState);
 
-        long result = mDatabase.functionExecutionDao().insert(execution);
+        long id = mDatabase.functionExecutionDao().insert(execution);
+        execution.setId(id);
 
         SendStateToRemoteClients(new RemoteStateUpdate(execution, "insertFunctionExecution"));
 
-        return  result;
+        return  id;
     }
     public void updateFunctionExecution(FunctionExecutionEntity execution) {
         long functionId = execution.getFunctionId();
@@ -221,11 +230,12 @@ public class DataRepository {
         return mDatabase.executionLogDao().loadAllExecutionLogs();
     }
     public long insertExecutionLog(ExecutionLogEntity log) {
-        long result = mDatabase.executionLogDao().insert(log);
+        long id = mDatabase.executionLogDao().insert(log);
+        log.setId(id);
 
         SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
 
-        return  result;
+        return  id;
     }
     public void updateExecutionLog(ExecutionLogEntity log) {
         mDatabase.executionLogDao().update(log);

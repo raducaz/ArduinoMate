@@ -7,7 +7,7 @@ import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.remote.CommandToControllerPublisher;
-import com.gmail.raducaz.arduinomate.remote.RemoteCommand;
+import com.gmail.raducaz.arduinomate.remote.RemoteFunctionCommand;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 /// Entry point for all function executions
@@ -74,7 +74,7 @@ public class TaskFunctionCaller implements TaskInterface {
             if(!mRepository.getSettingsSync().getIsController())
             {
                 CommandToControllerPublisher sender = new CommandToControllerPublisher(ArduinoMateApp.AmqConnection,
-                        ArduinoMateApp.STATES_EXCHANGE);
+                        ArduinoMateApp.COMMAND_QUEUE);
 
                 // By default send OFF command if the current state of the function is not certain
                 FunctionResultStateEnum orderedState = FunctionResultStateEnum.OFF;
@@ -84,7 +84,7 @@ public class TaskFunctionCaller implements TaskInterface {
                         orderedState = FunctionResultStateEnum.ON;
                 }
 
-                RemoteCommand cmd = new RemoteCommand(deviceName,
+                RemoteFunctionCommand cmd = new RemoteFunctionCommand(deviceName,
                         functionName,
                         orderedState);
 

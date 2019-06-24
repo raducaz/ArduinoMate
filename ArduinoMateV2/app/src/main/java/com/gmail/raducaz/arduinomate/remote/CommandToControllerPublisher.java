@@ -5,6 +5,8 @@ import android.util.Log;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
+import java.io.Serializable;
+
 public class CommandToControllerPublisher {
 
     private Connection connection;
@@ -15,7 +17,7 @@ public class CommandToControllerPublisher {
         this.queueName = queueName;
     }
 
-    public boolean SendCommand(RemoteCommand command) {
+    public boolean SendCommand(byte[] cmdMessage) {
         Channel channel = null;
         try {
             channel = connection.createChannel();
@@ -24,7 +26,6 @@ public class CommandToControllerPublisher {
 
             channel.queueDeclare(queueName,false,false,false,null);
 
-            byte[] cmdMessage = SerializerDeserializerUtility.Serialize(command);
             channel.basicPublish("", queueName, null, cmdMessage);
 
         } catch (Exception exc) {
@@ -35,6 +36,31 @@ public class CommandToControllerPublisher {
                 try{ channel.close(); } catch (Exception exc){
                     Log.e("CommandToController", "Channel cannot close", exc);
                 }
+        }
+
+        return true;
+    }
+
+    public boolean SendCommand(Serializable command) {
+        try {
+            byte[] cmdMessage = SerializerDeserializerUtility.Serialize(command);
+            SendCommand(cmdMessage);
+        }
+        catch (Exception exc)
+        {
+            Log.e("CommandToController", exc.getMessage());
+        }
+
+        return true;
+    }
+    public boolean SendCommand(String command) {
+        try {
+            byte[] cmdMessage = command.getBytes("UTF-8");
+            SendCommand(cmdMessage);
+        }
+        catch (Exception exc)
+        {
+            Log.e("CommandToController", exc.getMessage());
         }
 
         return true;

@@ -5,8 +5,8 @@ import android.util.Log;
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
-import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
-import com.gmail.raducaz.arduinomate.processes.TaskInterface;
+import com.gmail.raducaz.arduinomate.remote.CommandToControllerPublisher;
+import com.gmail.raducaz.arduinomate.remote.RemoteResetCommand;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
@@ -16,48 +16,50 @@ public class TaskFunctionReset implements TaskInterface {
 
     private String TAG = "TaskFunctionReset";
 
-    private final ArduinoMateApp mApplication;
     private final FunctionEntity function;
     private final DataRepository mRepository;
-    private final ExecutorService mExecutor;
-    public TaskFunctionReset(final ArduinoMateApp app, FunctionEntity function) {
-        mApplication = app;
+    public TaskFunctionReset(final DataRepository repository, FunctionEntity function) {
         this.function = function;
 
-        mRepository = mApplication.getRepository();
-        mExecutor = mApplication.getNetworkExecutor();
+        mRepository = repository;
     }
     // Use this constructor to reset all functions
-    public TaskFunctionReset(final ArduinoMateApp app) {
-        mApplication = app;
+    public TaskFunctionReset(final DataRepository repository) {
         function = null;
 
-        mRepository = mApplication.getRepository();
-        mExecutor = mApplication.getNetworkExecutor();
+        mRepository = repository;
     }
 
     public void execute() {
 
         try {
-            if(function != null) {
-                mRepository.deletePinStatesByFunction(function.getId());
-                mRepository.deleteFunctionExecutions(function.getId());
-                mRepository.deleteExecutionLogs(function.getId());
-
-                // Reset also the function states
-                function.setCallState(FunctionCallStateEnum.READY.getId());
-                function.setResultState(FunctionResultStateEnum.NA.getId());
-                mRepository.updateFunction(function);
-            }
-            else
+            // If client redirect the command to controller
+            if(!mRepository.getSettingsSync().getIsController())
             {
-                //Reset all !!
-                mRepository.deleteAllPinStates();
-                mRepository.deleteAllFunctionExecutions();
-                mRepository.deleteAllExecutionLogs();
+                CommandToControllerPublisher sender = new CommandToControllerPublisher(ArduinoMateApp.AmqConnection,
+                        ArduinoMateApp.COMMAND_QUEUE);
 
-                // Reset also the function states
-                mRepository.updateAllFunctionStates(FunctionCallStateEnum.READY.getId(), FunctionResultStateEnum.NA.getId());
+                RemoteResetCommand cmd = new RemoteResetCommand(function);
+                sender.SendCommand(cmd);
+            } else {
+                if (function != null) {
+                    mRepository.deletePinStatesByFunction(function.getId());
+                    mRepository.deleteFunctionExecutions(function.getId());
+                    mRepository.deleteExecutionLogs(function.getId());
+
+                    // Reset also the function states
+                    function.setCallState(FunctionCallStateEnum.READY.getId());
+                    function.setResultState(FunctionResultStateEnum.NA.getId());
+                    mRepository.updateFunction(function);
+                } else {
+                    //Reset all !!
+                    mRepository.deleteAllPinStates();
+                    mRepository.deleteAllFunctionExecutions();
+                    mRepository.deleteAllExecutionLogs();
+
+                    // Reset also the function states
+                    mRepository.updateAllFunctionStates(FunctionCallStateEnum.READY.getId(), FunctionResultStateEnum.NA.getId());
+                }
             }
 
         } catch (Exception exc) {

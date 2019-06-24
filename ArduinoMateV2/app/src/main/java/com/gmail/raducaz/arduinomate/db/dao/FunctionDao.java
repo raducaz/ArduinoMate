@@ -43,7 +43,7 @@ public interface FunctionDao {
     void updateAutoEnabled(long id, boolean isChecked);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(FunctionEntity function);
+    long insert(FunctionEntity function);
 
     @Query("SELECT * FROM function ")
     LiveData<List<FunctionEntity>> loadAllFunctions();

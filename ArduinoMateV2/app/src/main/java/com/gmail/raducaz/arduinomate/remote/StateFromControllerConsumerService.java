@@ -2,6 +2,7 @@ package com.gmail.raducaz.arduinomate.remote;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
+import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
@@ -133,6 +134,21 @@ public class StateFromControllerConsumerService implements Runnable {
 
         public void ProcessState(RemoteStateUpdate stateUpdate)
         {
+            if(stateUpdate.methodName.equals("insertDevice"))
+            {
+                DeviceEntity entity = (DeviceEntity) stateUpdate.entity;
+                mRepository.insertDevice(entity);
+            }
+            if(stateUpdate.methodName.equals("updateDevice"))
+            {
+                DeviceEntity entity = (DeviceEntity) stateUpdate.entity;
+                mRepository.updateDevice(entity);
+            }
+            if(stateUpdate.methodName.equals("insertFunction"))
+            {
+                FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
+                mRepository.insertFunction(entity);
+            }
             if(stateUpdate.methodName.equals("updateFunction"))
             {
                 FunctionEntity entity = (FunctionEntity) stateUpdate.entity;

@@ -149,7 +149,7 @@ public class ArduinoMateApp extends Application {
                 // Start AMQ remote command consumer
                 try {
                     CommandToControllerConsumerService consumerService = CommandToControllerConsumerService.getInstance(AmqConnection,
-                            STATES_EXCHANGE, getRepository());
+                            COMMAND_QUEUE, getRepository());
                     this.getNetworkExecutor().execute(consumerService);
                 } catch (Exception exc) {
                     Log.e("StartCommandConsumer", "", exc);

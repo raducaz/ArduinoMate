@@ -21,7 +21,7 @@ public interface DeviceDao {
     void update(DeviceEntity device);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(DeviceEntity device);
+    long insert(DeviceEntity device);
 
     @Query("SELECT * FROM device")
     LiveData<List<DeviceEntity>> loadAllDevices();

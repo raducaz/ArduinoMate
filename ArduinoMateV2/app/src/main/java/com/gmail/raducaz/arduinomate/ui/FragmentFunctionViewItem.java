@@ -71,7 +71,7 @@ public class FragmentFunctionViewItem extends Fragment {
             public void onClick(View b) {
 
                 ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionReset functionReset = new TaskFunctionReset(application, model.function.get());
+                TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), model.function.get());
                 new TaskExecutor().execute(functionReset);
             }
         });

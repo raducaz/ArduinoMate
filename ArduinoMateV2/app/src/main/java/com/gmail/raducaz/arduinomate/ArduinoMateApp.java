@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Radu.Cazacu on 11/27/2017.
@@ -55,9 +56,17 @@ public class ArduinoMateApp extends Application {
             };
             Future<SettingsEntity> future = executor.submit(callable);
             settings = future.get();
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException ex) {
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
-        catch (Exception exc)
-        {
+        catch (Exception exc) {
             Log.e(TAG, exc.getMessage());
         }
 

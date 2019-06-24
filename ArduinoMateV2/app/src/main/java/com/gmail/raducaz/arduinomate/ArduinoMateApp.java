@@ -56,15 +56,15 @@ public class ArduinoMateApp extends Application {
             };
             Future<SettingsEntity> future = executor.submit(callable);
             settings = future.get();
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                }
-            } catch (InterruptedException ex) {
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
+//            executor.shutdown();
+//            try {
+//                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+//                    executor.shutdownNow();
+//                }
+//            } catch (InterruptedException ex) {
+//                executor.shutdownNow();
+//                Thread.currentThread().interrupt();
+//            }
         }
         catch (Exception exc) {
             Log.e(TAG, exc.getMessage());

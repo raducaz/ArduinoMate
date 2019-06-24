@@ -261,7 +261,8 @@ public class DataRepository {
         return mDatabase.pinStateDao().loadDeviceCurrentPinState(deviceId, pinName);
     }
     public void insertPinState(PinStateEntity pinState) {
-        mDatabase.pinStateDao().insert(pinState);
+        long id = mDatabase.pinStateDao().insert(pinState);
+        pinState.setId(id);
 
         SendStateToRemoteClients(new RemoteStateUpdate(pinState, "insertPinState"));
     }
@@ -281,7 +282,7 @@ public class DataRepository {
 
         PinStateEntity pinState = new PinStateEntity();
         pinState.setId(id);
-        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
+        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "updatePinStateLastUpdate"));
 
     }
     public void deletePinStatesByFunction(long functionId)

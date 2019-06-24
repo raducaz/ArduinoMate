@@ -16,15 +16,25 @@ public class CommandToControllerPublisher {
     }
 
     public boolean SendCommand(RemoteCommand command) {
+        Channel channel = null;
         try {
-            Channel channel = connection.createChannel();
+            channel = connection.createChannel();
+            if(channel == null)
+                throw new Exception("Channel could not be created.");
+
             channel.queueDeclare(queueName,false,false,false,null);
 
             byte[] cmdMessage = SerializerDeserializerUtility.Serialize(command);
             channel.basicPublish("", queueName, null, cmdMessage);
 
         } catch (Exception exc) {
-            Log.e("StateFromController", exc.getMessage());
+            Log.e("CommandToController", exc.getMessage());
+        }
+        finally {
+            if(channel!= null)
+                try{ channel.close(); } catch (Exception exc){
+                    Log.e("CommandToController", "Channel cannot close", exc);
+                }
         }
 
         return true;

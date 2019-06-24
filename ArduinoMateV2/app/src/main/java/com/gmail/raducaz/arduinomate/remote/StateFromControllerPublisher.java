@@ -9,8 +9,12 @@ public class StateFromControllerPublisher {
 
 
     public static boolean SendState(Connection connection, String exchangeName, RemoteStateUpdate stateUpdate) {
+        Channel channel = null;
         try {
-            Channel channel = connection.createChannel();
+
+            channel = connection.createChannel();
+            if(channel == null)
+                throw new Exception("Channel could not be created.");
 
             channel.exchangeDeclare(exchangeName, "fanout");
 
@@ -19,6 +23,12 @@ public class StateFromControllerPublisher {
 
         } catch (Exception exc) {
             Log.e("StateFromController", exc.getMessage());
+        }
+        finally {
+            if(channel!= null)
+                try{ channel.close(); } catch (Exception exc){
+                    Log.e("StateFromController", "Channel cannot close", exc);
+                }
         }
 
         return true;

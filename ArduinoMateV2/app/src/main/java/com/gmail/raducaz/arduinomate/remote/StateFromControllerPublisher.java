@@ -7,15 +7,8 @@ import com.rabbitmq.client.Connection;
 
 public class StateFromControllerPublisher {
 
-    private Connection connection;
-    private String exchangeName;
-    public StateFromControllerPublisher(Connection  connection, String exchangeName)
-    {
-        this.connection = connection;
-        this.exchangeName = exchangeName;
-    }
 
-    public boolean SendState(RemoteStateUpdate stateUpdate) {
+    public static boolean SendState(Connection connection, String exchangeName, RemoteStateUpdate stateUpdate) {
         try {
             Channel channel = connection.createChannel();
 

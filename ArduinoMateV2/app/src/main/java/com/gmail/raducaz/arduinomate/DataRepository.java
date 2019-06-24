@@ -22,6 +22,7 @@ import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
 import java.util.List;
 
 import static com.gmail.raducaz.arduinomate.ArduinoMateApp.AmqConnection;
+import static com.gmail.raducaz.arduinomate.ArduinoMateApp.STATES_EXCHANGE;
 
 /**
  * Repository handling the work with devices and functions.
@@ -45,11 +46,13 @@ public class DataRepository {
 
     private DataRepository(final AppDatabase database) {
         mDatabase = database;
+    }
 
+    private void SendStateToRemoteClients(RemoteStateUpdate stateUpdate)
+    {
         SettingsEntity settings = this.getSettingsSync();
         if(settings.getIsController() && settings.getPermitRemoteControl()) {
-            remoteStateSender = new StateFromControllerPublisher(AmqConnection,
-                    ArduinoMateApp.STATES_EXCHANGE);
+            StateFromControllerPublisher.SendState(AmqConnection, STATES_EXCHANGE, stateUpdate);
         }
     }
 
@@ -140,10 +143,17 @@ public class DataRepository {
     }
     public void updateFunction(FunctionEntity function) {
         mDatabase.functionDao().update(function);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(function, "updateFunction"));
     }
     public void updateAllFunctionStates(int callState, int resultState)
     {
         mDatabase.functionDao().updateAllFunctionStates(callState, resultState);
+
+        FunctionEntity function = new FunctionEntity();
+        function.setCallState(callState);
+        function.setResultState(resultState);
+        SendStateToRemoteClients(new RemoteStateUpdate(function, "updateAllFunctionStates"));
     }
     public void updateFunctionAutoEnabled(final long functionId, boolean isChecked) {
         mDatabase.functionDao().updateAutoEnabled(functionId, isChecked);
@@ -167,9 +177,15 @@ public class DataRepository {
 
     public void deleteFunctionExecutions(final long functionId) {
         mDatabase.functionExecutionDao().deleteFunctionExecution(functionId);
+
+        FunctionExecutionEntity fe = new FunctionExecutionEntity();
+        fe.setFunctionId(functionId);
+        SendStateToRemoteClients(new RemoteStateUpdate(fe, "deleteFunctionExecutions"));
     }
     public void deleteAllFunctionExecutions() {
         mDatabase.functionExecutionDao().deleteAllFunctionExecution();
+
+        SendStateToRemoteClients(new RemoteStateUpdate(null, "deleteAllFunctionExecutions"));
     }
     public long insertFunctionExecution(FunctionExecutionEntity execution) {
         long functionId = execution.getFunctionId();
@@ -178,7 +194,11 @@ public class DataRepository {
 
         mDatabase.functionDao().updateStates(functionId, callState, resultState);
 
-        return mDatabase.functionExecutionDao().insert(execution);
+        long result = mDatabase.functionExecutionDao().insert(execution);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(execution, "insertFunctionExecution"));
+
+        return  result;
     }
     public void updateFunctionExecution(FunctionExecutionEntity execution) {
         long functionId = execution.getFunctionId();
@@ -188,6 +208,8 @@ public class DataRepository {
         mDatabase.functionDao().updateStates(functionId, callState, resultState);
 
         mDatabase.functionExecutionDao().update(execution);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(execution, "updateFunctionExecution"));
     }
     //endregion FunctionExecution
 
@@ -199,16 +221,26 @@ public class DataRepository {
         return mDatabase.executionLogDao().loadAllExecutionLogs();
     }
     public long insertExecutionLog(ExecutionLogEntity log) {
-        return mDatabase.executionLogDao().insert(log);
+        long result = mDatabase.executionLogDao().insert(log);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+
+        return  result;
     }
     public void updateExecutionLog(ExecutionLogEntity log) {
         mDatabase.executionLogDao().update(log);
     }
     public void deleteExecutionLogs(final long functionId) {
         mDatabase.executionLogDao().deleteFunctionExecutionLogs(functionId);
+
+        FunctionEntity fe = new FunctionEntity();
+        fe.setId(functionId);
+        SendStateToRemoteClients(new RemoteStateUpdate(fe, "deleteExecutionLogs"));
     }
     public void deleteAllExecutionLogs() {
         mDatabase.executionLogDao().deleteAllFunctionExecutionLogs();
+
+        SendStateToRemoteClients(new RemoteStateUpdate(null, "deleteAllExecutionLogs"));
     }
     //endregion ExecutionLog
 
@@ -231,39 +263,41 @@ public class DataRepository {
     public void insertPinState(PinStateEntity pinState) {
         mDatabase.pinStateDao().insert(pinState);
 
-        if(remoteStateSender != null)
-            remoteStateSender.SendState(new RemoteStateUpdate(pinState, "insertPinState"));
+        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "insertPinState"));
     }
     public void updatePinState(PinStateEntity pinStateEntity) {
         mDatabase.pinStateDao().update(pinStateEntity);
     }
-    public void updatePinStateToDate(long id)
-    {
+    public void updatePinStateToDate(long id) {
         mDatabase.pinStateDao().updateToDate(id, DateConverter.toDate(System.currentTimeMillis()));
 
-        if(remoteStateSender != null) {
-            PinStateEntity pinState = new PinStateEntity();
-            pinState.setToDate(DateConverter.toDate(System.currentTimeMillis()));
-            remoteStateSender.SendState(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
-        }
+        PinStateEntity pinState = new PinStateEntity();
+        pinState.setId(id);
+        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
+
     }
-    public void updatePinStateLastUpdate(long id)
-    {
+    public void updatePinStateLastUpdate(long id) {
         mDatabase.pinStateDao().updateLastUpdate(id, DateConverter.toDate(System.currentTimeMillis()));
 
-        if(remoteStateSender != null) {
-            PinStateEntity pinState = new PinStateEntity();
-            pinState.setLastUpdate(DateConverter.toDate(System.currentTimeMillis()));
-            remoteStateSender.SendState(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
-        }
+        PinStateEntity pinState = new PinStateEntity();
+        pinState.setId(id);
+        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
+
     }
     public void deletePinStatesByFunction(long functionId)
     {
         mDatabase.pinStateDao().deletePinStatesByFunction(functionId);
+
+        FunctionEntity fe = new FunctionEntity();
+        fe.setId(functionId);
+        SendStateToRemoteClients(new RemoteStateUpdate(fe, "deletePinStatesByFunction"));
+
     }
     public void deleteAllPinStates()
     {
         mDatabase.pinStateDao().deleteAllPinStates();
+
+        SendStateToRemoteClients(new RemoteStateUpdate(null, "deleteAllPinStates"));
     }
     //endregion PinState
 

@@ -70,7 +70,7 @@
                 android:tag="SAVE"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/remote_checkbox"
+                android:layout_below="@+id/testing_checkbox"
                 style="?android:attr/borderlessButtonStyle"
                 android:textColor="?attr/colorPrimary"
                 android:text="Save" />

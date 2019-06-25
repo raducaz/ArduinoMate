@@ -121,14 +121,15 @@ public class DeviceStateUpdater {
                     // Trigger here the custom event PinChanged
                     processPinStateChangeEvent(new PinStateChangeEvent(this, pName, pState));
 
-                    //TODO: Add custom listener
-                    PinStateChangeListener listener = new MyPinStateChangeListener();
-                    this.addPinStateListener(listener);
+//                    //TODO: Add custom listener
+//                    PinStateChangeListener listener = new MyPinStateChangeListener();
+//                    this.addPinStateListener(listener);
 
                     if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() != pState) {
                         // Update history with the date until the state was unchanged
                         dataRepository.updatePinStateToDate(currentPinsState.get(pName).getId());
                     }
+
                     insertPinStateHistory(pName,pState);
                 }
             }

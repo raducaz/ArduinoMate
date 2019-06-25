@@ -55,6 +55,8 @@ public class ArduinoMateApp extends Application {
                 }
             };
             Future<SettingsEntity> future = executor.submit(callable);
+
+            //TODO: Ensure this is completed synchronous before moving on
             settings = future.get();
 //            executor.shutdown();
 //            try {

@@ -59,6 +59,7 @@ public class ConsumerService implements Runnable {
 
                 channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
                 String queueName = channel.queueDeclare().getQueue();
+                //String queueName = channel.queueDeclare(EXCHANGE_NAME, false, false, false, null).getQueue();
                 channel.queueBind(queueName, EXCHANGE_NAME, "");
 
                 boolean autoAck = false;
@@ -78,10 +79,10 @@ public class ConsumerService implements Runnable {
 
                                 // positively acknowledge a single delivery, the message will
                                 // be discarded
-                                if(message.contains("1"))
+                                //if(message.contains("1"))
                                     channel.basicAck(deliveryTag, false);
-                                else
-                                    channel.basicReject(deliveryTag, false);
+//                                else
+//                                    channel.basicReject(deliveryTag, false);
                             }
 
                         }

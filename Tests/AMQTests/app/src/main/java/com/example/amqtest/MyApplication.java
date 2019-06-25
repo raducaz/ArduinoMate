@@ -81,14 +81,14 @@ public class MyApplication extends Application {
             //TODO: handle it somehow
         }
 
-//        try {
-////            ConsumerService2 consumerService = ConsumerService2.getInstance().getInstance();
-////            this.getNetworkExecutor().execute(consumerService);
-////        }
-////        catch (IOException exc)
-////        {
-////            //TODO: handle it somehow
-////        }
+        try {
+            ConsumerService2 consumerService = ConsumerService2.getInstance().getInstance();
+            this.getNetworkExecutor().execute(consumerService);
+        }
+        catch (IOException exc)
+        {
+            //TODO: handle it somehow
+        }
     }
 
     public ExecutorService getNetworkExecutor()

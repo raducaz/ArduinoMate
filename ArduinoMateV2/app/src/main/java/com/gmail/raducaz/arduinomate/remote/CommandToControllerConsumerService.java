@@ -122,6 +122,11 @@ public class CommandToControllerConsumerService implements Runnable {
 
                                         new TaskExecutor().execute(functionReset);
                                     }
+                                    if(bodyObject instanceof RemoteStateConsumerQueue)
+                                    {
+                                        RemoteStateConsumerQueue command = (RemoteStateConsumerQueue)bodyObject;
+                                        mRepository.insertRemoteQueue(command.queueName);
+                                    }
                                 }
                                 catch (Exception exc) {
                                     Log.e(TAG, exc.getMessage());

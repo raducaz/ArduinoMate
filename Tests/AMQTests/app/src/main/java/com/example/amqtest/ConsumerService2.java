@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.example.amqtest.MyApplication.EXCHANGE_NAME;
+
 public class ConsumerService2 implements Runnable {
 
     private static final String EXCHANGE_NAME = "states";
@@ -89,6 +91,7 @@ public class ConsumerService2 implements Runnable {
 
                 channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
                 String queueName = channel.queueDeclare().getQueue();
+//                String queueName = channel.queueDeclare(EXCHANGE_NAME, false, false, false, null).getQueue();
                 channel.queueBind(queueName, EXCHANGE_NAME, "");
 
                 boolean autoAck = false;

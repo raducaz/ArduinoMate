@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.gmail.raducaz.arduinomate.ArduinoMateApp.AmqConnection;
+import static com.gmail.raducaz.arduinomate.ArduinoMateApp.COMMAND_QUEUE;
+
 public class StateFromControllerConsumerService implements Runnable {
 
     private String TAG = "ControllerStateConsumerService";
@@ -87,11 +90,10 @@ public class StateFromControllerConsumerService implements Runnable {
                                                        Envelope envelope,
                                                        AMQP.BasicProperties properties,
                                                        byte[] body)
-                                    throws IOException
-                            {
+                                    throws IOException {
                                 long deliveryTag = envelope.getDeliveryTag();
                                 // Don;t process redelivered messages
-                                if(envelope.isRedeliver()) {
+                                if (envelope.isRedeliver()) {
                                     channel.basicAck(deliveryTag, false);
                                     return;
                                 }
@@ -106,9 +108,7 @@ public class StateFromControllerConsumerService implements Runnable {
                                     // positively acknowledge a single delivery, the message will
                                     // be discarded
                                     channel.basicAck(deliveryTag, false);
-                                }
-                                catch (Exception exc)
-                                {
+                                } catch (Exception exc) {
                                     Log.e(TAG, "", exc);
                                 }
                             }
@@ -116,6 +116,13 @@ public class StateFromControllerConsumerService implements Runnable {
                         }
                 );
 
+                // Send the consumer queue name to Controller
+                if (!mRepository.getSettingsSync().getIsController()) {
+                    CommandToControllerPublisher sender = new CommandToControllerPublisher(AmqConnection,
+                            COMMAND_QUEUE);
+                    sender.SendCommand(new RemoteStateConsumerQueue(queueName));
+
+                }
             }
             catch (Exception exc)
             {

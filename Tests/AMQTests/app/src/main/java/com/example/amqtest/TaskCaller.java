@@ -22,9 +22,10 @@ public class TaskCaller implements TaskInterface {
         String message = "Msg " + dateFormat.format(date);
 
         try {
-            for (int i = 0; i < 100; i++) {
-                sender.SendState("Msg:" + i);
-            }
+//            for (int i = 0; i < 100; i++) {
+//                sender.SendState("Msg:" + i);
+//            }
+            sender.SendState(message);
         }
         catch (Exception exc){}
     }

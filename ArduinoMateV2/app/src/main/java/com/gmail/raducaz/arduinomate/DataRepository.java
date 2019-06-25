@@ -15,7 +15,9 @@ import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
+import com.gmail.raducaz.arduinomate.db.entity.RemoteQueueEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
+import com.gmail.raducaz.arduinomate.model.RemoteQueue;
 import com.gmail.raducaz.arduinomate.remote.RemoteStateUpdate;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
 
@@ -52,7 +54,7 @@ public class DataRepository {
     {
         SettingsEntity settings = this.getSettingsSync();
         if(settings.getIsController() && settings.getPermitRemoteControl()) {
-            StateFromControllerPublisher.SendState(AmqConnection, STATES_EXCHANGE, stateUpdate);
+            StateFromControllerPublisher.SendState(this, AmqConnection, STATES_EXCHANGE, stateUpdate);
         }
     }
 
@@ -338,6 +340,34 @@ public class DataRepository {
     {
         mDatabase.mockPinStateDao().deleteAllPinStates();
     }
-    //endregion PinState
+    //endregion MockPinState
+
+    //region RemoteQueue
+    public LiveData<List<RemoteQueueEntity>> getRemoteQueues() {
+        return mDatabase.remoteQueueDao().getRemoteQueues();
+    }
+
+    public List<RemoteQueueEntity> getRemoteQueuesSync() {
+        return mDatabase.remoteQueueDao().getRemoteQueuesSync();
+    }
+    public int getNumberOfAllRemoteQueues() {
+        return mDatabase.remoteQueueDao().getNumberOfAllRemoteQueues();
+    }
+    public void getRemoteQueue(String name)
+    {
+        mDatabase.remoteQueueDao().getRemoteQueueSync(name);
+    }
+    public void insertRemoteQueue(String name)
+    {
+        RemoteQueueEntity entity = new RemoteQueueEntity();
+        entity.setName(name);
+        entity.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        mDatabase.remoteQueueDao().insert(entity);
+    }
+    public void deleteRemoteQueue(String name)
+    {
+        mDatabase.remoteQueueDao().deleteRemoteQueueSync(name);
+    }
+    //endregion RemoteQueue
 
 }

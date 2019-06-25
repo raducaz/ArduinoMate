@@ -19,6 +19,7 @@ import com.gmail.raducaz.arduinomate.db.dao.DeviceDao;
 import com.gmail.raducaz.arduinomate.db.dao.FunctionExecutionDao;
 import com.gmail.raducaz.arduinomate.db.dao.MockPinStateDao;
 import com.gmail.raducaz.arduinomate.db.dao.PinStateDao;
+import com.gmail.raducaz.arduinomate.db.dao.RemoteQueueDao;
 import com.gmail.raducaz.arduinomate.db.dao.SettingsDao;
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
@@ -26,7 +27,9 @@ import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
+import com.gmail.raducaz.arduinomate.db.entity.RemoteQueueEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
+import com.gmail.raducaz.arduinomate.model.RemoteQueue;
 import com.gmail.raducaz.arduinomate.model.Settings;
 
 import java.util.List;
@@ -40,7 +43,8 @@ import java.util.List;
                         FunctionExecutionEntity.class,
                         ExecutionLogEntity.class,
                         PinStateEntity.class,
-                        MockPinStateEntity.class
+                        MockPinStateEntity.class,
+                        RemoteQueueEntity.class
                 },
         version = 1
 )
@@ -70,6 +74,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ExecutionLogDao executionLogDao();
     public abstract PinStateDao pinStateDao();
     public abstract MockPinStateDao mockPinStateDao();
+    public abstract RemoteQueueDao remoteQueueDao();
     //endregion Dao's
 
     //region Initialize Database

@@ -19,6 +19,7 @@ public class StateFromControllerPublisher {
         for (RemoteQueueEntity queue : consumerQueues)
         {
             try {
+                // This will throw RESOURCE_LOCKED - cannot obtain exclusive access to locked queue if queue is exclusive declared
                 AMQP.Queue.DeclareOk result = channel.queueDeclarePassive(queue.getName());
                 if(result.getConsumerCount()>0)
                     return true;
@@ -26,6 +27,16 @@ public class StateFromControllerPublisher {
             catch (Exception exc)
             {
                 Log.e("HasConsumers", "Cannot declare passive queue" + queue.getName(), exc);
+
+                String cause = exc.getCause().getMessage();
+                if(cause.contains("NOT_FOUND - no queue"))
+                {
+                    repository.deleteRemoteQueue(queue.getName());
+                }
+                if(cause.contains("RESOURCE_LOCKED - cannot obtain exclusive access to locked queue"))
+                {
+                    return true;
+                }
             }
         }
 

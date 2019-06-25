@@ -8,6 +8,7 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class StateFromControllerPublisher {
@@ -31,7 +32,7 @@ public class StateFromControllerPublisher {
         return false;
     }
 
-    public static boolean SendState(DataRepository repository, Connection connection, String exchangeName, RemoteStateUpdate stateUpdate) {
+    public static boolean SendState(DataRepository repository, Connection connection, String exchangeName, Serializable stateUpdate) {
 
         Channel channel = null;
         try {

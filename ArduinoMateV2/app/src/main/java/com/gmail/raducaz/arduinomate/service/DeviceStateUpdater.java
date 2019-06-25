@@ -119,7 +119,7 @@ public class DeviceStateUpdater {
                         oldPinStates.put(pName, currentPinsState.get(pName).getState());
 
                     // Trigger here the custom event PinChanged
-                    processPinStateChangeEvent(new PinStateChangeEvent(this, pName, pState));
+//                    processPinStateChangeEvent(new PinStateChangeEvent(this, pName, pState));
 
 //                    //TODO: Add custom listener
 //                    PinStateChangeListener listener = new MyPinStateChangeListener();

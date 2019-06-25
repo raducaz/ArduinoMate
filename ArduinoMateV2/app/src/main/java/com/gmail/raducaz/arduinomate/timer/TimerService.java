@@ -6,8 +6,12 @@ import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
+import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
 import com.gmail.raducaz.arduinomate.mocks.MockArduinoClient;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
+import com.gmail.raducaz.arduinomate.remote.RemotePinStateUpdate;
+import com.gmail.raducaz.arduinomate.remote.RemoteStateUpdate;
+import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
 
@@ -16,6 +20,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.gmail.raducaz.arduinomate.ArduinoMateApp.AmqConnection;
+import static com.gmail.raducaz.arduinomate.ArduinoMateApp.STATES_EXCHANGE;
 
 public class TimerService implements Runnable {
 
@@ -98,12 +105,24 @@ public class TimerService implements Runnable {
 
                         //TODO: Check Level of water in garden tanks: if is maximum then Close Main Tap => close pump and generator automatically
 
+
+                        // Send State Update Buffer
+                        SendStateToRemoteClients(new RemotePinStateUpdate(DataRepository.getMqStateUpdateBuffer()));
+
                     }
                     catch (Exception exc) {
                         Log.e(TAG, exc.getMessage());
                     }
                 }
             }, 1000, 5000);
+        }
+    }
+
+    private void SendStateToRemoteClients(RemotePinStateUpdate stateUpdate)
+    {
+        SettingsEntity settings = dataRepository.getSettingsSync();
+        if(settings.getIsController() && settings.getPermitRemoteControl()) {
+            StateFromControllerPublisher.SendState(dataRepository, AmqConnection, STATES_EXCHANGE, stateUpdate);
         }
     }
 }

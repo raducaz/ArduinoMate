@@ -31,6 +31,18 @@ import static com.gmail.raducaz.arduinomate.ArduinoMateApp.STATES_EXCHANGE;
  */
 public class DataRepository {
 
+    public static String getMqStateUpdateBuffer() {
+        return mqStateUpdateBuffer;
+    }
+
+    private static String mqStateUpdateBuffer;
+    public static void appendMqStateUpdateBuffer(String mqStateUpdateBuffer) {
+        DataRepository.mqStateUpdateBuffer += "\r\n" + mqStateUpdateBuffer;
+    }
+    public static void clearMqStateUpdateBuffer() {
+        DataRepository.mqStateUpdateBuffer = "";
+    }
+
     private static DataRepository sInstance;
     public static DataRepository getInstance(final AppDatabase database) {
         if (sInstance == null) {
@@ -276,7 +288,8 @@ public class DataRepository {
         long id = mDatabase.pinStateDao().insert(pinState);
         pinState.setId(id);
 
-        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "insertPinState"));
+        // To often - there is 1M limit of messages
+//        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "insertPinState"));
     }
     public void updatePinState(PinStateEntity pinStateEntity) {
         mDatabase.pinStateDao().update(pinStateEntity);
@@ -284,17 +297,19 @@ public class DataRepository {
     public void updatePinStateToDate(long id) {
         mDatabase.pinStateDao().updateToDate(id, DateConverter.toDate(System.currentTimeMillis()));
 
-        PinStateEntity pinState = new PinStateEntity();
-        pinState.setId(id);
-        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
+        // To often - there is 1M limit of messages
+//        PinStateEntity pinState = new PinStateEntity();
+//        pinState.setId(id);
+//        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "updatePinStateToDate"));
 
     }
     public void updatePinStateLastUpdate(long id) {
         mDatabase.pinStateDao().updateLastUpdate(id, DateConverter.toDate(System.currentTimeMillis()));
 
-        PinStateEntity pinState = new PinStateEntity();
-        pinState.setId(id);
-        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "updatePinStateLastUpdate"));
+        // To often - there is 1M limit of messages
+//        PinStateEntity pinState = new PinStateEntity();
+//        pinState.setId(id);
+//        SendStateToRemoteClients(new RemoteStateUpdate(pinState, "updatePinStateLastUpdate"));
 
     }
     public void deletePinStatesByFunction(long functionId)

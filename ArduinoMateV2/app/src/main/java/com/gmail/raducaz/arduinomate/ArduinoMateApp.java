@@ -51,7 +51,8 @@ public class ArduinoMateApp extends Application {
             Callable<SettingsEntity> callable = new Callable<SettingsEntity>() {
                 @Override
                 public SettingsEntity call() {
-                    return getRepository().getSettingsSync();
+                    SettingsEntity settings = getRepository().getSettingsSync();
+                    return settings;
                 }
             };
             Future<SettingsEntity> future = executor.submit(callable);

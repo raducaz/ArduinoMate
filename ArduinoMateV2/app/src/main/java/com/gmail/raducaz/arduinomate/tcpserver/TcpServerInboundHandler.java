@@ -92,6 +92,8 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
             DeviceStateUpdater deviceStateUpdater = new DeviceStateUpdater(dataRepository, msg);
             deviceStateUpdater.updatePinStates();
 
+            DataRepository.appendMqStateUpdateBuffer(msg);
+
             // Function State is not received anymore
 //            FunctionStateUpdater functionStateUpdater = new FunctionStateUpdater(dataRepository, msg);
 //            functionStateUpdater.insertExecutionLog();

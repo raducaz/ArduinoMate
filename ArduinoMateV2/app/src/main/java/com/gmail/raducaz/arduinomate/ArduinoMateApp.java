@@ -57,7 +57,7 @@ public class ArduinoMateApp extends Application {
             Future<SettingsEntity> future = executor.submit(callable);
 
             //TODO: Ensure this is completed synchronous before moving on
-            settings = future.get();
+            settings = future.get(5, TimeUnit.SECONDS);
 //            executor.shutdown();
 //            try {
 //                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {

@@ -35,7 +35,7 @@ public class DataRepository {
         return mqStateUpdateBuffer;
     }
 
-    private static String mqStateUpdateBuffer;
+    private static String mqStateUpdateBuffer = "";
     public static void appendMqStateUpdateBuffer(String mqStateUpdateBuffer) {
         DataRepository.mqStateUpdateBuffer += "\r\n" + mqStateUpdateBuffer;
     }

@@ -51,6 +51,9 @@ public class StateFromControllerPublisher {
             channel = connection.createChannel();
             if(!HasConsumers(repository, channel))
                 throw  new Exception("No consumers, publish aborted");
+            else
+                channel = connection.createChannel();
+
 
             if(channel == null)
                 throw new Exception("Channel could not be created.");

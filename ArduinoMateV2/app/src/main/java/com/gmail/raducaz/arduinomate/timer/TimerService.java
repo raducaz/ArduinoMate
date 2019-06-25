@@ -108,6 +108,7 @@ public class TimerService implements Runnable {
 
                         // Send State Update Buffer
                         SendStateToRemoteClients(new RemotePinStateUpdate(DataRepository.getMqStateUpdateBuffer()));
+                        DataRepository.clearMqStateUpdateBuffer();
 
                     }
                     catch (Exception exc) {

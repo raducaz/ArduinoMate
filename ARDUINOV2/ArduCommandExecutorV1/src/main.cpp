@@ -14,6 +14,12 @@
 #include <jsonhelper.cpp>
 #include <executor.h>
 
+#include "Adafruit_Sensor.h"
+#include "DHT.h"
+
+#define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
+DHT dht(9, DHTTYPE);
+
 volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
 
 ThreadController threadsController = ThreadController();
@@ -47,6 +53,10 @@ void calibrateCurrentSensor()
   zeroCurrent = c / 10.0;
 }
 float f1()
+{
+  return sensor.getCurrentAC()-zeroCurrent;
+}
+float f2()
 {
   return sensor.getCurrentAC()-zeroCurrent;
 }
@@ -351,7 +361,8 @@ void setup() {
 
   delay(1000);
   calibrateCurrentSensor();
-  
+  dht.begin();
+
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway, subnet);
 
@@ -371,5 +382,37 @@ void loop() {
   Logger::logln("I'm alive !");
   digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
   delay(500);
+
+
+  // Reading temperature or humidity takes about 250 milliseconds!
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  float h = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float t = dht.readTemperature();
+  // Read temperature as Fahrenheit (isFahrenheit = true)
+  float f = dht.readTemperature(true);
+
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(h) || isnan(t) || isnan(f)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+
+  // Compute heat index in Fahrenheit (the default)
+  float hif = dht.computeHeatIndex(f, h);
+  // Compute heat index in Celsius (isFahreheit = false)
+  float hic = dht.computeHeatIndex(t, h, false);
+
+  Serial.print(F("Humidity: "));
+  Serial.print(h);
+  Serial.print(F("%  Temperature: "));
+  Serial.print(t);
+  Serial.print(F("°C "));
+  Serial.print(f);
+  Serial.print(F("°F  Heat index: "));
+  Serial.print(hic);
+  Serial.print(F("°C "));
+  Serial.print(hif);
+  Serial.println(F("°F"));
 
 }

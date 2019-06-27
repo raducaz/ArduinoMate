@@ -1,7 +1,5 @@
 #include <Arduino.h>
 
-byte resetSelf = 13;
-
 // This is the matrix of clients with their states
 // clients[0] = [0,1234234] - client on pin 2 is 0 from 1234234 timestamp
 // clients[1] = [0,1234234] - client on pin 4 is 0 from 1234234 timestamp
@@ -21,6 +19,7 @@ void setup() {
     digitalWrite(2*(b+1)+1, 1);
   }
 }
+void(* resetFunc) (void) = 0;
 
 void loop() {
   delay(1000);
@@ -59,6 +58,9 @@ void loop() {
   // Reset self if millis > 1 day - is not working this way
   if(millis() > (unsigned long)24*3600*pow(10, 3))
   {
-    digitalWrite(resetSelf,0);
+    Serial.println("Self reset");
+    delay(100);
+    
+    resetFunc();
   }
 }

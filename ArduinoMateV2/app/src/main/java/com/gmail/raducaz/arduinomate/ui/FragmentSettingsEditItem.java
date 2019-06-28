@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
@@ -70,6 +71,9 @@ public class FragmentSettingsEditItem extends Fragment {
 
                 CheckBox isTestingChk = mBinding.getRoot().findViewById(R.id.testing_checkbox);
                 settingsEntity.setIsTestingMode(isTestingChk.isChecked());
+
+                TextView amqUriTxt = mBinding.getRoot().findViewById(R.id.uri_text);
+                settingsEntity.setAmqUri(amqUriTxt.getText().toString());
 
                 application.getDbExecutor().execute(new DbUpdater(settingsEntity));
 

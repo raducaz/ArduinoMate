@@ -103,6 +103,25 @@ public class TimerService implements Runnable {
                             }
                         }
 
+                        FunctionEntity generatorOnOff = dataRepository.loadDeviceFunctionSync("Generator","GeneratorOnOff");
+                        double temperature = deviceGeneratorFunctions.getCurrentTemperature();
+                        if(temperature > 45)
+                        {
+                            try {
+                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(dataRepository,
+                                        "Generator",
+                                        "GeneratorOnOff",
+                                        FunctionResultStateEnum.OFF,
+                                        "Temperature is over 45");
+                                new TaskExecutor().execute(functionCaller);
+                            }
+                            catch (Exception exc) {
+                                Log.e(TAG, exc.getMessage());
+                            }
+                        }
+                        dataRepository.insertExecutionLogOnLastFunctionExecution(generatorOnOff.getId(), "Temperature is " + temperature);
+
+
                         //TODO: Check Level of water in garden tanks: if is maximum then Close Main Tap => close pump and generator automatically
 
 

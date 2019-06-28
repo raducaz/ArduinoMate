@@ -40,7 +40,7 @@ public class TaskFunctionReset implements TaskInterface {
                         ArduinoMateApp.COMMAND_QUEUE);
 
                 RemoteResetCommand cmd = new RemoteResetCommand(function);
-                sender.SendCommand(cmd);
+                sender.SendCommand(cmd, 5);
             } else {
                 if (function != null) {
                     mRepository.deletePinStatesByFunction(function.getId());

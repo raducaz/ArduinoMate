@@ -65,12 +65,26 @@
                 android:layout_below="@+id/testing_label"
                 android:checked="@{settingsViewModel.settings.isTestingMode}"/>
 
+            <TextView
+                android:id="@+id/uri_label"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_below="@+id/testing_checkbox"
+                android:text="Testing mode:"
+                />
+            <EditText
+                android:id="@+id/uri_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/cd_device_name"
+                android:text="@={settingsViewModel.settings.amqUri}"/>
+
             <Button
                 android:id="@+id/save_button"
                 android:tag="SAVE"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/testing_checkbox"
+                android:layout_below="@+id/uri_text"
                 style="?android:attr/borderlessButtonStyle"
                 android:textColor="?attr/colorPrimary"
                 android:text="Save" />

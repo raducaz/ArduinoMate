@@ -7,6 +7,7 @@ package com.gmail.raducaz.arduinomate.model;
 
 public interface Settings {
     long getId();
+    String getAmqUri();
     boolean getIsController();
     boolean getPermitRemoteControl();
     boolean getIsTestingMode();

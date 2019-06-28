@@ -122,7 +122,7 @@ public class StateFromControllerConsumerService implements Runnable {
                 if (!mRepository.getSettingsSync().getIsController()) {
                     CommandToControllerPublisher sender = new CommandToControllerPublisher(AmqConnection,
                             COMMAND_QUEUE);
-                    sender.SendCommand(new RemoteStateConsumerQueue(queueName));
+                    sender.SendCommand(new RemoteStateConsumerQueue(queueName), 3600);
 
                 }
             }

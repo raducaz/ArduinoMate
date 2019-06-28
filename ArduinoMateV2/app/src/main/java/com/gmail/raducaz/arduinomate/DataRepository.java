@@ -17,6 +17,7 @@ import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.RemoteQueueEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
+import com.gmail.raducaz.arduinomate.model.FunctionExecution;
 import com.gmail.raducaz.arduinomate.model.RemoteQueue;
 import com.gmail.raducaz.arduinomate.remote.RemoteStateUpdate;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
@@ -157,6 +158,9 @@ public class DataRepository {
     public FunctionEntity loadFunctionSync(final long deviceId, final String functionName) {
         return mDatabase.functionDao().loadFunctionSync(deviceId, functionName);
     }
+    public FunctionEntity loadDeviceFunctionSync(final String deviceName, final String functionName) {
+        return mDatabase.functionDao().loadDeviceFunctionSync(deviceName, functionName);
+    }
     public void insertFunction(FunctionEntity function) {
         long id = mDatabase.functionDao().insert(function);
         function.setId(id);
@@ -248,6 +252,24 @@ public class DataRepository {
         log.setId(id);
 
         SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+
+        return  id;
+    }
+    public long insertExecutionLogOnLastFunctionExecution(long functionId, String msg) {
+
+        FunctionExecution functionExecution = loadLastFunctionExecutionSync(functionId);
+        long id = 0;
+
+        if(functionExecution != null) {
+            ExecutionLogEntity log = new ExecutionLogEntity();
+            log.setExecutionId(functionExecution.getId());
+            log.setLog(msg);
+            log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+            log.setFunctionName(functionExecution.getName());
+            id = insertExecutionLog(log);
+
+            SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+        }
 
         return  id;
     }

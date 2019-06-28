@@ -88,7 +88,7 @@ public class TaskFunctionCaller implements TaskInterface {
                         functionName,
                         orderedState);
 
-                sender.SendCommand(cmd);
+                sender.SendCommand(cmd, 5);
             } else {
 
                 switch (functionName) {

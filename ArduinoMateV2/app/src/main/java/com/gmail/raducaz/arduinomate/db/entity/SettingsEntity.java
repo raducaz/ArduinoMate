@@ -18,6 +18,7 @@ public class SettingsEntity implements Settings, Serializable {
     @PrimaryKey
     private long id;
 
+    private String amqUri;
     private boolean isController;
     private boolean isTestingMode;
     private boolean permitRemoteControl;
@@ -28,6 +29,14 @@ public class SettingsEntity implements Settings, Serializable {
     }
     public void setId(long id) {
         this.id = id;
+    }
+
+    @Override
+    public String getAmqUri() {
+        return amqUri;
+    }
+    public void setAmqUri(String amqUri) {
+        this.amqUri = amqUri;
     }
 
     @Override

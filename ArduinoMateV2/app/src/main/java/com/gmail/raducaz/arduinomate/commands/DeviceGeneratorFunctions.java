@@ -37,6 +37,23 @@ public class DeviceGeneratorFunctions {
             return false;
         }
     }
+    public double getCurrentTemperature()
+    {
+        try {
+            // Check AC current - if high then it's on
+            String command = "[{\"F2\":0}]";
+            String result = arduinoCommander.SendCommand(command);
+            double temp = 0;
+            temp = new Parser(result).getDouble("F2");
+
+            return temp;
+        }
+        catch (Exception exc)
+        {
+            Log.e("isCurrentAbove", exc.getMessage());
+            return -50;
+        }
+    }
 
     // Returns true if probe proves the pressure sensor is activated
     public boolean testLongRun() {

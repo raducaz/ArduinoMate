@@ -16,6 +16,7 @@ const int ContactDemaror12V = 8; // controleaza releul de 12V pentru contact dem
 const int PresostatProbeSender = A3;
 const int PresostatProbeReceiver = A4;
 const int CurrentSensor = A1; //A1 is used by SD card ca drop value some times
+const int TemperatureSensor = 9; 
 
 bool Configuration::isDebug()
 {
@@ -38,6 +39,7 @@ void Configuration::setupPins()
   pinMode(PresostatProbeSender, OUTPUT);
   pinMode(PresostatProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
   pinMode(CurrentSensor, INPUT);
+  pinMode(TemperatureSensor, INPUT);
 }
 void Configuration::initializePins()
 { 

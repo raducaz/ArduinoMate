@@ -119,7 +119,6 @@ public class ArduinoMateApp extends Application {
 //        TaskServerServiceInitializer serviceInitializer = new TaskServerServiceInitializer(this);
 //        new TaskExecutor().execute();
 
-
         if(!settings.getIsController()) {
 
             // Start AMQ state consumer

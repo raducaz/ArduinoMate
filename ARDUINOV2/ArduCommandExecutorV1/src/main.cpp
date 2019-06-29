@@ -18,7 +18,7 @@
 #include "DHT.h"
 
 #define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
-DHT dht(9, DHTTYPE);
+DHT dht(8, DHTTYPE);
 
 volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
 
@@ -36,6 +36,9 @@ unsigned int bufferSize = 0;
 
 EthernetClient arduinoClient;
 
+// Reset function
+void(* resetFunc) (void) = 0;
+
 void calibrateCurrentSensor()
 {
   // calibrate() method calibrates zero point of sensor,
@@ -51,6 +54,10 @@ void calibrateCurrentSensor()
     delay(100);
   }
   zeroCurrent = c / 10.0;
+}
+void f0()
+{
+  resetFunc();
 }
 float f1()
 {
@@ -149,8 +156,14 @@ void parseCommand(String plainJson, EthernetClient client)
             if(strcmp(p.key,"!")==0){ // Cmd wait
               MyExecutor::wait(p.value);
             }
+            if(strcmp(p.key,"F0")==0){ // Cmd function
+              f0();
+            }
             if(strcmp(p.key,"F1")==0){ // Cmd function
               obj[p.key] = f1();
+            }
+            if(strcmp(p.key,"F2")==0){ // Cmd function
+              obj[p.key] = f2();
             }
           }
          
@@ -383,6 +396,8 @@ void loop() {
   digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
   delay(500);
 
+
+  digitalWrite(8,1);
 
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)

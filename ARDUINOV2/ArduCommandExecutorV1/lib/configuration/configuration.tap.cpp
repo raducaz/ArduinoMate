@@ -7,7 +7,11 @@
 // const int Priza7 = 7; 
 // const int Priza6 = 6; 
 // const int Priza5 = 5; // Not yet connected
+
 // const int SDCard = 4;
+
+// const int Priza4 = 3; 
+// const int Priza3 = 2; 
 
 // const int TapProbeSender = A3;
 // const int TapProbeReceiver = A4;
@@ -28,6 +32,9 @@
 //   pinMode(Priza7, OUTPUT);
 //   pinMode(Priza6, OUTPUT);
 //   pinMode(Priza5, OUTPUT);
+//     pinMode(Priza4, OUTPUT);
+//     pinMode(Priza3, OUTPUT);
+
 
 //   pinMode(TapProbeSender, OUTPUT);
 //   pinMode(TapProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
@@ -40,6 +47,8 @@
 //   digitalWrite(Priza7, HIGH); 
 //   digitalWrite(Priza6, HIGH); 
 //   digitalWrite(Priza5, HIGH); 
+//   digitalWrite(Priza3, HIGH); // decuplat
+//   digitalWrite(Priza4, HIGH); 
 
 //   digitalWrite(TapProbeSender, HIGH); // This will be our ground when probing, until then let it HIGH
 // }

@@ -18,7 +18,7 @@
 #include "DHT.h"
 
 #define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
-DHT dht(8, DHTTYPE);
+DHT dht(0, DHTTYPE);
 
 volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
 
@@ -65,7 +65,13 @@ float f1()
 }
 float f2()
 {
+  Serial.end();
+  delay(100);
+
+  // To ensure temp can be read using pins 0 and 1
   float t = dht.readTemperature();
+  Serial.begin(9600);
+
   // Check if any reads failed and exit early (to try again).
   if (isnan(t)) {
     return -100;
@@ -369,17 +375,16 @@ void setupThread()
 }
 void setup() {
   // put your setup code here, to run once:
+  calibrateCurrentSensor();
+  dht.begin();
 
+  delay(1000);
   
   Serial.begin(9600);
   Logger::logln("Entering Setup");
 
   Configuration::setupPins();
   Configuration::initializePins();
-
-  delay(1000);
-  calibrateCurrentSensor();
-  dht.begin();
 
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip, dns, gateway, subnet);
@@ -401,19 +406,17 @@ void loop() {
   digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
   delay(500);
 
+  Serial.println(f2());
 
-  digitalWrite(8,1);
   // // Reading temperature or humidity takes about 250 milliseconds!
+  // // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  // float h = dht.readHumidity();
+  // // Read temperature as Celsius (the default)
+  // float t = dht.readTemperature();
+  // // Read temperature as Fahrenheit (isFahrenheit = true)
+  // float f = dht.readTemperature(true);
 
-  // Reading temperature or humidity takes about 250 milliseconds!
-  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-  float h = dht.readHumidity();
-  // Read temperature as Celsius (the default)
-  float t = dht.readTemperature();
-  // Read temperature as Fahrenheit (isFahrenheit = true)
-  float f = dht.readTemperature(true);
-
-  // // Check if any reads failed and exit early (to try again).
+  // // // Check if any reads failed and exit early (to try again).
   // if (isnan(h) || isnan(t) || isnan(f)) {
   //   Serial.println(F("Failed to read from DHT sensor!"));
   //   return;

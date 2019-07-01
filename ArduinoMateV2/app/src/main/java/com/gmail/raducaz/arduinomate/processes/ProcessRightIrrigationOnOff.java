@@ -6,13 +6,13 @@ import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 import java.util.concurrent.TimeUnit;
 
-public class ProcessRigthIrrigationOnOff extends Process {
+public class ProcessRightIrrigationOnOff extends Process {
 
-    public ProcessRigthIrrigationOnOff(DataRepository dataRepository, String deviceName)
+    public ProcessRightIrrigationOnOff(DataRepository dataRepository, String deviceName)
     {
         super(dataRepository, deviceName, "RightIrrigationOnOff");
     }
-    public ProcessRigthIrrigationOnOff(DataRepository dataRepository, long deviceId)
+    public ProcessRightIrrigationOnOff(DataRepository dataRepository, long deviceId)
     {
         super(dataRepository, deviceId, "RightIrrigationOnOff");
     }
@@ -22,11 +22,9 @@ public class ProcessRigthIrrigationOnOff extends Process {
         DeviceTapFunctions tapFunctions = new DeviceTapFunctions(dataRepository, deviceEntity.getName());
 
         logInfo("Start OPEN right tap");
-        tapFunctions.tapIrrigationRightOPENStart();
+        tapFunctions.tapIrrigationRightOPEN();
         logInfo("Wait 45 sec");
         TimeUnit.SECONDS.sleep(45);
-        logInfo("Stop OPEN right tap");
-        tapFunctions.tapIrrigationRightOPENStop();
         logInfo("Right tap OPENED");
 
         return super.on(isOnDemand);
@@ -37,11 +35,9 @@ public class ProcessRigthIrrigationOnOff extends Process {
         DeviceTapFunctions tapFunctions = new DeviceTapFunctions(dataRepository, deviceEntity.getName());
 
         logInfo("Start CLOSE right tap");
-        tapFunctions.tapIrrigationRightCLOSEStart();
+        tapFunctions.tapIrrigationRightCLOSE();
         logInfo("Wait 45 sec");
         TimeUnit.SECONDS.sleep(45);
-        logInfo("Stop CLOSE right tap");
-        tapFunctions.tapIrrigationRightCLOSEStop();
         logInfo("Right tap CLOSED");
 
         return super.off(isOnDemand);

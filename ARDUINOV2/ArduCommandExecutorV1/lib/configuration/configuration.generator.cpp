@@ -35,11 +35,12 @@ void Configuration::setupPins()
   pinMode(ActuatorInversat, OUTPUT);
   pinMode(ContactRetea220V, OUTPUT);
   pinMode(ContactDemaror12V, OUTPUT);
-  pinMode(WatchDog, OUTPUT);
   pinMode(PresostatProbeSender, OUTPUT);
   pinMode(PresostatProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
   pinMode(CurrentSensor, INPUT);
   pinMode(TemperatureSensor, INPUT);
+
+    pinMode(WatchDog, OUTPUT);
 }
 void Configuration::initializePins()
 { 
@@ -49,7 +50,7 @@ void Configuration::initializePins()
   digitalWrite(ActuatorInversat, HIGH); // Decuplat
   digitalWrite(ContactRetea220V, HIGH); // Decuplat
   digitalWrite(ContactDemaror12V, LOW); // Decuplat
-  digitalWrite(WatchDog, LOW); // Initial state
+  //digitalWrite(WatchDog, LOW); // Initial state
   digitalWrite(PresostatProbeSender, HIGH); // This will be our ground when probing, until then let it HIGH
 }
 

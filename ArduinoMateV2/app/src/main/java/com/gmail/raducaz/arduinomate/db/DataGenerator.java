@@ -23,6 +23,7 @@ public class DataGenerator {
         settings.setIsController(true);
         settings.setPermitRemoteControl(false);
         settings.setIsTestingMode(false);
+        settings.setAmqUri("amqp://lttjuzsi:pjSXi8zN4wT8Pljaq14lIEAVWpQddzxS@bulldog.rmq.cloudamqp.com/lttjuzsi");
 
         return settings;
     }
@@ -121,6 +122,22 @@ public class DataGenerator {
         function.setDeviceId(device.getId());
         function.setName("WaterSupplyTapOnOff");
         function.setDescription("WaterSupplyTapOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("RightIrrigationOnOff");
+        function.setDescription("RightIrrigationOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("LeftIrrigationOnOff");
+        function.setDescription("LeftIrrigationOnOff" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

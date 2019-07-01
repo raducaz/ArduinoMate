@@ -46,19 +46,22 @@ public class ArduinoMateApp extends Application {
         super.onCreate();
         mAppExecutors = new AppExecutors();
 
+        DataRepository repository = getRepository();
         try {
             ExecutorService executor = mAppExecutors.networkIO();
             Callable<SettingsEntity> callable = new Callable<SettingsEntity>() {
                 @Override
                 public SettingsEntity call() {
-                    SettingsEntity settings = getRepository().getSettingsSync();
+                    SettingsEntity settings = repository.getSettingsSync();
+                    while(settings==null)
+                        settings = repository.getSettingsSync();
                     return settings;
                 }
             };
             Future<SettingsEntity> future = executor.submit(callable);
 
             //TODO: Ensure this is completed synchronous before moving on
-            settings = future.get(5, TimeUnit.SECONDS);
+            settings = future.get();
 //            executor.shutdown();
 //            try {
 //                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {

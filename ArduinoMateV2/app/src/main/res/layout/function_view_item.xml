@@ -83,6 +83,23 @@
                         android:layout_height="wrap_content"
                         android:text="@{functionViewModel.functionExecution.resultStateText}"/>
                 </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/groupLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/groupResultState">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:text="Log:"
+                        />
+                    <TextView
+                        android:id="@+id/log"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{functionViewModel.function.log}"/>
+                </LinearLayout>
                 <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/auto_checkbox"

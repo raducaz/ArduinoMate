@@ -119,7 +119,8 @@ public class TimerService implements Runnable {
                                 Log.e(TAG, exc.getMessage());
                             }
                         }
-                        dataRepository.insertExecutionLogOnLastFunctionExecution(generatorOnOff.getId(), "Temperature is " + temperature);
+                        generatorOnOff.setLog("Temperature is " + temperature);
+                        dataRepository.updateFunction(generatorOnOff);
 
 
                         //TODO: Check Level of water in garden tanks: if is maximum then Close Main Tap => close pump and generator automatically

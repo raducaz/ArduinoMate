@@ -70,13 +70,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:layout_below="@+id/testing_checkbox"
-                android:text="Testing mode:"
+                android:text="Amq Uri:"
                 />
             <EditText
                 android:id="@+id/uri_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/cd_device_name"
+                android:layout_below="@+id/uri_label"
                 android:text="@={settingsViewModel.settings.amqUri}"/>
 
             <Button

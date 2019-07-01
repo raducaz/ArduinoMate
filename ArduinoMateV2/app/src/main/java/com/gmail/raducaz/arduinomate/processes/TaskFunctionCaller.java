@@ -116,6 +116,12 @@ public class TaskFunctionCaller implements TaskInterface {
                     case "WaterSupplyTapOnOff":
                         new ProcessWaterSupplyTapOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                         break;
+                    case "LeftIrrigationOnOff":
+                        new ProcessLeftIrrigationOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                        break;
+                    case "RightIrrigationOnOff":
+                        new ProcessRightIrrigationOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                        break;
                     case "BoilerOnOff":
                         new ProcessBoilerOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                         break;

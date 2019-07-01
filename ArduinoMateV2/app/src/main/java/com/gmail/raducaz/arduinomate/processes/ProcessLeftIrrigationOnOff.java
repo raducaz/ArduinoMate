@@ -21,11 +21,9 @@ public class ProcessLeftIrrigationOnOff extends Process {
         DeviceTapFunctions tapFunctions = new DeviceTapFunctions(dataRepository, deviceEntity.getName());
 
         logInfo("Start OPEN left tap");
-        tapFunctions.tapIrrigationLeftOPENStart();
+        tapFunctions.tapIrrigationLeftOPEN();
         logInfo("Wait 45 sec");
         TimeUnit.SECONDS.sleep(45);
-        logInfo("Stop OPEN left tap");
-        tapFunctions.tapIrrigationLeftOPENStop();
         logInfo("Left tap OPENED");
 
         return super.on(isOnDemand);
@@ -36,11 +34,9 @@ public class ProcessLeftIrrigationOnOff extends Process {
         DeviceTapFunctions tapFunctions = new DeviceTapFunctions(dataRepository, deviceEntity.getName());
 
         logInfo("Start CLOSE left tap");
-        tapFunctions.tapIrrigationLeftCLOSEStart();
+        tapFunctions.tapIrrigationLeftCLOSE();
         logInfo("Wait 45 sec");
         TimeUnit.SECONDS.sleep(45);
-        logInfo("Stop CLOSE left tap");
-        tapFunctions.tapIrrigationLeftCLOSEStop();
         logInfo("Left tap CLOSED");
 
         return super.off(isOnDemand);

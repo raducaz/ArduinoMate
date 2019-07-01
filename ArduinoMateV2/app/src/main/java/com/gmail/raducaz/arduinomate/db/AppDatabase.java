@@ -94,7 +94,7 @@ public abstract class AppDatabase extends RoomDatabase {
                         super.onCreate(db);
                         executors.diskIO().execute(() -> {
                             // Add a delay to simulate a long-running operation
-                            addDelay();
+                            //addDelay();
                             // Generate the data for pre-population
                             AppDatabase database = AppDatabase.getInstance(appContext, executors);
                             SettingsEntity settingsEntity = DataGenerator.generateSettings();

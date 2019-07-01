@@ -113,5 +113,38 @@ public class DeviceTapFunctions {
 
     }
 
+    public boolean tapIrrigationLeftCLOSE() {
+        String TAG = "tapIrrigationLeftCLOSE";
+
+        String command = "[{\"=3\":1}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
+    public boolean tapIrrigationLeftOPEN() {
+        String TAG = "tapIrrigationLeftOPEN";
+
+        String command = "[{\"=3\":0}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
+
+    public boolean tapIrrigationRightCLOSE() {
+        String TAG = "tapIrrigationLeftCLOSE";
+
+        String command = "[{\"=2\":1}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
+    public boolean tapIrrigationRightOPEN() {
+        String TAG = "tapIrrigationLeftOPEN";
+
+        String command = "[{\"=2\":0}]";
+        String result = arduinoCommander.SendCommand(command);
+
+        return true;
+    }
 
 }

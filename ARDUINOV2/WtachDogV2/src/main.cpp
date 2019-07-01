@@ -6,8 +6,8 @@
 unsigned long clients[6][2];
 
 void setup() {
-  // Serial.begin(9600);
-  // Serial.println("Entering Setup");
+  Serial.begin(9600);
+  Serial.println("Entering Setup");
   for(byte b=0;b<6;b++)
   {
     pinMode(2*(b+1), INPUT_PULLUP);
@@ -16,7 +16,7 @@ void setup() {
   }
 }
 
-void(* resetFunc) (void) = 0;
+ void(* resetFunc) (void) = 0;
 
 void loop() {
   delay(1000);
@@ -27,10 +27,10 @@ void loop() {
 
     byte clientIN = 2*(b+1);
     byte clientOUT = clientIN+1;
-    int currentState = digitalRead(clientIN);
+    unsigned long currentState = (unsigned long) digitalRead(clientIN);
     if(currentState==clients[b][0])
     {
-      if(millis() - clients[b][1] > 60*pow(10, 3))
+      if(millis() - clients[b][1] > 10*pow(10, 3))
       {
         Serial.println("reset");
         // reset client
@@ -40,7 +40,10 @@ void loop() {
         clients[b][1] = millis();
       }
 
-      Serial.print("same");Serial.print(currentState);Serial.println(clients[b][0]);
+      Serial.print("same");Serial.print(currentState);Serial.print(clients[b][0]);Serial.print("-");
+      Serial.println((millis() - clients[b][1])/1000);
+    
+      
 
     } 
     if(currentState!=clients[b][0])
@@ -55,6 +58,8 @@ void loop() {
   // Reset self if millis > 1 day - is not working this way
   if(millis() > (unsigned long)24*3600*pow(10, 3))
   {
-    resetFunc();
+    Serial.println("Reset self");
+    delay(100);
+   resetFunc();
   }
 }

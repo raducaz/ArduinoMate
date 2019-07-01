@@ -39,6 +39,7 @@
 //   pinMode(TapProbeSender, OUTPUT);
 //   pinMode(TapProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
 
+// pinMode(Configuration::WatchDog, OUTPUT);
 // }
 // void Configuration::initializePins()
 // {  

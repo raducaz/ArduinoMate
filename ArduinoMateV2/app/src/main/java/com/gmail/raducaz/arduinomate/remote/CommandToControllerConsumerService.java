@@ -118,7 +118,7 @@ public class CommandToControllerConsumerService implements Runnable {
                                         RemoteResetCommand command = (RemoteResetCommand)bodyObject;
                                         TaskFunctionReset functionReset = new TaskFunctionReset(
                                                 mRepository,
-                                                command.function);
+                                                command.function, command.alsoRestart);
 
                                         new TaskExecutor().execute(functionReset);
                                     }

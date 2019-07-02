@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
+import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
+import com.gmail.raducaz.arduinomate.commands.DeviceGenericFunctions;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.remote.CommandToControllerPublisher;
 import com.gmail.raducaz.arduinomate.remote.RemoteResetCommand;
@@ -18,8 +20,11 @@ public class TaskFunctionReset implements TaskInterface {
 
     private final FunctionEntity function;
     private final DataRepository mRepository;
-    public TaskFunctionReset(final DataRepository repository, FunctionEntity function) {
+    private boolean alsoRestart = false;
+
+    public TaskFunctionReset(final DataRepository repository, FunctionEntity function, boolean alsoRestart) {
         this.function = function;
+        this.alsoRestart = alsoRestart;
 
         mRepository = repository;
     }
@@ -39,7 +44,7 @@ public class TaskFunctionReset implements TaskInterface {
                 CommandToControllerPublisher sender = new CommandToControllerPublisher(ArduinoMateApp.AmqConnection,
                         ArduinoMateApp.COMMAND_QUEUE);
 
-                RemoteResetCommand cmd = new RemoteResetCommand(function);
+                RemoteResetCommand cmd = new RemoteResetCommand(function, alsoRestart);
                 sender.SendCommand(cmd, 5);
             } else {
                 if (function != null) {
@@ -51,6 +56,13 @@ public class TaskFunctionReset implements TaskInterface {
                     function.setCallState(FunctionCallStateEnum.READY.getId());
                     function.setResultState(FunctionResultStateEnum.NA.getId());
                     mRepository.updateFunction(function);
+
+                    // Restart device if alsoRestart
+                    if(alsoRestart)
+                    {
+                        DeviceGenericFunctions deviceGenericFunctions = new DeviceGenericFunctions(mRepository, function.getDeviceId());
+                        mRepository.insertExecutionLogOnLastFunctionExecution(function.getId(), "Device RESTARTED");
+                    }
                 } else {
                     //Reset all !!
                     mRepository.deleteAllPinStates();

@@ -22,6 +22,7 @@ import com.gmail.raducaz.arduinomate.model.RemoteQueue;
 import com.gmail.raducaz.arduinomate.remote.RemoteStateUpdate;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.gmail.raducaz.arduinomate.ArduinoMateApp.AmqConnection;
@@ -288,6 +289,13 @@ public class DataRepository {
 
         SendStateToRemoteClients(new RemoteStateUpdate(null, "deleteAllExecutionLogs"));
     }
+    public void deleteExecutionLogsToDate(Date toDate) {
+        mDatabase.executionLogDao().deleteFunctionExecutionLogsToDate(toDate);
+
+        ExecutionLogEntity executionLogEntity = new ExecutionLogEntity();
+        executionLogEntity.setDate(toDate);
+        SendStateToRemoteClients(new RemoteStateUpdate(executionLogEntity, "deleteExecutionLogsToDate"));
+    }
     //endregion ExecutionLog
 
     //region PinState
@@ -348,6 +356,14 @@ public class DataRepository {
         mDatabase.pinStateDao().deleteAllPinStates();
 
         SendStateToRemoteClients(new RemoteStateUpdate(null, "deleteAllPinStates"));
+    }
+
+    public void deletePinStatesToDate(Date toDate) {
+        mDatabase.pinStateDao().deletePinStatesToDate(toDate);
+
+        PinStateEntity e = new PinStateEntity();
+        e.setToDate(toDate);
+        SendStateToRemoteClients(new RemoteStateUpdate(e, "deletePinStatesToDate"));
     }
     //endregion PinState
 

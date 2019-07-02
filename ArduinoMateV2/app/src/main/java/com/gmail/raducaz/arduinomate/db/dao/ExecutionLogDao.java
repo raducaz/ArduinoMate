@@ -14,6 +14,7 @@ import android.arch.persistence.room.Update;
 
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
@@ -42,6 +43,10 @@ public interface ExecutionLogDao {
             "WHERE functionId = :functionId" +
             ")")
     void deleteFunctionExecutionLogs(long functionId);
+
+    @Query("DELETE FROM executionLog " +
+            "WHERE date < :toDate")
+    void deleteFunctionExecutionLogsToDate(Date toDate);
 
     @Query("DELETE FROM executionLog ")
     void deleteAllFunctionExecutionLogs();

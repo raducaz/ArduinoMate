@@ -94,17 +94,8 @@ public abstract class AppDatabase extends RoomDatabase {
                         super.onCreate(db);
                         executors.diskIO().execute(() -> {
                             // Add a delay to simulate a long-running operation
-                            //addDelay();
-                            // Generate the data for pre-population
-                            AppDatabase database = AppDatabase.getInstance(appContext, executors);
-                            SettingsEntity settingsEntity = DataGenerator.generateSettings();
-                            List<DeviceEntity> devices = DataGenerator.generateDevices();
-                            List<FunctionEntity> functions =
-                                    DataGenerator.generateFunctionsForDevices(devices);
-
-                            insertData(database, devices, functions, settingsEntity);
-                            // notify that the database was created and it's ready to be used
-                            database.setDatabaseCreated();
+//                            addDelay();
+                            BuildDatabase(appContext, executors);
                         });
                     }
                 }).build();
@@ -112,6 +103,22 @@ public abstract class AppDatabase extends RoomDatabase {
     /**
      * Check whether the database already exists and expose it via {@link #getDatabaseCreated()}
      */
+
+    public static void BuildDatabase(final Context appContext,
+                                     final AppExecutors executors)
+    {
+        // Generate the data for pre-population
+        AppDatabase database = AppDatabase.getInstance(appContext, executors);
+        SettingsEntity settingsEntity = DataGenerator.generateSettings();
+        List<DeviceEntity> devices = DataGenerator.generateDevices();
+        List<FunctionEntity> functions =
+                DataGenerator.generateFunctionsForDevices(devices);
+
+        insertData(database, devices, functions, settingsEntity);
+        // notify that the database was created and it's ready to be used
+        database.setDatabaseCreated();
+    }
+
     private void updateDatabaseCreated(final Context context) {
         if (context.getDatabasePath(DATABASE_NAME).exists()) {
             setDatabaseCreated();

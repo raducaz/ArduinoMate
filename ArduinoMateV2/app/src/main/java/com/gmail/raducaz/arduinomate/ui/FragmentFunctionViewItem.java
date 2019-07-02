@@ -66,12 +66,22 @@ public class FragmentFunctionViewItem extends Fragment {
             }
         });
 
+        Button buttonRestart = mBinding.getRoot().findViewById(R.id.restart_button);
+        buttonRestart.setOnClickListener(new OnClickListener() {
+            public void onClick(View b) {
+
+                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+                TaskFunctionReset execution = new TaskFunctionReset(application.getRepository(), model.function.get(), true);
+                new TaskExecutor().execute(execution);
+            }
+        });
+
         Button buttonReset = mBinding.getRoot().findViewById(R.id.reset_button);
         buttonReset.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 
                 ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), model.function.get());
+                TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), model.function.get(), false);
                 new TaskExecutor().execute(functionReset);
             }
         });

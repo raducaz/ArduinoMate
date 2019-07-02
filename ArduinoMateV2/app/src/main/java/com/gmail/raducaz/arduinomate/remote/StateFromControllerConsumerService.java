@@ -192,6 +192,11 @@ public class StateFromControllerConsumerService implements Runnable {
                 if (stateUpdate.methodName.equals("deleteAllExecutionLogs")) {
                     mRepository.deleteAllExecutionLogs();
                 }
+                if(stateUpdate.methodName.equals("deleteExecutionLogsToDate"))
+                {
+                    ExecutionLog entity = (ExecutionLog) stateUpdate.entity;
+                    mRepository.deleteExecutionLogsToDate(entity.getDate());
+                }
                 if (stateUpdate.methodName.equals("insertPinState")) {
                     PinStateEntity pinState = (PinStateEntity) stateUpdate.entity;
                     mRepository.insertPinState(pinState);
@@ -210,6 +215,11 @@ public class StateFromControllerConsumerService implements Runnable {
                 }
                 if (stateUpdate.methodName.equals("deleteAllPinStates")) {
                     mRepository.deleteAllPinStates();
+                }
+                if(stateUpdate.methodName.equals("deletePinStatesToDate"))
+                {
+                    PinStateEntity pinState = (PinStateEntity) stateUpdate.entity;
+                    mRepository.deletePinStatesToDate(pinState.getToDate());
                 }
             }
             if (input instanceof RemotePinStateUpdate)

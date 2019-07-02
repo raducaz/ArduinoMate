@@ -8,8 +8,10 @@ import java.io.Serializable;
 
 public class RemoteResetCommand implements Serializable {
     FunctionEntity function;
+    boolean alsoRestart;
 
-    public RemoteResetCommand(FunctionEntity function){
+    public RemoteResetCommand(FunctionEntity function, boolean alsoRestart){
         this.function = function;
+        this.alsoRestart = alsoRestart;
     }
 }

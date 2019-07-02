@@ -63,7 +63,7 @@ public interface FunctionDao {
     @Query("select * from function where id = :functionId")
     FunctionEntity loadFunctionSync(long functionId);
 
-    @Query("select * from function " +
+    @Query("select function.* from function " +
             "inner join device on function.deviceId = deviceId " +
             "where device.name = :deviceName and function.name = :functionName")
     FunctionEntity loadDeviceFunctionSync(String deviceName, String functionName);

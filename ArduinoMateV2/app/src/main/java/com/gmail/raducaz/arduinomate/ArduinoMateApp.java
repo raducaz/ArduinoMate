@@ -36,7 +36,12 @@ public class ArduinoMateApp extends Application {
     public static final String STATES_EXCHANGE = "states";
     public static final String COMMAND_QUEUE = "commands";
     public static Connection AmqConnection;
-    String uri = "amqp://lttjuzsi:pjSXi8zN4wT8Pljaq14lIEAVWpQddzxS@bulldog.rmq.cloudamqp.com/lttjuzsi";
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    String uri = "";
 
     private AppExecutors mAppExecutors;
     private TimerService timerService;
@@ -47,14 +52,17 @@ public class ArduinoMateApp extends Application {
         mAppExecutors = new AppExecutors();
 
         DataRepository repository = getRepository();
+
         try {
             ExecutorService executor = mAppExecutors.networkIO();
             Callable<SettingsEntity> callable = new Callable<SettingsEntity>() {
                 @Override
                 public SettingsEntity call() {
                     SettingsEntity settings = repository.getSettingsSync();
-                    while(settings==null)
+                    while(settings == null)
+                    {
                         settings = repository.getSettingsSync();
+                    }
                     return settings;
                 }
             };
@@ -75,6 +83,8 @@ public class ArduinoMateApp extends Application {
         catch (Exception exc) {
             Log.e(TAG, exc.getMessage());
         }
+
+        uri = settings.getAmqUri();
 
         try {
 

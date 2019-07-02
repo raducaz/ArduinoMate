@@ -158,6 +158,22 @@ public class DataGenerator {
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("RightIrrigationOnOff");
+        function.setDescription("RightIrrigationOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("LeftIrrigationOnOff");
+        function.setDescription("LeftIrrigationOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
         device = devices.get(2);
         function = new FunctionEntity();
         function.setDeviceId(device.getId());

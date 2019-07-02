@@ -33,6 +33,15 @@
                     android:textColor="?attr/colorPrimary"
                     android:text="EXECUTE" />
                 <Button
+                    android:id="@+id/restart_button"
+                    android:tag="RESET"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:textColor="?attr/colorPrimary"
+                    android:layout_toRightOf="@id/execute_button"
+                    android:text="RESTART" />
+                <Button
                     android:id="@+id/reset_button"
                     android:tag="RESET"
                     android:layout_width="wrap_content"
@@ -84,7 +93,7 @@
                         android:text="@{functionViewModel.functionExecution.resultStateText}"/>
                 </LinearLayout>
                 <LinearLayout
-                    android:id="@+id/groupLog"
+                    android:id="@+id/groupDetails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -92,10 +101,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="24dp"
-                        android:text="Log:"
+                        android:text="Details:"
                         />
                     <TextView
-                        android:id="@+id/log"
+                        android:id="@+id/details"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@{functionViewModel.function.log}"/>
@@ -105,7 +114,7 @@
                     android:id="@+id/auto_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/groupResultState"
+                    android:layout_below="@id/groupDetails"
                     android:checked="@{functionViewModel.function.isAutoEnabled}"/>
 
     </RelativeLayout>

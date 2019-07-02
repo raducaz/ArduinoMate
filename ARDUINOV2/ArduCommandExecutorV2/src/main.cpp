@@ -8,7 +8,8 @@
 #include <ACS712.h>
 #include <configuration.h>
 #include "logger.h"
-#include <jsonhelper.cpp>
+// #include <jsonhelper.cpp>
+#include <ArduinoJson.h>
 #include <executor.h>
 
 #include "Adafruit_Sensor.h"
@@ -17,8 +18,17 @@
 #define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
 DHT dht(0, DHTTYPE);
 
-volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
 byte noLoopRuns = 0;
+bool isRestarted = true;
+const char PIN[4] = "pin";
+const char NAME[5] = "name";
+const char DEVICESTATE[6] = "state";
+const char VALUE[6] =     "value";
+const char FCTNAME[8] =   "fctName";
+const char FCTSTATE[9] =  "fctState";
+const char MSG[4] = "msg";
+const char DIGITAL[12] = "digitalPins";
+const char ANALOG[11] = "analogPins";
 
 // We have 30 amps version sensor connected to A5 pin of arduino
 ACS712 sensor(ACS712_30A, A1);
@@ -77,6 +87,48 @@ float f2()
 // void timerCallback(){
 // 	threadsController.run();
 // }
+
+JsonObject& constructPinStatesJSON(const char* deviceName,
+    const byte deviceState,
+    byte pinType, 
+    const int* pinStates, byte size, 
+    const char* msg)
+  {
+      StaticJsonBuffer<400> _buffer;
+      JsonObject& _root = _buffer.createObject();
+      if(strcmp(msg,"") != 0)
+          _root[MSG] = msg;
+      _root[NAME] = deviceName;
+      _root[DEVICESTATE] = deviceState;
+
+      JsonArray& psArr = _root.createNestedArray(pinType==0?DIGITAL:ANALOG);
+      for(byte i=0;i<size;i++)
+      {
+          psArr.add(pinStates[i]);
+      }
+
+      return _root;
+  }
+JsonObject& constructPinStatesJSON(const char* deviceName,
+    const byte deviceState,
+    byte pinType, 
+    int* pinStates, byte size)
+  {
+      return constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
+  }
+
+
+  // JsonObject& constructDeviceJSON(const char* deviceName,
+  //   const byte deviceState)
+  // {
+  //     StaticJsonBuffer<400> _buffer;
+  //     JsonObject& _root = _buffer.createObject();
+      
+  //     _root[NAME] = deviceName;
+  //     _root[DEVICESTATE] = deviceState;
+
+  //     return _root;
+  // }
 
 int getPin(const byte startIndex, const char* key)
 {
@@ -243,13 +295,13 @@ void listenEthernet()
   
   if (client) 
   {
+    Logger::debugln("Client connected");
     while (client.connected()) 
     {
-      Logger::debugln("Client connected");
       if (client.available()) 
       {
         char receivedChar = client.read();
-        Logger::debugln(receivedChar);
+        //Logger::debugln(receivedChar);
 
         if (receivedChar==endChar)
         {
@@ -327,7 +379,7 @@ bool ConnectToServer(const byte* ip, const int port)
 }
 void clientThreadCallback()
 {
-  int i = 0;
+  byte i = 0;
   while(!(arduinoClient.connected()) && (i < 2))
   {
     ConnectToServer(serverIp, serverPort);
@@ -345,13 +397,19 @@ void clientThreadCallback()
   {
     // Send status all the time
     Logger::debug("MON: Sending status from ...");Logger::debugln(Ethernet.localIP());
+    byte state = 0;
+    if(isRestarted)
+    { 
+      state = 3;
+    }
     // Send the state of the pins
     int digitalPinStates[14];
     for(byte i=0;i<14;i++)
     {
         digitalPinStates[i] = digitalRead(i);
     }
-    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(arduinoName, 0, 0, digitalPinStates, 14),arduinoClient);
+    //MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(arduinoName, 0, 0, digitalPinStates, 14),arduinoClient);
+    MyExecutor::sendToServer(constructPinStatesJSON(arduinoName, state, 0, digitalPinStates, 14),arduinoClient);
 
     int analogPinStates[6];
     for(byte i=0;i<=5;i++)
@@ -363,13 +421,9 @@ void clientThreadCallback()
     analogPinStates[1] = f1();
     //--------DEVICE SPECIFIC---------------------------
 
-    MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(arduinoName, 0, 1, analogPinStates, 6),arduinoClient);
- 
-    if(noLoopRuns==0)
-    {
-      // Send specific message that device has restarted
-      MyExecutor::sendToServer("RESTART",arduinoClient);
-    }
+    MyExecutor::sendToServer(constructPinStatesJSON(arduinoName, state, 1, analogPinStates, 6),arduinoClient);
+  
+    isRestarted=false;
     
     MyExecutor::sendToServer("END",arduinoClient);
   }
@@ -427,7 +481,7 @@ void loop() {
   {
     // send pin status
     clientThreadCallback();
-    noLoopRuns = 1;
+    noLoopRuns = 0;
   }
 
 

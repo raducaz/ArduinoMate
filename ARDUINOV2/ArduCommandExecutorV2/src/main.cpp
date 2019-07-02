@@ -368,7 +368,7 @@ void clientThreadCallback()
     if(noLoopRuns==0)
     {
       // Send specific message that device has restarted
-      MyExecutor::sendToServer("RESTARTED",arduinoClient);
+      MyExecutor::sendToServer("RESTART",arduinoClient);
     }
     
     MyExecutor::sendToServer("END",arduinoClient);

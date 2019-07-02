@@ -61,6 +61,7 @@ public class TaskFunctionReset implements TaskInterface {
                     if(alsoRestart)
                     {
                         DeviceGenericFunctions deviceGenericFunctions = new DeviceGenericFunctions(mRepository, function.getDeviceId());
+                        deviceGenericFunctions.restartDevice();
                         mRepository.insertExecutionLogOnLastFunctionExecution(function.getId(), "Device RESTARTED");
                     }
                 } else {

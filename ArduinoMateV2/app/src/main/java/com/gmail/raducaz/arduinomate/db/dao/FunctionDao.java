@@ -32,6 +32,14 @@ public interface FunctionDao {
     @Query(
             "UPDATE function SET " +
                     "callState = :callState," +
+                    "resultState = :resultState " +
+                    "WHERE deviceId = :deviceId"
+    )
+    void updateDeviceFunctionsStates(long deviceId, int callState, int resultState);
+
+    @Query(
+            "UPDATE function SET " +
+                    "callState = :callState," +
                     "resultState = :resultState ")
     void updateAllFunctionStates(int callState, int resultState);
 

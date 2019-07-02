@@ -173,6 +173,17 @@ public class DataRepository {
 
         SendStateToRemoteClients(new RemoteStateUpdate(function, "updateFunction"));
     }
+    public void updateDeviceFunctionsStates(long deviceId, int callState, int resultState) {
+
+        FunctionEntity functionEntity = new FunctionEntity();
+        functionEntity.setDeviceId(deviceId);
+        functionEntity.setResultState(resultState);
+        functionEntity.setCallState(callState);
+        mDatabase.functionDao().updateDeviceFunctionsStates(deviceId,callState,resultState);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(functionEntity, "updateDeviceFunctionsStates"));
+    }
+
     public void updateAllFunctionStates(int callState, int resultState)
     {
         mDatabase.functionDao().updateAllFunctionStates(callState, resultState);

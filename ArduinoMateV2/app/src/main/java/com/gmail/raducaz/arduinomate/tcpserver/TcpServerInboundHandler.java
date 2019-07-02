@@ -3,6 +3,7 @@ package com.gmail.raducaz.arduinomate.tcpserver;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionStopper;
 import com.gmail.raducaz.arduinomate.service.DeviceStateUpdater;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionStateUpdater;
@@ -107,6 +108,11 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
             // We do not need to write a ChannelBuffer here.
             // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
             ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" + msg);
+
+            if (msg.endsWith("RESTART") || msg.endsWith("RESTART\r\n")) {
+                TaskFunctionStopper taskFunctionStopper = new TaskFunctionStopper(dataRepository, deviceStateUpdater.getDeviceEntity());
+                taskFunctionStopper.execute();
+            }
 
             if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
                 Log.d(TAG, "ChannelRead0-END " + incoming.remoteAddress());

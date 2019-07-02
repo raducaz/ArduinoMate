@@ -162,6 +162,10 @@ public class StateFromControllerConsumerService implements Runnable {
                     FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
                     mRepository.updateFunction(entity);
                 }
+                if (stateUpdate.methodName.equals("updateDeviceFunctionsStates")) {
+                    FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
+                    mRepository.updateDeviceFunctionsStates(entity.getDeviceId(), entity.getCallState(), entity.getResultState());
+                }
                 if (stateUpdate.methodName.equals("updateAllFunctionStates")) {
                     FunctionEntity entity = (FunctionEntity) stateUpdate.entity;
                     mRepository.updateAllFunctionStates(entity.getCallState(), entity.getResultState());

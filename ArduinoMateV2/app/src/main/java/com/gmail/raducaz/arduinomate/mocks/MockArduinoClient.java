@@ -40,12 +40,23 @@ public class MockArduinoClient {
     public void SendMockPinStates(String deviceName)
     {
         SendCommand(ConstructDigitalPinStates(deviceName));
-        SendCommand("END");
+        //SendCommand("END");
 
         SendCommand(ConstructAnalogPinStates(deviceName));
         SendCommand("END");
     }
-
+    private double getPinState(String deviceName, int pinNo)
+    {
+        MockPinStateEntity pin = dataRepository.loadMockDevicePinStateSync(deviceName, pinNo);
+        double state = pin.getState();
+        return state;
+    }
+    private void setPinState(String deviceName, int pinNo, double state)
+    {
+        MockPinStateEntity pin = dataRepository.loadMockDevicePinStateSync(deviceName, pinNo);
+        pin.setState(state);
+        dataRepository.updateMockPinState(pin);
+    }
     private String ConstructDigitalPinStates(String deviceName)
     {
         //return "{\"name\":\""+deviceName+"\",\"state\":0,\"digitalPins\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0]}";
@@ -53,7 +64,11 @@ public class MockArduinoClient {
         try {
             JSONObject root = new JSONObject();
             root.put("name", deviceName);
-            root.put("state", 0);
+            double state = getPinState(deviceName, 20);
+            root.put("state", state);
+
+            if(state==3)
+                setPinState(deviceName, 20, 0);
 
             JSONArray jsonArray = new JSONArray();
             List<MockPinStateEntity> pins = dataRepository.loadMockDevicePinsStateSync(deviceName);

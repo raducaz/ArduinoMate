@@ -102,7 +102,8 @@ public class MockArduinoServerService implements Runnable {
         // Clear all the mock pins
         dataRepository.deleteMockPinStatesByDevice(getName());
 
-        for (int i=0;i<=19;i++)
+        // pin 20 is for device state
+        for (int i=0;i<=20;i++)
         {
             MockPinStateEntity pinState = new MockPinStateEntity();
             pinState.setDeviceName(getName());

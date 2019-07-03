@@ -12,6 +12,8 @@ import com.gmail.raducaz.arduinomate.remote.RemoteResetCommand;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
+import java.util.List;
+
 public class TaskFunctionStopper implements TaskInterface {
 
     private String TAG = "TaskFunctionStopper";
@@ -31,7 +33,17 @@ public class TaskFunctionStopper implements TaskInterface {
         try {
 
             if (deviceEntity != null) {
-                mRepository.updateDeviceFunctionsStates(deviceEntity.getId(), FunctionCallStateEnum.READY.getId(), FunctionResultStateEnum.OFF.getId());
+                List<FunctionEntity> deviceFunctions = mRepository.loadFunctionsSync(deviceEntity.getId());
+                for (FunctionEntity f : deviceFunctions)
+                {
+                    TaskFunctionCaller caller = new TaskFunctionCaller(mRepository, deviceEntity.getName(),
+                            f.getName(), FunctionResultStateEnum.OFF, "Device restarted");
+                    caller.setAutoExecution(false);
+                    caller.setOnDemand(true);
+                    caller.execute();
+                }
+
+                //mRepository.updateDeviceFunctionsStates(deviceEntity.getId(), FunctionCallStateEnum.READY.getId(), FunctionResultStateEnum.OFF.getId());
             }
 
 

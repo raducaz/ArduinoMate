@@ -188,6 +188,10 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
                     {
                         obj.put(key,getAnalogPinState(15));
                     }
+                    if (key.equals("F0")) // Cmd function restart
+                    {
+                        setAnalogPinState(20, 3);
+                    }
 
                 }
 

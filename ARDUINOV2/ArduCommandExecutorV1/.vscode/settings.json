@@ -4,5 +4,9 @@
         "PLATFORMIO_CALLER": "vscode"
     },
     "C_Cpp.errorSquiggles": "Disabled",
-    "C_Cpp.intelliSenseEngineFallback": "Disabled"
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "terminal.integrated.env.linux": {
+        "PATH": "/home/radu/.platformio/penv/bin:/home/radu/.platformio/penv:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games",
+        "PLATFORMIO_CALLER": "vscode"
+    }
 }

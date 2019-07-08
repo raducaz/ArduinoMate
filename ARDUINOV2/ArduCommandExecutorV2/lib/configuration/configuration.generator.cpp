@@ -16,7 +16,6 @@ const byte ContactDemaror12V = 8; // controleaza releul de 12V pentru contact de
 const byte PresostatProbeSender = A3;
 const byte PresostatProbeReceiver = A4;
 const byte CurrentSensor = A1; //A1 is used by SD card ca drop value some times
-const byte TemperatureSensor = 9; 
 
 bool Configuration::isDebug()
 {

@@ -16,7 +16,7 @@
 #include "DHT.h"
 
 #define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
-DHT dht(0, DHTTYPE);
+DHT dht(Configuration::TemperatureSensor, DHTTYPE);
 
 byte noLoopRuns = 0;
 bool isRestarted = true;
@@ -39,6 +39,7 @@ char buffer[MAXBUFFERSIZE] = "";
 unsigned int bufferSize = 0;
 
 EthernetClient arduinoClient;
+EthernetServer server = EthernetServer(arduinoPort);
 
 // Reset function
 void(* resetFunc) (void) = 0;
@@ -281,13 +282,8 @@ void listenSerial()
 }
 void listenEthernet()
 {
-  EthernetServer server = EthernetServer(arduinoPort);
-  server.begin();
-
   EthernetClient client = server.available();
   client.setTimeout(10000);
-
-  Logger::debugln("Server started...listening...");
 
   char endChar = '\n';
   const byte SIZE = 250;
@@ -463,6 +459,9 @@ void setup() {
   Logger::log("My IP address: ");
   Logger::logln(Ethernet.localIP());
   
+  server.begin();
+  Logger::debugln("Server started...listening...");
+
   setupThread();
 }
 void loop() {
@@ -487,7 +486,7 @@ void loop() {
 
   // Send ImAlive to WatchDog
   Logger::logln("I'm alive !");
-  digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
+  //digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
   delay(500);
 
   // // Reading temperature or humidity takes about 250 milliseconds!

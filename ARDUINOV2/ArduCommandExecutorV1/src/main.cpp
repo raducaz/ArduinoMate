@@ -18,7 +18,7 @@
 #include "DHT.h"
 
 #define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
-DHT dht(0, DHTTYPE);
+DHT dht(TemperatureSensor, DHTTYPE);
 
 volatile byte DeviceState = 0; // 0=READY,1=BUSY,2=ERROR
 

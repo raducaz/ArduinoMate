@@ -16,11 +16,11 @@
 
 // Enter a MAC address and IP address for your controller below.
 /* TEST */
-byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x02 };
-IPAddress            ip(192,168,1,100); //<<< ENTER YOUR IP ADDRESS HERE!!!
-const char myIp[15]  = "192.168.1.100";
+byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x71 };
+IPAddress            ip(192,168,1,101); //<<< ENTER YOUR IP ADDRESS HERE!!!
+const char myIp[15]  = "192.168.1.101";
 /* TEST */
-int myPort = 8080;
+int myPort = 8081;
 
 /* PROD */
 //byte mac[] = { 0x00, 0xAA, 0xBB, 0xCC, 0xDA, 0x03 };
@@ -28,7 +28,7 @@ int myPort = 8080;
 //const char myIp[15]  = "192.168.1.200";
 /* PROD */
 
-byte serverIp[] = { 192, 168, 1, 168 };
+byte serverIp[] = { 192, 168, 1, 10 };
 int serverPort = 9090;
 byte gateway[] = { 192, 168, 1, 1 };
 byte subnet[] = { 255, 255, 255, 0 };

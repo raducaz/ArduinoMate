@@ -2,6 +2,7 @@ package com.gmail.raducaz.arduinomate.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
@@ -9,6 +10,7 @@ import com.gmail.raducaz.arduinomate.model.FunctionExecution;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "functionExecution",
@@ -19,7 +21,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "functionId")
         })
-public class FunctionExecutionEntity implements FunctionExecution {
+public class FunctionExecutionEntity implements FunctionExecution, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
@@ -97,6 +99,7 @@ public class FunctionExecutionEntity implements FunctionExecution {
     public FunctionExecutionEntity() {
     }
 
+    @Ignore
     public FunctionExecutionEntity(long id, long functionId, String name, int callState, int resultState, Date startDate, Date endDate) {
         this.id = id;
         this.functionId = functionId;
@@ -107,6 +110,7 @@ public class FunctionExecutionEntity implements FunctionExecution {
         this.endDate = endDate;
     }
 
+    @Ignore
     public FunctionExecutionEntity(FunctionExecution execution) {
         this.id = execution.getId();
         this.functionId = execution.getFunctionId();

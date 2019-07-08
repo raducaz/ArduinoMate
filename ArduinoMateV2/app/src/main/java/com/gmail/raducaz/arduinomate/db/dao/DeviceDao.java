@@ -21,7 +21,7 @@ public interface DeviceDao {
     void update(DeviceEntity device);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(DeviceEntity device);
+    long insert(DeviceEntity device);
 
     @Query("SELECT * FROM device")
     LiveData<List<DeviceEntity>> loadAllDevices();
@@ -40,4 +40,7 @@ public interface DeviceDao {
 
     @Query("select * from device where ip = :deviceIp")
     DeviceEntity loadDeviceSync(String deviceIp);
+
+    @Query("select * from device where name = :deviceName LIMIT 1")
+    DeviceEntity loadDeviceByNameSync(String deviceName);
 }

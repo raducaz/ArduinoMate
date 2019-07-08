@@ -37,11 +37,11 @@ public class ActivityConfigItem extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_config_item);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Set Collapsing Toolbar layout to the screen
         CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+                findViewById(R.id.collapsing_toolbar);
 
         deviceId = getIntent().getLongExtra(EXTRA_ID, 0);
         FragmentDeviceEditItem deviceFragment = FragmentDeviceEditItem.forDevice(deviceId);

@@ -4,12 +4,19 @@
 #include <Arduino.h>
 #include <Thread.h>
 #include <ArduinoJson.h>
+#include <ACS712.h>
 
 class JSONSerializer
 {
-    public: static JsonObject& constructPinStatesJSON();
-     static JsonObject& constructPinStatesJSON(const char* msg);
-     static JsonObject& constructPinStateJSON(byte pin, const char* msg);
-     static JsonObject& constructPinStateJSON(byte pin);
-     static JsonObject& constructFctStateJSON(byte state, const char* msg, const char* fct);
+    ACS712 sensor(ACS712_30A, A1);
+
+    public: static JsonObject& constructPinStatesJSON(const byte* deviceIp,
+                                    const byte deviceState,
+                                    byte pinType, 
+                                    float* pinStates, byte size);
+     static JsonObject& constructPinStatesJSON(const byte* deviceIp,
+                                    const byte deviceState,
+                                    byte pinType, 
+                                    const float* pinStates, byte size, 
+                                    const char* msg);
 };

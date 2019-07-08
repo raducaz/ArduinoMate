@@ -49,7 +49,7 @@ public class ActivityDetail extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         functionId = getIntent().getLongExtra(EXTRA_ID, 0);
@@ -64,15 +64,15 @@ public class ActivityDetail extends AppCompatActivity {
         this.setTitle(getIntent().getStringExtra(EXTRA_NAME));
 
         // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         // Set Tabs inside Toolbar
-        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         /* Add the other tabs needed except the first tab */
         tabs.addTab(tabs.newTab().setText("Executions"));
-        tabs.addTab(tabs.newTab().setText("Logs"));
+        tabs.addTab(tabs.newTab().setText("Pins"));
         tabs.addOnTabSelectedListener(onTabSelectedListener(viewPager));
 
 
@@ -93,6 +93,7 @@ public class ActivityDetail extends AppCompatActivity {
                     TextView tv = findViewById(R.id.header);
                     tv.setVisibility(View.VISIBLE);
                 } else if(BottomSheetBehavior.STATE_DRAGGING == newState){
+                    fab.show();
                     TextView tv = findViewById(R.id.header);
                     tv.setVisibility(View.GONE);
 
@@ -106,6 +107,14 @@ public class ActivityDetail extends AppCompatActivity {
                 fab.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
             }
         });
+
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        TextView tv = findViewById(R.id.header);
+        tv.setVisibility(View.GONE);
+
+        tabs.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.VISIBLE);
+        fab.hide();
     }
 
     // Add Fragments to Tabs
@@ -124,8 +133,8 @@ public class ActivityDetail extends AppCompatActivity {
 
         /* Use the root fragment so it can be reused for the other tabs in the TabLayout */
         RootFragment initialFragment = new RootFragment();
-        initialFragment.setReplacementFragment(new FragmentPinStateList());
-        adapter.addFragment(initialFragment, "Pins");
+        initialFragment.setReplacementFragment(new FragmentExecutionLogList());
+        adapter.addFragment(initialFragment, "Logs");
 
         viewPager.setAdapter(adapter);
 //        viewPager.setCurrentItem(0);
@@ -152,11 +161,11 @@ public class ActivityDetail extends AppCompatActivity {
                  * "root_fragment.xml" as the reference to replace fragment
                  */
                 if(tab.getPosition()==0)
-                    trans.replace(R.id.root_frame, new FragmentPinStateList());
+                    trans.replace(R.id.root_frame, new FragmentExecutionLogList());
                 if(tab.getPosition()==1)
                     trans.replace(R.id.root_frame, new FragmentFunctionExecutionList());
                 if(tab.getPosition()==2)
-                    trans.replace(R.id.root_frame, new FragmentExecutionLogList());
+                    trans.replace(R.id.root_frame, new FragmentPinStateList());
 
                 /*
                  * IMPORTANT: The following lines allow us to add the fragment

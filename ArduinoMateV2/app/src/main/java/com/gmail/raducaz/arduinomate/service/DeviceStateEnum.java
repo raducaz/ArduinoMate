@@ -4,7 +4,8 @@ public enum DeviceStateEnum {
     NA          (-1),  //calls constructor with value -1
     READY       (0),
     EXECUTING   (1),
-    ERROR       (2)
+    ERROR       (2),
+    RESTARTED   (3),
     ; // semicolon needed when fields / methods follow
 
     private final int id;

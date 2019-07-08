@@ -16,6 +16,7 @@
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/item_horizontal_margin"
         android:layout_marginEnd="@dimen/item_horizontal_margin"
+        android:backgroundTint="@{function.getStateColor}"
         app:cardUseCompatPadding="true">
 
         <RelativeLayout
@@ -25,36 +26,69 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/result_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/execute_button"
+                android:layout_marginTop="@dimen/tile_padding"
+                android:layout_marginBottom="@dimen/tile_padding"
+                android:text="@{function.resultStateText}"/>
+
+            <TextView
+                android:id="@+id/label_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/result_state"
+                android:layout_marginTop="@dimen/tile_padding"
+                android:layout_marginBottom="@dimen/tile_padding"
+                android:text=" / "/>
+
+            <TextView
+                android:id="@+id/call_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/label_state"
+                android:layout_marginTop="@dimen/tile_padding"
+                android:layout_marginBottom="@dimen/tile_padding"
+                android:text="@{function.callStateText}"/>
+
+            <!--<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"-->
+                <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+                <!--android:id="@+id/auto_checkbox"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/execute_button"-->
+                <!--android:enabled="false"-->
+                <!--android:checked="@{function.isAutoEnabled}"/>-->
+            <TextView
                 android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/result_state"
+                android:layout_marginTop="@dimen/tile_padding"
+                android:layout_marginLeft="@dimen/tile_padding"
+                android:layout_marginBottom="@dimen/tile_padding"
                 android:contentDescription="@string/cd_function_name"
                 android:text="@{function.name}"/>
 
-            <TextView
-                android:id="@+id/card_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/name"
-                android:text="@{function.description}"/>
+            <!--<TextView-->
+                <!--android:id="@+id/card_text"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/name"-->
+                <!--android:text="@{function.description}"/>-->
 
-            <TextView
-                android:id="@+id/result_state"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/card_text"
-                android:text="@{function.resultStateText}"/>
+
 
             <ImageButton
                 android:id="@+id/execute_button"
                 android:layout_width="@dimen/cards_button_width"
                 android:layout_height="@dimen/cards_button_height"
-                android:layout_marginRight="@dimen/md_keylines"
-                app:srcCompat="@drawable/ic_share"
-                android:layout_below="@+id/card_text"
-                android:layout_alignParentRight="true"
+                app:srcCompat="@drawable/ic_play"
                 style="?android:attr/borderlessButtonStyle"
                 android:tint="@color/button_grey" />
+            <!--android:layout_marginRight="@dimen/md_keylines"-->
+            <!--android:layout_alignParentRight="true"-->
 
         </RelativeLayout>
 

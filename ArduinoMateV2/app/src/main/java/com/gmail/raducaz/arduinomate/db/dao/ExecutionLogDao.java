@@ -14,22 +14,29 @@ import android.arch.persistence.room.Update;
 
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
 public interface ExecutionLogDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void update(ExecutionLogEntity function);
+    void update(ExecutionLogEntity executionLog);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insert(ExecutionLogEntity function);
+    long insert(ExecutionLogEntity executionLog);
 
     @Query("SELECT * FROM executionLog " +
-            "where executionId = :executionId")
+            "where executionId = :executionId " +
+            "ORDER BY Date DESC")
     LiveData<List<ExecutionLogEntity>> loadExecutionLogs(long executionId);
-
-    @Query("SELECT * FROM executionLog where executionId = :executionId")
+    @Query("SELECT * FROM executionLog " +
+            "where executionId = :executionId " +
+            "ORDER BY Date")
     List<ExecutionLogEntity> loadExecutionLogsSync(long executionId);
+
+    @Query("SELECT * FROM executionLog " +
+            "ORDER BY Date DESC")
+    LiveData<List<ExecutionLogEntity>> loadAllExecutionLogs();
 
     @Query("DELETE FROM executionLog " +
             "WHERE executionId IN (" +
@@ -37,5 +44,12 @@ public interface ExecutionLogDao {
             "WHERE functionId = :functionId" +
             ")")
     void deleteFunctionExecutionLogs(long functionId);
+
+    @Query("DELETE FROM executionLog " +
+            "WHERE date < :toDate")
+    void deleteFunctionExecutionLogsToDate(Date toDate);
+
+    @Query("DELETE FROM executionLog ")
+    void deleteAllFunctionExecutionLogs();
 }
 

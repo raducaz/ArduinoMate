@@ -2,12 +2,14 @@ package com.gmail.raducaz.arduinomate.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.DeviceLog;
 import com.gmail.raducaz.arduinomate.model.ExecutionLog;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "executionLog",
@@ -18,13 +20,14 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "executionId")
         })
-public class ExecutionLogEntity implements ExecutionLog {
+public class ExecutionLogEntity implements ExecutionLog, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long executionId;
     private Date date;
     private String log;
+    private String functionName;
 
     @Override
     public long getId() {
@@ -58,18 +61,30 @@ public class ExecutionLogEntity implements ExecutionLog {
         this.log = log;
     }
 
+    @Override
+    public String getFunctionName() {
+        return functionName;
+    }
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
+    }
+
     public ExecutionLogEntity() {
     }
 
-    public ExecutionLogEntity(long executionId, Date date, String log) {
+    @Ignore
+    public ExecutionLogEntity(long executionId, Date date, String log, String functionName) {
         this.executionId = executionId;
         this.date = date;
         this.log = log;
+        this.functionName = functionName;
     }
 
+    @Ignore
     public ExecutionLogEntity(ExecutionLog log) {
         this.executionId = log.getExecutionId();
         this.date = log.getDate();
         this.log = log.getLog();
+        this.functionName = log.getFunctionName();
     }
 }

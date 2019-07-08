@@ -40,7 +40,7 @@
                 android:id="@+id/sinceLastUpdate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/state"
+                android:layout_alignRight="@+id/name"
                 android:text="@{pinState.secondsFromLastUpdateText}"/>
 
         </RelativeLayout>

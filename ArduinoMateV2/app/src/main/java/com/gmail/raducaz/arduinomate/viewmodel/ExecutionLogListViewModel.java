@@ -36,4 +36,21 @@ public class ExecutionLogListViewModel extends AndroidViewModel {
 
         return mObservableExecutionLogs;
     }
+
+    public LiveData<List<ExecutionLogEntity>> getAllExecutionLogs() {
+        // MediatorLiveData can observe other LiveData objects and react on their emissions.
+        MediatorLiveData<List<ExecutionLogEntity>> mObservableExecutionLogs;
+
+        mObservableExecutionLogs = new MediatorLiveData<>();
+        // set by default null, until we get data from the database.
+        mObservableExecutionLogs.setValue(null);
+
+        LiveData<List<ExecutionLogEntity>> executionLogs =
+                ((ArduinoMateApp) getApplication()).getRepository().loadAllExecutionLog();
+
+        // observe the changes of the function from the database and forward them
+        mObservableExecutionLogs.addSource(executionLogs, mObservableExecutionLogs::setValue);
+
+        return mObservableExecutionLogs;
+    }
 }

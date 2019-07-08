@@ -33,13 +33,19 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/name"
                 android:text="@={deviceViewModel.device.ip}"/>
+            <EditText
+                android:id="@+id/port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ip"
+                android:text="@{deviceViewModel.device.portText}"/>
 
             <Button
                 android:id="@+id/save_button"
                 android:tag="SAVE"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/ip"
+                android:layout_below="@+id/port"
                 style="?android:attr/borderlessButtonStyle"
                 android:textColor="?attr/colorPrimary"
                 android:text="Save" />

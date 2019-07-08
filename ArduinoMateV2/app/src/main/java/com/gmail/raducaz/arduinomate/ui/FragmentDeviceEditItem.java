@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
@@ -51,12 +52,16 @@ public class FragmentDeviceEditItem extends Fragment {
 
         subscribeToModel(model);
 
-        Button button = (Button) mBinding.getRoot().findViewById(R.id.save_button);
+        Button button = mBinding.getRoot().findViewById(R.id.save_button);
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 
                 ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
                 DeviceEntity deviceEntity = mBinding.getDeviceViewModel().getObservableDevice().getValue();
+
+                EditText portText = mBinding.getRoot().findViewById(R.id.port);
+                deviceEntity.setPortText(portText.getText().toString());
+
                 application.getDbExecutor().execute(new DbUpdater(deviceEntity));
 
                 NavUtils.navigateUpFromSameTask(getActivity());

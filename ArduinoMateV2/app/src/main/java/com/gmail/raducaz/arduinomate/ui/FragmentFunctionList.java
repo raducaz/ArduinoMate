@@ -10,10 +10,12 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.databinding.RecyclerViewBinding;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
@@ -36,8 +38,15 @@ public class FragmentFunctionList extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.recycler_view, container, false);
 
-        mFunctionAdapter = new AdapterFunctionList(mFunctionClickCallback);
+        ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+        mFunctionAdapter = new AdapterFunctionList(mFunctionClickCallback, application);
         mBinding.myRecyclerView.setAdapter(mFunctionAdapter);
+
+        mBinding.myRecyclerView.setHasFixedSize(true);
+        // Set padding for Tiles
+        int tilePadding = getResources().getDimensionPixelSize(R.dimen.tile_padding);
+        mBinding.myRecyclerView.setPadding(tilePadding, tilePadding, tilePadding, tilePadding);
+        mBinding.myRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
 
         return mBinding.getRoot();
     }

@@ -7,6 +7,7 @@ import android.arch.persistence.room.Index;
 import com.gmail.raducaz.arduinomate.model.DeviceLog;
 import com.gmail.raducaz.arduinomate.model.DeviceState;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "deviceLog",
@@ -17,7 +18,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "deviceId")
         })
-public class DeviceLogEntity implements DeviceLog {
+public class DeviceLogEntity implements DeviceLog, Serializable {
 
     private long deviceId;
     private Date date;

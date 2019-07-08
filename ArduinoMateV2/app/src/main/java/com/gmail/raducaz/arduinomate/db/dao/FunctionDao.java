@@ -29,8 +29,29 @@ public interface FunctionDao {
     )
     void updateStates(long id, int callState, int resultState);
 
+    @Query(
+            "UPDATE function SET " +
+                    "callState = :callState," +
+                    "resultState = :resultState " +
+                    "WHERE deviceId = :deviceId"
+    )
+    void updateDeviceFunctionsStates(long deviceId, int callState, int resultState);
+
+    @Query(
+            "UPDATE function SET " +
+                    "callState = :callState," +
+                    "resultState = :resultState ")
+    void updateAllFunctionStates(int callState, int resultState);
+
+    @Query(
+            "UPDATE function SET " +
+                    "isAutoEnabled = :isChecked " +
+                    "WHERE id = :id"
+    )
+    void updateAutoEnabled(long id, boolean isChecked);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(FunctionEntity function);
+    long insert(FunctionEntity function);
 
     @Query("SELECT * FROM function ")
     LiveData<List<FunctionEntity>> loadAllFunctions();
@@ -50,7 +71,15 @@ public interface FunctionDao {
     @Query("select * from function where id = :functionId")
     FunctionEntity loadFunctionSync(long functionId);
 
-    @Query("select * from function where deviceId = :deviceId and name = :functionName")
+    @Query("select function.* from function " +
+            "inner join device on function.deviceId = deviceId " +
+            "where device.name = :deviceName and function.name = :functionName")
+    FunctionEntity loadDeviceFunctionSync(String deviceName, String functionName);
+
+    @Query("select * from function where name = :functionName")
+    FunctionEntity loadFunctionByNameSync(String functionName);
+
+    @Query("select * from function where  deviceId = :deviceId and name = :functionName")
     FunctionEntity loadFunctionSync(long deviceId, String functionName);
 }
 

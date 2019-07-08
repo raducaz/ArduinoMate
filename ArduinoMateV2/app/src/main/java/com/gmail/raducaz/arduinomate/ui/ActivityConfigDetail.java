@@ -37,11 +37,11 @@ public class ActivityConfigDetail extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_config_detail);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Set Collapsing Toolbar layout to the screen
         CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+                findViewById(R.id.collapsing_toolbar);
 
         deviceId = getIntent().getLongExtra(EXTRA_ID, 0);
         FragmentDeviceViewItem deviceFragment = FragmentDeviceViewItem.forDevice(deviceId);
@@ -56,11 +56,11 @@ public class ActivityConfigDetail extends AppCompatActivity {
 
 
         // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         // Set Tabs inside Toolbar
-        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
     }
 

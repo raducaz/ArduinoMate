@@ -4,6 +4,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.gmail.raducaz.arduinomate.model.DeviceState;
@@ -16,7 +17,7 @@ import com.gmail.raducaz.arduinomate.model.DeviceState;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "deviceId")
         })
-public class DeviceStateEntity implements DeviceState {
+public class DeviceStateEntity implements DeviceState, Serializable {
 
     private long deviceId;
     private int state;

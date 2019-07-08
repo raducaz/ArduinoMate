@@ -2,8 +2,7 @@ package com.gmail.raducaz.arduinomate.ui;
 
 import android.os.AsyncTask;
 
-import com.gmail.raducaz.arduinomate.service.TaskFunctionCaller;
-import com.gmail.raducaz.arduinomate.service.TaskInterface;
+import com.gmail.raducaz.arduinomate.processes.TaskInterface;
 
 
 public class TaskExecutor extends AsyncTask<TaskInterface, Void, String>

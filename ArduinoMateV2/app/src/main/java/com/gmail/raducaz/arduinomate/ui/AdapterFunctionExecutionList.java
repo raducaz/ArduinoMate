@@ -95,7 +95,7 @@ public class AdapterFunctionExecutionList extends RecyclerView.Adapter<AdapterFu
             super(binding.getRoot());
             this.binding = binding;
 
-            ImageButton shareImageButton = (ImageButton) itemView.findViewById(R.id.details_button);
+            ImageButton shareImageButton = itemView.findViewById(R.id.details_button);
             shareImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

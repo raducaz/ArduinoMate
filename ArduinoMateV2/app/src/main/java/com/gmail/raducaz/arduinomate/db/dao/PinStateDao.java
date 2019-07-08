@@ -87,5 +87,12 @@ public interface PinStateDao {
             "WHERE id = :functionId" +
             ")")
     void deletePinStatesByFunction(long functionId);
+
+    @Query("DELETE FROM pinState " +
+            "WHERE toDate < :toDate")
+    void deletePinStatesToDate(Date toDate);
+
+    @Query("DELETE FROM pinState ")
+    void deleteAllPinStates();
 }
 

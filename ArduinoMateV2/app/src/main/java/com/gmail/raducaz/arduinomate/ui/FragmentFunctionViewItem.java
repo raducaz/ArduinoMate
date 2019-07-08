@@ -3,7 +3,6 @@ package com.gmail.raducaz.arduinomate.ui;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,14 +11,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
+import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.databinding.FunctionViewItemBinding;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
-import com.gmail.raducaz.arduinomate.service.TaskFunctionCaller;
-import com.gmail.raducaz.arduinomate.service.TaskFunctionReset;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
 import com.gmail.raducaz.arduinomate.viewmodel.FunctionViewModel;
 
 public class FragmentFunctionViewItem extends Fragment {
@@ -52,26 +54,72 @@ public class FragmentFunctionViewItem extends Fragment {
 
         subscribeToModel(model);
 
-        Button buttonExecute = (Button) mBinding.getRoot().findViewById(R.id.execute_button);
+        Button buttonExecute = mBinding.getRoot().findViewById(R.id.execute_button);
         buttonExecute.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 
                 ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionCaller functionCaller = new TaskFunctionCaller(application, model.function.get());
+                TaskFunctionCaller functionCaller = new TaskFunctionCaller(
+                        application.getRepository(),
+                        model.function.get());
                 new TaskExecutor().execute(functionCaller);
             }
         });
 
-        Button buttonReset = (Button) mBinding.getRoot().findViewById(R.id.reset_button);
+        Button buttonRestart = mBinding.getRoot().findViewById(R.id.restart_button);
+        buttonRestart.setOnClickListener(new OnClickListener() {
+            public void onClick(View b) {
+
+                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+                TaskFunctionReset execution = new TaskFunctionReset(application.getRepository(), model.function.get(), true);
+                new TaskExecutor().execute(execution);
+            }
+        });
+
+        Button buttonReset = mBinding.getRoot().findViewById(R.id.reset_button);
         buttonReset.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 
                 ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionReset functionReset = new TaskFunctionReset(application, model.function.get());
+                TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), model.function.get(), false);
                 new TaskExecutor().execute(functionReset);
             }
         });
 
+        CheckBox autoCheckBox = mBinding.getRoot().findViewById(R.id.auto_checkbox);
+        autoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+
+                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+                FunctionEntity functionEntity = mBinding.getFunctionViewModel().getObservableFunction().getValue();
+                functionEntity.setIsAutoEnabled(isChecked);
+                application.getDbExecutor().execute(new DbUpdater(functionEntity));
+
+//                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+//                DataRepository repository = application.getRepository();
+//                repository.updateFunctionAutoEnabled(model.functionId, isChecked);
+
+
+            }
+        });
+
+    }
+
+    private class DbUpdater implements Runnable {
+        FunctionEntity functionEntity;
+        DbUpdater(FunctionEntity functionEntity)
+        {
+            this.functionEntity = functionEntity;
+        }
+
+        @Override
+        public void run() {
+            ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+            DataRepository repo = application.getRepository();
+            repo.updateFunction(functionEntity);
+        }
     }
 
     private void subscribeToModel(final FunctionViewModel model) {

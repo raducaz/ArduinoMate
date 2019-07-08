@@ -2,7 +2,10 @@ package com.gmail.raducaz.arduinomate.db;
 
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
+import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
 import com.gmail.raducaz.arduinomate.model.Device;
+import com.gmail.raducaz.arduinomate.model.MockPinState;
+import com.gmail.raducaz.arduinomate.model.Settings;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,22 +18,40 @@ import java.util.concurrent.TimeUnit;
  */
 public class DataGenerator {
 
+    public static SettingsEntity generateSettings() {
+        SettingsEntity settings = new SettingsEntity();
+        settings.setIsController(true);
+        settings.setPermitRemoteControl(false);
+        settings.setIsTestingMode(false);
+        settings.setAmqUri("amqp://lttjuzsi:pjSXi8zN4wT8Pljaq14lIEAVWpQddzxS@bulldog.rmq.cloudamqp.com/lttjuzsi");
+
+        return settings;
+    }
+
     public static List<DeviceEntity> generateDevices() {
 
         List<DeviceEntity> devices = new ArrayList<>(3);
         DeviceEntity device = new DeviceEntity();
         device.setIp("192.168.1.100");
         device.setPort(8080);
-        device.setName("TEST - Generator");
-        device.setDescription("Controllerul de pornire/oprire generator si control pompa - TEST");
+        device.setName("Generator");
+        device.setDescription("Generator, pompa, senzor curent si presiune");
+        device.setId(0);
+        devices.add(device);
+
+        device = new DeviceEntity();
+        device.setIp("192.168.1.101");
+        device.setPort(8081);
+        device.setName("Tap");
+        device.setDescription("Robineti");
         device.setId(1);
         devices.add(device);
 
         device = new DeviceEntity();
-        device.setIp("192.168.1.200");
-        device.setPort(8080);
-        device.setName("PROD - Generator");
-        device.setDescription("Controllerul de pornire/oprire generator si control pompa - PROD");
+        device.setIp("192.168.1.102");
+        device.setPort(8082);
+        device.setName("Boiler");
+        device.setDescription("Boiler si prize casa");
         device.setId(2);
         devices.add(device);
 
@@ -54,7 +75,6 @@ public class DataGenerator {
 
         List<FunctionEntity> functions = new ArrayList<>();
 
-        // Device Generator - TEST
         Device device = devices.get(0);
         FunctionEntity function = new FunctionEntity();
         function.setDeviceId(device.getId());
@@ -74,53 +94,96 @@ public class DataGenerator {
 
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("PowerAutoEnableDisable");
-        function.setDescription("Enable/Disable 220V supply" + device.getName());
+        function.setName("PumpOnOff");
+        function.setDescription("Start/Stop generator and 220V supply to " + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
-        // Device Generator - TEST
 
-        // Device Generator - PROD
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("SocOnOff");
+        function.setDescription("Used for initial generator start");
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("IgnitionOnOff");
+        function.setDescription("Used for initial generator start");
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
         device = devices.get(1);
+
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("GeneratorOnOff");
-        function.setDescription("Start/Stop Generator" + device.getName());
+        function.setName("WaterSupplyTapOnOff");
+        function.setDescription("WaterSupplyTapOnOff" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("PowerOnOff");
-        function.setDescription("Start/Stop 220V supply" + device.getName());
+        function.setName("RightIrrigationOnOff");
+        function.setDescription("RightIrrigationOnOff" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("PowerAutoEnableDisable");
-        function.setDescription("Enable/Disable 220V supply" + device.getName());
+        function.setName("LeftIrrigationOnOff");
+        function.setDescription("LeftIrrigationOnOff" + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
-//        Random rnd = new Random();
-//
-//        for (Product product : products) {
-//            int commentsNumber = rnd.nextInt(5) + 1;
-//            for (int i = 0; i < commentsNumber; i++) {
-//                CommentEntity comment = new CommentEntity();
-//                comment.setProductId(product.getId());
-//                comment.setText(COMMENTS[i] + " for " + product.getName());
-//                comment.setPostedAt(new Date(System.currentTimeMillis()
-//                        - TimeUnit.DAYS.toMillis(commentsNumber - i) + TimeUnit.HOURS.toMillis(i)));
-//                comments.add(comment);
-//            }
-//        }
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("HouseWaterOnOff");
+        function.setDescription("HouseWaterOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("GardenWaterOnOff");
+        function.setDescription("GardenWaterOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("RightIrrigationOnOff");
+        function.setDescription("RightIrrigationOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("LeftIrrigationOnOff");
+        function.setDescription("LeftIrrigationOnOff" + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        device = devices.get(2);
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("BoilerOnOff");
+        function.setDescription("Start/Stop generator for Boiler circuit " + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
 
         return functions;
     }
+
 }

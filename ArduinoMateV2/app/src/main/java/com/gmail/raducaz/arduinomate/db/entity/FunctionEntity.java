@@ -7,13 +7,16 @@ package com.gmail.raducaz.arduinomate.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.graphics.Color;
 
 import com.gmail.raducaz.arduinomate.model.Function;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "function",
@@ -24,7 +27,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "deviceId")
         })
-public class FunctionEntity implements Function {
+public class FunctionEntity implements Function, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
@@ -34,6 +37,7 @@ public class FunctionEntity implements Function {
     private String log;
     private int resultState;
     private int callState;
+    private boolean isAutoEnabled;
     private Date dateSample;
 
     @Override
@@ -88,6 +92,30 @@ public class FunctionEntity implements Function {
         this.resultState = resultState;
     }
     @Override
+    public int getStateColor() {
+        if(callState == FunctionCallStateEnum.READY.getId()) {
+            if (resultState == FunctionResultStateEnum.OFF.getId())
+                return Color.argb(100, 250,250,250);
+            else if (resultState == FunctionResultStateEnum.ON.getId()) {
+                return Color.argb(100, 98, 229, 118);
+            } else if(resultState == FunctionResultStateEnum.ERROR.getId()){
+                return Color.argb(100, 239, 138, 124);
+            }
+            else
+            {
+                return Color.argb(100, 242, 243, 244);
+            }
+        }
+        else if(callState == FunctionCallStateEnum.EXECUTING.getId())
+        {
+            return Color.argb(100, 239, 255, 66);
+        }
+        else
+        {
+            return Color.argb(100, 239, 138, 124);
+        }
+    }
+    @Override
     public String getResultStateText() {
         return String.valueOf(FunctionResultStateEnum.forInt(resultState));
     }
@@ -100,7 +128,21 @@ public class FunctionEntity implements Function {
     }
     @Override
     public String getCallStateText() {
-        return String.valueOf(FunctionCallStateEnum.forInt(callState));
+        if(callState==FunctionCallStateEnum.EXECUTING.getId())
+            return "EXEC..";
+        else if(isAutoEnabled)
+            return "AUTO";
+        else
+            return String.valueOf(FunctionCallStateEnum.forInt(callState));
+    }
+
+    @Override
+    public boolean getIsAutoEnabled() {
+        return isAutoEnabled;
+    }
+
+    public void setIsAutoEnabled(boolean isAutoEnabled) {
+        this.isAutoEnabled = isAutoEnabled;
     }
 
     @Override
@@ -115,6 +157,7 @@ public class FunctionEntity implements Function {
     public FunctionEntity() {
     }
 
+    @Ignore
     public FunctionEntity(long id, long deviceId, String name, String log, int resultState,int callState, Date dateSample) {
         this.id = id;
         this.deviceId = deviceId;
@@ -125,6 +168,7 @@ public class FunctionEntity implements Function {
         this.dateSample = dateSample;
     }
 
+    @Ignore
     public FunctionEntity(Function function) {
         this.id = function.getId();
         this.deviceId = function.getDeviceId();

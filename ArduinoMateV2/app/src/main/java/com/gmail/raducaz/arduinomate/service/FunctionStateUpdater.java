@@ -35,9 +35,9 @@ public class FunctionStateUpdater {
         this.deviceStateInfo = new DeviceStateInfo(msg);
 
         String fctName = deviceStateInfo.getFunctionName();
-        String devIp = deviceStateInfo.getDeviceIp();
-        if(devIp != null && fctName != null) {
-            DeviceEntity deviceEntity = this.dataRepository.loadDeviceSync(devIp);
+        String devName = deviceStateInfo.getDeviceName();
+        if(devName != null && fctName != null) {
+            DeviceEntity deviceEntity = this.dataRepository.loadDeviceByNameSync(devName);
             if(deviceEntity != null) {
                 FunctionEntity functionEntity = this.dataRepository.loadFunctionSync(deviceEntity.getId(), fctName);
 
@@ -47,7 +47,7 @@ public class FunctionStateUpdater {
                         functionExecution = new FunctionExecutionEntity();
                         functionExecution.setFunctionId(functionEntity.getId());
                         functionExecution.setName(functionEntity.getName());
-                        this.startFunctionExecution();
+                        this.startFunctionExecution("no reason");
                     }
                 }
             }
@@ -86,6 +86,7 @@ public class FunctionStateUpdater {
         log.setExecutionId(functionExecution.getId());
         log.setLog(msg);
         log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        log.setFunctionName(functionExecution.getName());
         return dataRepository.insertExecutionLog(log);
     }
     public long insertExecutionLog(Exception exc){
@@ -96,6 +97,7 @@ public class FunctionStateUpdater {
         log.setExecutionId(functionExecution.getId());
         log.setLog(exc.getMessage() + " " + exc.getStackTrace().toString());
         log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        log.setFunctionName(functionExecution.getName());
         return dataRepository.insertExecutionLog(log);
     }
     public long insertExecutionLog(Throwable cause){
@@ -106,9 +108,10 @@ public class FunctionStateUpdater {
         log.setExecutionId(functionExecution.getId());
         log.setLog(cause.getMessage() + " " + cause.getStackTrace().toString());
         log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        log.setFunctionName(functionExecution.getName());
         return dataRepository.insertExecutionLog(log);
     }
-    public long startFunctionExecution(){
+    public long startFunctionExecution(String reason){
         if(functionExecution == null)
             return -1;
 
@@ -119,7 +122,7 @@ public class FunctionStateUpdater {
         functionExecution.setId(executionId);
 
         // Automatically insert log as well
-        insertExecutionLog("Starting execution ... ");
+        insertExecutionLog("Starting execution ... because " + reason);
 
         return executionId;
     }
@@ -129,10 +132,6 @@ public class FunctionStateUpdater {
 
         functionExecution.setCallState(callState.getId());
 
-        // Some calls to this function doesn't contain a fctState, in this case do not update
-        if(deviceStateInfo.getFunctionState() != FunctionResultStateEnum.NA)
-            functionExecution.setResultState(deviceStateInfo.getFunctionState().getId());
-
         if (callState.equals(FunctionCallStateEnum.READY)) {
             functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
             insertExecutionLog("Execution completed");
@@ -141,6 +140,17 @@ public class FunctionStateUpdater {
             functionExecution.setEndDate(DateConverter.toDate(System.currentTimeMillis()));
             insertExecutionLog("Execution failed");
         }
+        dataRepository.updateFunctionExecution(functionExecution);
+
+        return  functionExecution;
+    }
+    public FunctionExecutionEntity updateFunctionExecution(FunctionResultStateEnum resultState) {
+        if(functionExecution == null)
+            return null;
+
+        //if(deviceStateInfo.getFunctionState() != FunctionResultStateEnum.NA)
+        functionExecution.setResultState(resultState.getId());
+
         dataRepository.updateFunctionExecution(functionExecution);
 
         return  functionExecution;

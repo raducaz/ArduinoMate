@@ -2,6 +2,7 @@ package com.gmail.raducaz.arduinomate.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.icu.util.TimeUnit;
@@ -10,6 +11,7 @@ import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
 import com.gmail.raducaz.arduinomate.model.FunctionState;
 import com.gmail.raducaz.arduinomate.model.PinState;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "pinState",
@@ -20,7 +22,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "deviceId")
         })
-public class PinStateEntity implements PinState {
+public class PinStateEntity implements PinState, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
@@ -61,7 +63,7 @@ public class PinStateEntity implements PinState {
     }
     @Override
     public String getStateText() {
-        return Double.toString(state);
+        return String.format("%.2f", state);
     }
     public void setState(double state) {
         this.state = state;
@@ -100,12 +102,13 @@ public class PinStateEntity implements PinState {
     @Override
     public String getSecondsFromLastUpdateText() {
         long s = getSecondsFromLastUpdate();
-        return String.valueOf(s>100?">100":s);
+        return String.valueOf(s>100?"[>100s]":"["+s+"s]");
     }
 
     public PinStateEntity() {
     }
 
+    @Ignore
     public PinStateEntity(long id, long deviceId, String name, int state, Date fromDate, Date toDate) {
         this.id = id;
         this.deviceId = deviceId;
@@ -115,6 +118,7 @@ public class PinStateEntity implements PinState {
         this.toDate = toDate;
     }
 
+    @Ignore
     public PinStateEntity(FunctionState state) {
         this.id = state.getId();
         this.deviceId = state.getDeviceId();

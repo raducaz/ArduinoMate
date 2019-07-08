@@ -49,7 +49,7 @@ public class FragmentDeviceViewItem extends Fragment {
 
         subscribeToModel(model);
 
-        ImageButton button = (ImageButton) mBinding.getRoot().findViewById(R.id.execute_button);
+        ImageButton button = mBinding.getRoot().findViewById(R.id.execute_button);
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {
 

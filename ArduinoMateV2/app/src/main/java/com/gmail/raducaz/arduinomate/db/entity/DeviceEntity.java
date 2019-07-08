@@ -5,12 +5,15 @@ package com.gmail.raducaz.arduinomate.db.entity;
  */
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.Device;
 
+import java.io.Serializable;
+
 @Entity(tableName = "device")
-public class DeviceEntity implements Device {
+public class DeviceEntity implements Device, Serializable {
     @PrimaryKey
     private long id;
     private String ip;
@@ -33,6 +36,19 @@ public class DeviceEntity implements Device {
     }
     public void setPort(int port) {
         this.port = port;
+    }
+    @Override
+    public String getPortText() {
+        return Integer.toString(port);
+    }
+    public void setPortText(String port) {
+        try {
+            this.port = Integer.parseInt(port);
+        }
+        catch (Exception exc)
+        {
+            this.port = 8080;
+        }
     }
 
     @Override
@@ -65,12 +81,14 @@ public class DeviceEntity implements Device {
     public DeviceEntity() {
     }
 
+    @Ignore
     public DeviceEntity(long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
     }
 
+    @Ignore
     public DeviceEntity(Device device) {
         this.id = device.getId();
         this.name = device.getName();

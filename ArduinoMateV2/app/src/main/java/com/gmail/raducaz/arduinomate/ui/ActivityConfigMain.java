@@ -33,16 +33,16 @@ public class ActivityConfigMain extends AppCompatActivity {
         setContentView(R.layout.activity_config_main);
 
         // Adding Toolbar to Main screen
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         // Create Navigation drawer and inlfate layout
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        mDrawerLayout = findViewById(R.id.drawer);
 
         // Adding menu icon to Toolbar
         ActionBar supportActionBar = getSupportActionBar();
@@ -69,6 +69,11 @@ public class ActivityConfigMain extends AppCompatActivity {
                             Intent intent = new Intent(getBaseContext(), ActivityMain.class);
                             startActivity(intent);
                         }
+                        if(menuItem.getTitle().equals("Settings"))
+                        {
+                            Intent intent = new Intent(getBaseContext(), ActivitySettingsMain.class);
+                            startActivity(intent);
+                        }
 
                         // Closing drawer on item click
                         mDrawerLayout.closeDrawers();
@@ -77,7 +82,7 @@ public class ActivityConfigMain extends AppCompatActivity {
                 });
 
         // Adding Floating Action Button to bottom right of main view
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addButton);
+        FloatingActionButton fab = findViewById(R.id.addButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

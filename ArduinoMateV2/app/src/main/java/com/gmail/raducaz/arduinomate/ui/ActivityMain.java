@@ -15,8 +15,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.gmail.raducaz.arduinomate.ArduinoMateApp;
+import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.R;
-import com.gmail.raducaz.arduinomate.service.TcpServerIntentService;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
 
 
 /**
@@ -32,22 +34,24 @@ public class ActivityMain extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Adding Toolbar to Main screen
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Set title of Detail page
         toolbar.setTitle("Home - All available functions");
 
         // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         // Set Tabs inside Toolbar
-        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+        tabs.addTab(tabs.newTab().setText("Logs"));
+        tabs.addOnTabSelectedListener(onTabSelectedListener(viewPager));
 
         // Create Navigation drawer and inlfate layout
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        mDrawerLayout = findViewById(R.id.drawer);
 
         // Adding menu icon to Toolbar
         ActionBar supportActionBar = getSupportActionBar();
@@ -74,6 +78,11 @@ public class ActivityMain extends AppCompatActivity {
                             Intent intent = new Intent(getBaseContext(), ActivityConfigMain.class);
                             startActivity(intent);
                         }
+                        if(menuItem.getTitle().equals("Settings"))
+                        {
+                            Intent intent = new Intent(getBaseContext(), ActivitySettingsMain.class);
+                            startActivity(intent);
+                        }
 
                         // Closing drawer on item click
                         mDrawerLayout.closeDrawers();
@@ -92,11 +101,62 @@ public class ActivityMain extends AppCompatActivity {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        // All Tab
-        FragmentFunctionList fragment = new FragmentFunctionList();
-        adapter.addFragment(fragment, "All");
+        /* Use the root fragment so it can be reused for the other tabs in the TabLayout */
+        RootFragment initialFragment = new RootFragment();
+        initialFragment.setReplacementFragment(new FragmentFunctionList());
+        adapter.addFragment(initialFragment, "All");
 
         viewPager.setAdapter(adapter);
+//        viewPager.setCurrentItem(0);
+//        adapter.notifyDataSetChanged();
+
+        ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+        };
+        viewPager.addOnPageChangeListener(pageChangeListener);
+    }
+
+    private TabLayout.OnTabSelectedListener onTabSelectedListener(final ViewPager viewPager) {
+
+        return new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                android.support.v4.app.FragmentTransaction trans = getSupportFragmentManager()
+                        .beginTransaction();
+                /*
+                 * IMPORTANT: We use the "root frame" defined in
+                 * "root_fragment.xml" as the reference to replace fragment
+                 */
+                if(tab.getPosition()==0)
+                    trans.replace(R.id.root_frame, new FragmentFunctionList());
+                if(tab.getPosition()==1)
+                    trans.replace(R.id.root_frame, new FragmentAllExecutionLogList());
+
+                /*
+                 * IMPORTANT: The following lines allow us to add the fragment
+                 * to the stack and return to it later, by pressing back
+                 */
+//                trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                trans.addToBackStack(null);
+
+                trans.commit();
+
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        };
     }
 
     @Override
@@ -115,7 +175,16 @@ public class ActivityMain extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        } else if (id == android.R.id.home) {
+        }else if (id==R.id.action_reset_all)
+        {
+            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository());
+            new TaskExecutor().execute(functionReset);
+        }else if (id==R.id.action_sync_all)
+        {
+            // TODO: Send command to controller to send all data
+        }
+        else if (id == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
         return super.onOptionsItemSelected(item);

@@ -621,7 +621,7 @@ void setupTcpServerThread()
   threadsController.add(&tcpServerThread);
 
   MyMonitorTcpClientThread monitorTcpClientThread = MyMonitorTcpClientThread();
-  monitorTcpClientThread.setInterval(500); // in ms
+  monitorTcpClientThread.setInterval(1000); // in ms
   threadsController.add(&monitorTcpClientThread);
 }
 
@@ -650,6 +650,7 @@ void loop() {
     delay(500);
     //Start the Thread in loop
     threadsController.run();
+    
     delay(500);
 }
 /*==============================================================================================*/

@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.VariableState;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "variableState",
@@ -17,7 +18,7 @@ import java.util.Date;
                         onDelete = ForeignKey.CASCADE)},
         indices = {@Index(value = "deviceId")
         })
-public class VariableStateEntity implements VariableState {
+public class VariableStateEntity implements VariableState, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;

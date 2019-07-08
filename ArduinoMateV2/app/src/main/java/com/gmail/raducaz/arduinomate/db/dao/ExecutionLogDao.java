@@ -29,8 +29,9 @@ public interface ExecutionLogDao {
             "where executionId = :executionId " +
             "ORDER BY Date DESC")
     LiveData<List<ExecutionLogEntity>> loadExecutionLogs(long executionId);
-
-    @Query("SELECT * FROM executionLog where executionId = :executionId")
+    @Query("SELECT * FROM executionLog " +
+            "where executionId = :executionId " +
+            "ORDER BY Date")
     List<ExecutionLogEntity> loadExecutionLogsSync(long executionId);
 
     @Query("SELECT * FROM executionLog " +

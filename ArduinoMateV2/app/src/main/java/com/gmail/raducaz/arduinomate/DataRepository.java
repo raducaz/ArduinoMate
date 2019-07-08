@@ -259,6 +259,9 @@ public class DataRepository {
     public LiveData<List<ExecutionLogEntity>> loadExecutionLog(final long executionId) {
         return mDatabase.executionLogDao().loadExecutionLogs(executionId);
     }
+    public List<ExecutionLogEntity> loadExecutionLogSync(final long executionId) {
+        return mDatabase.executionLogDao().loadExecutionLogsSync(executionId);
+    }
     public LiveData<List<ExecutionLogEntity>> loadAllExecutionLog() {
         return mDatabase.executionLogDao().loadAllExecutionLogs();
     }

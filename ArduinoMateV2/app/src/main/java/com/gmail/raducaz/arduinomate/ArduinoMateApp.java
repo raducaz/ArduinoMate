@@ -1,6 +1,7 @@
 package com.gmail.raducaz.arduinomate;
 
 import android.app.Application;
+import android.os.Environment;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
@@ -10,6 +11,12 @@ import com.gmail.raducaz.arduinomate.remote.StateFromControllerConsumerService;
 import com.gmail.raducaz.arduinomate.mocks.MockArduinoServerService;
 import com.gmail.raducaz.arduinomate.tcpserver.TcpServerService;
 import com.gmail.raducaz.arduinomate.timer.TimerService;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.CsvFormatStrategy;
+import com.orhanobut.logger.DiskLogAdapter;
+import com.orhanobut.logger.FormatStrategy;
+import com.orhanobut.logger.Logger;
+import com.rabbitmq.client.BlockedListener;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -49,6 +56,21 @@ public class ArduinoMateApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Logger.addLogAdapter(new AndroidLogAdapter() {
+            @Override public boolean isLoggable(int priority, String tag) {
+                return BuildConfig.DEBUG;
+            }
+        });
+        //Logger.addLogAdapter(new DiskLogAdapter());
+        FormatStrategy formatStrategy = CsvFormatStrategy.newBuilder()
+                .tag("custom")
+                .build();
+        Logger.addLogAdapter(new DiskLogAdapter(formatStrategy));
+
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+        Logger.i("test Logger");
+
         mAppExecutors = new AppExecutors();
 
         DataRepository repository = getRepository();
@@ -104,6 +126,19 @@ public class ArduinoMateApp extends Application {
             Future<Connection> future = executor.submit(callable);
             AmqConnection = future.get();
 
+            AmqConnection.addBlockedListener(
+                    new BlockedListener() {
+                        @Override
+                        public void handleBlocked(String reason) throws IOException {
+                            int i = 0;
+                        }
+
+                        @Override
+                        public void handleUnblocked() throws IOException {
+                            int i = 0;
+                        }
+                    }
+            );
             AmqConnection.addShutdownListener(
                     new ShutdownListener() {
                         @Override

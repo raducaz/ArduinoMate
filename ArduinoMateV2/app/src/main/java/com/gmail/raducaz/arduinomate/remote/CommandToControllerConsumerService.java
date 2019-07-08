@@ -4,6 +4,7 @@ import android.util.Log;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -121,6 +122,15 @@ public class CommandToControllerConsumerService implements Runnable {
                                                 command.function, command.alsoRestart);
 
                                         new TaskExecutor().execute(functionReset);
+                                    }
+                                    if(bodyObject instanceof RemoteSyncCommand)
+                                    {
+                                        RemoteSyncCommand command = (RemoteSyncCommand)bodyObject;
+                                        TaskFunctionSync functionSync = new TaskFunctionSync(
+                                                mRepository,
+                                                command.function);
+
+                                        new TaskExecutor().execute(functionSync);
                                     }
                                     if(bodyObject instanceof RemoteStateConsumerQueue)
                                     {

@@ -46,6 +46,8 @@ public class TaskFunctionReset implements TaskInterface {
 
                 RemoteResetCommand cmd = new RemoteResetCommand(function, alsoRestart);
                 sender.SendCommand(cmd, 5);
+                mRepository.insertExecutionLogOnLastFunctionExecution(function.getId(),
+                        (alsoRestart? "Restart" : "Reset") + " cmd sent remotely...");
             } else {
                 if (function != null) {
                     mRepository.deletePinStatesByFunction(function.getId());

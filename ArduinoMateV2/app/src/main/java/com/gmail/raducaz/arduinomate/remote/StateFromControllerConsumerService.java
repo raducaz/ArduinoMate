@@ -107,11 +107,13 @@ public class StateFromControllerConsumerService implements Runnable {
                                     Serializable stateUpdate = (Serializable) SerializerDeserializerUtility.Deserialize(body);
                                     ProcessState(stateUpdate);
 
+                                } catch (Exception exc) {
+                                    Log.e(TAG, "", exc);
+                                }
+                                finally {
                                     // positively acknowledge a single delivery, the message will
                                     // be discarded
                                     channel.basicAck(deliveryTag, false);
-                                } catch (Exception exc) {
-                                    Log.e(TAG, "", exc);
                                 }
                             }
 

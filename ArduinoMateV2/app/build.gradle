@@ -12,6 +12,7 @@ android {
     }
     buildTypes {
         release {
+            debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -28,6 +29,7 @@ android {
     dataBinding {
         enabled = true
     }
+
 }
 
 dependencies {
@@ -66,4 +68,8 @@ dependencies {
     /*Rabbit MQ*/
     implementation 'com.rabbitmq:amqp-client:4.11.1'
     /*Rabbit MQ*/
+
+    /*Logger*/
+    implementation 'com.orhanobut:logger:2.2.0'
+    /*Logger*/
 }

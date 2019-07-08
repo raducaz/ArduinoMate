@@ -89,6 +89,7 @@ public class TaskFunctionCaller implements TaskInterface {
                         orderedState);
 
                 sender.SendCommand(cmd, 5);
+                mRepository.insertExecutionLogOnLastFunctionExecution(function.getId(), "Exec cmd sent remotely...");
             } else {
 
                 switch (functionName) {

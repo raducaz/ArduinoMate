@@ -26,7 +26,7 @@ public interface FunctionDao {
                     "callState = :callState," +
                     "resultState = :resultState " +
             "WHERE id = :id"
-    )
+            )
     void updateStates(long id, int callState, int resultState);
 
     @Query(

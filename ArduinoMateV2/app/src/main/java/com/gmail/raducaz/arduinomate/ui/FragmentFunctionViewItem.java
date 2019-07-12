@@ -22,6 +22,7 @@ import com.gmail.raducaz.arduinomate.databinding.FunctionViewItemBinding;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 import com.gmail.raducaz.arduinomate.viewmodel.FunctionViewModel;
 
 public class FragmentFunctionViewItem extends Fragment {
@@ -66,6 +67,15 @@ public class FragmentFunctionViewItem extends Fragment {
             }
         });
 
+        Button buttonSync = mBinding.getRoot().findViewById(R.id.sync_button);
+        buttonSync.setOnClickListener(new OnClickListener() {
+            public void onClick(View b) {
+
+                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+                TaskFunctionSync execution = new TaskFunctionSync(application.getRepository(), model.function.get());
+                new TaskExecutor().execute(execution);
+            }
+        });
         Button buttonRestart = mBinding.getRoot().findViewById(R.id.restart_button);
         buttonRestart.setOnClickListener(new OnClickListener() {
             public void onClick(View b) {

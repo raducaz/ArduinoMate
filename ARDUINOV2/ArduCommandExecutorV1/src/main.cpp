@@ -65,12 +65,13 @@ float f1()
 }
 float f2()
 {
-  Serial.end();
-  delay(100);
+  // Serial.end();
+  // delay(100);
 
   // To ensure temp can be read using pins 0 and 1
   float t = dht.readTemperature();
-  Serial.begin(9600);
+  
+  // Serial.begin(9600);
 
   // Check if any reads failed and exit early (to try again).
   if (isnan(t)) {

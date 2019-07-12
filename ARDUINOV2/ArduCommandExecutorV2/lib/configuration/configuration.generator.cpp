@@ -39,7 +39,7 @@ void Configuration::setupPins()
   pinMode(CurrentSensor, INPUT);
   pinMode(TemperatureSensor, INPUT);
 
-    pinMode(WatchDog, OUTPUT);
+  pinMode(WatchDog, OUTPUT);
 }
 void Configuration::initializePins()
 {

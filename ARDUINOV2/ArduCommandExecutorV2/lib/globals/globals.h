@@ -1,11 +1,11 @@
 #ifndef globals_h
 #define globals_h
 
-//--------DEVICE SPECIFIC GENERATOR---------------------------
-byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x72 };
-const byte ip[] = { 192, 168, 1, 100 }; //This needs to match the name configured on Android App
-int arduinoPort = 8080; //This needs to match the name configured on Android App
-char arduinoName[] = "Generator"; //This needs to match the name configured on Android App
+//--------DEVICE SPECIFIC TAP---------------------------
+byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x71 };
+const byte ip[] = { 192, 168, 1, 101 }; //This needs to match the name configured on Android App
+int arduinoPort = 8081; //This needs to match the name configured on Android App
+const char arduinoName[] = "Tap"; //This needs to match the name configured on Android App
 //--------DEVICE SPECIFIC---------------------------
 
 byte serverIp[] = { 192, 168, 1, 10 }; // Android device IP

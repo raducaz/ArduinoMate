@@ -8,7 +8,6 @@
 #include <ACS712.h>
 #include <configuration.h>
 #include "logger.h"
-// #include <jsonhelper.cpp>
 #include <ArduinoJson.h>
 #include <executor.h>
 

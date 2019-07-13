@@ -9,10 +9,27 @@
 #include <configuration.h>
 #include "logger.h"
 #include <ArduinoJson.h>
-#include <executor.h>
 
 #include "Adafruit_Sensor.h"
 #include "DHT.h"
+
+#ifdef __arm__
+// should use uinstd.h to define sbrk but Due causes a conflict
+extern "C" char* sbrk(int incr);
+#else  // __ARM__
+extern char *__brkval;
+#endif  // __arm__
+
+int freeMemory() {
+  char top;
+#ifdef __arm__
+  return &top - reinterpret_cast<char*>(sbrk(0));
+#elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
+  return &top - __brkval;
+#else  // __arm__
+  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+#endif  // __arm__
+}
 
 #define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
 DHT dht(Configuration::TemperatureSensor, DHTTYPE);
@@ -88,18 +105,73 @@ float f2()
 // 	threadsController.run();
 // }
 
-JsonObject& constructPinStatesJSON(const char* deviceName,
+void wait(unsigned int msInterval)
+{
+    Logger::debug("wait for ");Logger::debug(msInterval);Logger::debugln(" ms");
+    unsigned long waitStart = millis();
+
+    unsigned long current = millis();
+    while((current - waitStart)< msInterval) 
+    {
+      current = millis();
+    }; 
+}  
+
+void sendToServer(const char* msg)
+{
+  arduinoClient.println(msg);
+
+  Logger::debugln(msg);
+}
+void setDigitalPin(byte pin, byte state)
+{
+  Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
+  digitalWrite(pin, state);
+}
+void setAnalogPin(byte pin, float state)
+{
+  Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
+  analogWrite(pin, state);
+}
+void setDigitalPinTemp(byte pin, byte state, unsigned int interval)
+{
+  Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
+  Logger::debug(" for ");Logger::debugln(interval);
+
+  byte state1 = digitalRead(pin);
+  digitalWrite(pin, state);
+  wait(interval);
+  digitalWrite(pin, state1);
+}
+
+void setAnalogPinTemp(byte pin, float state, unsigned int interval)
+{
+  Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
+  Logger::debug(" for ");Logger::debugln(interval);
+
+  int state1 = analogRead(pin);
+  analogWrite(pin, state);
+  wait(interval);
+  analogWrite(pin, state1);
+}
+
+void constructPinStatesJSON(const char* deviceName,
     const byte deviceState,
     byte pinType, 
     const int* pinStates, byte size, 
     const char* msg)
   {
       StaticJsonBuffer<400> _buffer;
+      
+      Serial.println(freeMemory());
+
       JsonObject& _root = _buffer.createObject();
       if(strcmp(msg,"") != 0)
           _root[MSG] = msg;
       _root[NAME] = deviceName;
       _root[DEVICESTATE] = deviceState;
+
+      Serial.println(freeMemory());
 
       JsonArray& psArr = _root.createNestedArray(pinType==0?DIGITAL:ANALOG);
       for(byte i=0;i<size;i++)
@@ -107,28 +179,25 @@ JsonObject& constructPinStatesJSON(const char* deviceName,
           psArr.add(pinStates[i]);
       }
 
-      return _root;
+      Serial.println(freeMemory());
+
+      _root.printTo(arduinoClient);
+      arduinoClient.println();
+
+Serial.println(freeMemory());
+
+      _root.printTo(Serial);
+      Serial.println();
+
+      Serial.println(freeMemory());
   }
-JsonObject& constructPinStatesJSON(const char* deviceName,
+void constructPinStatesJSON(const char* deviceName,
     const byte deviceState,
     byte pinType, 
     int* pinStates, byte size)
   {
-      return constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
+      constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
   }
-
-
-  // JsonObject& constructDeviceJSON(const char* deviceName,
-  //   const byte deviceState)
-  // {
-  //     StaticJsonBuffer<400> _buffer;
-  //     JsonObject& _root = _buffer.createObject();
-      
-  //     _root[NAME] = deviceName;
-  //     _root[DEVICESTATE] = deviceState;
-
-  //     return _root;
-  // }
 
 int getPin(const byte startIndex, const char* key)
 {
@@ -162,8 +231,12 @@ void parseCommand(char* plainJson, EthernetClient client)
     // StaticJsonBuffer<capacity> jb;
     DynamicJsonBuffer jb;
 
+Serial.println(freeMemory());
+
     // Parse JSON object
     JsonArray& arr = jb.parseArray(plainJson);
+
+Serial.println(freeMemory());
 
     if (arr.success()) {
       for (JsonVariant& elem : arr) {
@@ -180,24 +253,24 @@ void parseCommand(char* plainJson, EthernetClient client)
               if(obj["@"]){ // Cmd set temp for x ms
                 if(strncmp(p.key,"~",1)==0) 
                 { 
-                  MyExecutor::setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
+                  setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
                 }
                 else
                 {
-                  if(pin<=13) MyExecutor::setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
-                  else MyExecutor::setAnalogPinTemp(pin,p.value,obj["@"].as<float>());  
+                  if(pin<=13) setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
+                  else setAnalogPinTemp(pin,p.value,obj["@"].as<float>());  
                 }
               }
               else // Cmd permanent set
               {
                 if(strncmp(p.key,"~",1)==0) 
                 {
-                  MyExecutor::setDigitalPin(pin, p.value.as<int>());
+                  setDigitalPin(pin, p.value.as<int>());
                 }
                 else
                 {
-                  if(pin<=13) MyExecutor::setDigitalPin(pin, p.value.as<int>());
-                  else MyExecutor::setAnalogPin(pin, p.value.as<float>());
+                  if(pin<=13) setDigitalPin(pin, p.value.as<int>());
+                  else setAnalogPin(pin, p.value.as<float>());
                 }
               }
             }
@@ -211,7 +284,7 @@ void parseCommand(char* plainJson, EthernetClient client)
                 obj[p.key] = pin<=13 ? digitalRead(pin) : analogRead(pin);
             }
             if(strcmp(p.key,"!")==0){ // Cmd wait
-              MyExecutor::wait(p.value);
+              wait(p.value);
             }
             if(strcmp(p.key,"F0")==0){ // Cmd function
               f0();
@@ -403,8 +476,7 @@ void clientThreadCallback()
     {
         digitalPinStates[i] = digitalRead(i);
     }
-    //MyExecutor::sendToServer(JSONSerializer::constructPinStatesJSON(arduinoName, 0, 0, digitalPinStates, 14),arduinoClient);
-    MyExecutor::sendToServer(constructPinStatesJSON(arduinoName, state, 0, digitalPinStates, 14),arduinoClient);
+    constructPinStatesJSON(arduinoName, state, 0, digitalPinStates, 14);
 
     int analogPinStates[6];
     for(byte i=0;i<=5;i++)
@@ -416,11 +488,11 @@ void clientThreadCallback()
     analogPinStates[1] = f1();
     //--------DEVICE SPECIFIC---------------------------
 
-    MyExecutor::sendToServer(constructPinStatesJSON(arduinoName, state, 1, analogPinStates, 6),arduinoClient);
+    constructPinStatesJSON(arduinoName, state, 1, analogPinStates, 6);
   
     isRestarted=false;
     
-    MyExecutor::sendToServer("END",arduinoClient);
+    sendToServer("END");
   }
 }
 

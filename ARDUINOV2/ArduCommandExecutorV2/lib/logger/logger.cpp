@@ -9,11 +9,6 @@ void Logger::debugln(const char* msg)
     if(Configuration::isDebug())
       Logger::logln(msg);
 }
-void Logger::debugln(const String msg)
-{
-    if(Configuration::isDebug())
-      Logger::logln(msg);
-}
 void Logger::debugln(const int msg)
 {
     if(Configuration::isDebug())
@@ -52,10 +47,6 @@ void Logger::log(const char* msg)
     Serial.print(msg);
 }
 void Logger::logln(const int msg)
-{
-    Serial.println(msg);
-}
-void Logger::logln(String msg)
 {
     Serial.println(msg);
 }

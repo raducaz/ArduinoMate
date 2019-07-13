@@ -486,8 +486,9 @@ void loop() {
 
   // Send ImAlive to WatchDog
   Logger::logln("I'm alive !");
-  //digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
+  digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
   delay(500);
+  Serial.println(f2());
 
   // // Reading temperature or humidity takes about 250 milliseconds!
   // // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)

@@ -10,7 +10,7 @@ class Configuration
 
     public:
         static const byte WatchDog = 9;
-        static const byte TemperatureSensor = 9;
+        static const byte TemperatureSensor = A2;
         static bool isDebug();
         static bool useEthernet();
         static void setupPins();

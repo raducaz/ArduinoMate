@@ -20,6 +20,7 @@ void setup() {
 
 void loop() {
   delay(1000);
+  
 
   for(byte b=0;b<6;b++)
   {
@@ -35,7 +36,7 @@ void loop() {
         Serial.println("reset");
         // reset client
         digitalWrite(clientOUT, 0);
-        delay(500);
+        delay(1000);
         digitalWrite(clientOUT, 1);
         clients[b][1] = millis();
       }

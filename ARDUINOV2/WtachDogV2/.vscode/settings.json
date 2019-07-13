@@ -1,6 +1,6 @@
 {
     "terminal.integrated.env.linux": {
-        "PATH": "/home/radu/.platformio/penv/bin:/home/radu/.platformio/penv:/sbin:/bin:/usr/bin:/usr/local/bin",
+        "PATH": "/home/radu/.platformio/penv/bin:/home/radu/.platformio/penv:/sbin:/bin:/usr/bin:/usr/local/bin:/Users/radu/bin",
         "PLATFORMIO_CALLER": "vscode"
     },
     "terminal.integrated.env.windows": {

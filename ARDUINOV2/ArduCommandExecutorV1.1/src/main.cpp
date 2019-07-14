@@ -84,16 +84,20 @@ float f1()
 {
   return sensor.getCurrentAC()-zeroCurrent;
 }
-int f2()
+float f2()
 {
-  // To ensure temp can be read using pins 0 and 1 need to Serial.end();
+  Serial.end();
+  delay(100);
+
+  // To ensure temp can be read using pins 0 and 1
   float t = dht.readTemperature();
-  
+  Serial.begin(9600);
+
   // Check if any reads failed and exit early (to try again).
   if (isnan(t)) {
     return -100;
   }
-  return (int)t;
+  return t;
 }
 
 // This is the callback for the Timer
@@ -124,7 +128,7 @@ void setDigitalPin(byte pin, byte state)
   Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
   digitalWrite(pin, state);
 }
-void setAnalogPin(byte pin, int state)
+void setAnalogPin(byte pin, float state)
 {
   Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
   analogWrite(pin, state);
@@ -140,7 +144,7 @@ void setDigitalPinTemp(byte pin, byte state, unsigned int interval)
   digitalWrite(pin, state1);
 }
 
-void setAnalogPinTemp(byte pin, int state, unsigned int interval)
+void setAnalogPinTemp(byte pin, float state, unsigned int interval)
 {
   Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
   Logger::debug(" for ");Logger::debugln(interval);
@@ -194,54 +198,14 @@ void constructPinStatesJSON(const char* deviceName,
   {
       constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
   }
-void appendCmdResult(char* res, char* cmd, int value)
+
+int getPin(const byte startIndex, const char* key)
 {
-  size_t len = strlen(res);
-  if(len>0){
-    res[len] = '|';
-    res[len+1] = '\0';
-  }
-  strcat(res, cmd); //append cmd in res
-  len = strlen(res);
-  res[len] = ':';
-  res[len+1] = '\0';
-  char buffer [33]; //reads cannot be more than 4 chars
-  
-  Serial.print(res);Serial.println(value);
-  strcat(res, itoa(value, buffer, 10));
-}
-int getCmdParam(char* cmd, byte paramIndex)
-{
-  byte i = 1; //First char is cmd char
-  byte index = 0;
-  char res[strlen(cmd)] = "";
-  const char separator = ':';
-  while(cmd[i]>0){
-
-    if(cmd[i]==separator){
-      index++;
-
-      if(index>paramIndex)
-        break;
-
-    } else if(index==paramIndex){
-      size_t len = strlen(res);
-      res[len] = cmd[i];
-      res[len + 1] = '\0';
-    }
-
-    i++;
-  }
-
-  return atoi(res);
-}
-int getPin(const char* key)
-{
-  char sPin[4]="";
-  bool isAnalogPin = (key[0]=='A'||key[0]=='a');
+  char sPin[5]="";
+  bool isAnalogPin = (key[startIndex]=='A'||key[startIndex]=='a');
   
   byte i= 0; //Start from second character id analog
-  byte index = (isAnalogPin ? 1 : 0);
+  byte index = startIndex + (isAnalogPin ? 1 : 0);
   while(key[index+i]){
     sPin[i]=key[index+i];
     i++;
@@ -252,132 +216,119 @@ int getPin(const char* key)
   //return isAnalogPin ? (pinNo<2 ? pinNo+16 : pinNo+18) : pinNo;
   return isAnalogPin ? pinNo+14 : pinNo; //A0 is 14, A1 is 15...
 }
-void parseCommand(char* plainJson)
+void parseCommand(char* plainJson, EthernetClient& client)
 {
-  // [=3:0.25:2] - set analog 3 to 0.25 for 2 ms (setdigital if digital pin)
-  // [~3:0.25:2] - set digital 3 to 0.25 for 2 ms 
-  // [=3:0.25] - set analog 2 to ...
-  // [~3:0.25] - set digital
-  // [!:20] - wait for 20 ms
-  // [?:3] - digital read (including analog pins)
-  // [#:3] - analog read if analog
-  // [F0] - run f0()
-  // [=3:0.25:2|!20|?:3]
+  // [
+  //   {"=3":0.25,"@":2}, // for 2 ms and revert
+  //   {"=13":0},//set indefinite
+  //   {"!":20} // wait for 20 ms
+  //   {"get/13":"?"}
+  // ]
+  // [{"=3":1,"@":2},{"?13":0},{"=13":0},{"?13":0},{"!":20}]
+  // [set 3=1 for 2, get 13, set 13 to 0, get 13, wait 20]
+    
+    // static const int capacity = JSON_ARRAY_SIZE(10) + 10*JSON_OBJECT_SIZE(2) + 32;
+    // StaticJsonBuffer<capacity> jb;
+    
+    DynamicJsonBuffer jb;
+    //StaticJsonBuffer<300> jb;
 
 Serial.println(freeMemory());
 
-size_t len = strlen(plainJson);
-char cmd[len] = "";
-char res[len] = ""; //return get pin values
+    // Parse JSON object
+    JsonArray& arr = jb.parseArray(plainJson);
 
-if(plainJson[0]=='['&&plainJson[len-1]==']')
-{
-  byte i = 0;
-  while(plainJson[i]>0)
-  {
-    Serial.print(plainJson[i]);
+Serial.println(freeMemory());
 
-    if(plainJson[i]=='|' || plainJson[i]==']') // cmd terminator
-    {
-        Serial.println(cmd);
+    if (arr.success()) {
+      for (JsonVariant& elem : arr) {
+        if (elem.is<JsonObject>()) {
+          JsonObject& obj = elem.as<JsonObject>();
 
-        byte pin = getCmdParam(cmd,0);
-        int value = getCmdParam(cmd,1);
-        int interval = getCmdParam(cmd,2);
-
-      Serial.print("pin");Serial.print(pin);
-      Serial.print("value");Serial.print(value);
-      Serial.print("interv");Serial.print(interval);
-
-        // execute
-        if(strncmp(cmd,"=",1)==0 || 
-              strncmp(cmd,"~",1)==0) //Cmd set
-        {
-          if(interval>0){ // Cmd set temp for x ms
-            if(strncmp(cmd,"~",1)==0) 
-            { 
-              setDigitalPinTemp(pin,value,interval);
-            }
-            else
+          int pin=0;
+          for (JsonPair& p : obj) {
+            //p.key is a const char* pointing to the key
+            if(strncmp(p.key,"=",1)==0 || 
+                strncmp(p.key,"~",1)==0) //Cmd set
             {
-              if(pin<=13) setDigitalPinTemp(pin,value,interval);
-              else setAnalogPinTemp(pin,value,interval);  
+              pin = getPin(1, p.key);
+              if(obj["@"]){ // Cmd set temp for x ms
+                if(strncmp(p.key,"~",1)==0) 
+                { 
+                  setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
+                }
+                else
+                {
+                  if(pin<=13) setDigitalPinTemp(pin,p.value,obj["@"].as<int>());
+                  else setAnalogPinTemp(pin,p.value,obj["@"].as<float>());  
+                }
+              }
+              else // Cmd permanent set
+              {
+                if(strncmp(p.key,"~",1)==0) 
+                {
+                  setDigitalPin(pin, p.value.as<int>());
+                }
+                else
+                {
+                  if(pin<=13) setDigitalPin(pin, p.value.as<int>());
+                  else setAnalogPin(pin, p.value.as<float>());
+                }
+              }
+            }
+            if(strncmp(p.key,"?",1)==0 || 
+                strncmp(p.key,"#",1)==0) // Cmd get
+            {
+              pin = getPin(1, p.key);
+              if(strncmp(p.key,"#",1)==0)
+                obj[p.key] = digitalRead(pin);
+              else
+                obj[p.key] = pin<=13 ? digitalRead(pin) : analogRead(pin);
+            }
+            if(strcmp(p.key,"!")==0){ // Cmd wait
+              wait(p.value);
+            }
+            if(strcmp(p.key,"F0")==0){ // Cmd function
+              f0();
+            }
+            if(strcmp(p.key,"F1")==0){ // Cmd function
+              obj[p.key] = f1();
+            }
+            if(strcmp(p.key,"F2")==0){ // Cmd function
+              obj[p.key] = f2();
             }
           }
-          else // Cmd permanent set
-          {
-            if(strncmp(cmd,"~",1)==0) 
-            {
-              setDigitalPin(pin, value);
-            }
-            else
-            {
-              if(pin<=13) setDigitalPin(pin, value);
-              else setAnalogPin(pin, value);
-            }
-          }
+         
+          obj[">"] = 1;
         }
-        
-        if(strncmp(cmd,"?",1)==0){
-          appendCmdResult(res, cmd, digitalRead(pin));
-        }
-        if(strncmp(cmd,"#",1)==0){
-          appendCmdResult(res, cmd, (pin<=13 ? digitalRead(pin) : analogRead(pin)));
-        }
-        if(strncmp(cmd,"!",1)==0){ // Cmd wait
-          wait(value);
-        }
-        if(strncmp(cmd,"F",1)==0){ // Cmd function
-          if(pin==0)
-            f0();
-          if(pin==1)
-            appendCmdResult(res,cmd,f1());
-          if(pin==2)
-            appendCmdResult(res,cmd,f2());
-        }
-        
-        // Clear received temp to be prepared to receive next command
-        strcpy(cmd, "\0");
-    }
-    else{
-      if(plainJson[i]!='['){
-        size_t len = strlen(cmd);
-        cmd[len] = plainJson[i];
-        cmd[len + 1] = '\0';
       }
+
+    } else {
+      // parseObject() failed
+      JsonArray& arr = jb.createArray();
+      arr.add("Error parsing message");
+      Logger::debugln("Deserialize received message failed.");
     }
 
-    i++;
-  }
-  
-} else {
-  strcat(res, "Error parsing message");
-  Logger::debugln("Deserialize received message failed.");
-}
+Serial.println(freeMemory());
+    if(client)
+      arr.printTo(client);
+    arr.printTo(Serial);
 
 Serial.println(freeMemory());
-
-strcpy(plainJson, res);
-
 }
 void listenSerial()
 {
-  Serial.println("Listen Serial");
   char endChar = '\n';
   const byte SerialSize = 64; // This is Serial.read limit
   
   if(Serial){
 
     if (Serial.available()!=0) {
-      Serial.println("Serial available");
-
       char c = 0;
       bool endCmd = false;
       byte i=0;
       while(((c=Serial.read())!=endChar) && i<SerialSize ){
-
-        Serial.print(c);
-
         buffer[bufferSize]=c;
         buffer[bufferSize+1]='\0';
         bufferSize++;
@@ -398,8 +349,7 @@ void listenSerial()
       //TODO: Test - this executes actual commands and blocks the thread until done
       if(endCmd)
       {
-        parseCommand(buffer);//this fills buffer with results
-        Serial.println(buffer);
+        //parseCommand(buffer, 0);
         
         buffer[0]=0;
         bufferSize=0;
@@ -429,13 +379,11 @@ void listenEthernet()
         if (receivedChar==endChar)
         {
           //!!!This blocks current thread until command is done
-          parseCommand(receivedText); //Fills receivesText with results
-          client.println(receivedText);
-          Serial.println(receivedText);
+          parseCommand(receivedText, client);
          
           // Clear received temp to be prepared to receive next command
           strcpy(receivedText, "\0");
-        } 
+        }
         else
         {
           size_t len = strlen(receivedText);

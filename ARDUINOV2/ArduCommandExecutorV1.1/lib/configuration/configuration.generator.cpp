@@ -23,7 +23,7 @@ bool Configuration::isDebug()
 }
 bool Configuration::useEthernet()
 {
-  return false;
+  return true;
 }
 void Configuration::setupPins()
 {

@@ -1,20 +1,12 @@
 // #include "configuration.h"
 // #include <Arduino.h>
 
-// //--------DEVICE SPECIFIC TAP---------------------------
+// //--------DEVICE SPECIFIC---------------------------
 
-// const byte Priza8 = 8; 
-// const byte Priza7 = 7; 
-// const byte Priza6 = 6; 
-// const byte Priza5 = 5; // Not yet connected
-
+// const byte PrizaDreapta = 3; // controleaza releul pentru priza dreapta (cu senzor de curent) 
 // const byte SDCard = 4;
-
-// const byte Priza4 = 3; 
-// const byte Priza3 = 2; 
-
-// const byte TapProbeSender = A3;
-// const byte TapProbeReceiver = A4;
+// const byte PrizaStanga = 5; // controleaza releul pentru priza stanga (fara senzor de curent) 
+// const byte CurrentSensor = A1;
 
 // bool Configuration::isDebug()
 // {
@@ -26,33 +18,17 @@
 // }
 // void Configuration::setupPins()
 // {
-//     // OUTPUT PINS
-//     pinMode(SDCard, OUTPUT);
-//     pinMode(Priza8, OUTPUT);
-//     pinMode(Priza7, OUTPUT);
-//     pinMode(Priza6, OUTPUT);
-//     pinMode(Priza5, OUTPUT);
-//     pinMode(Priza4, OUTPUT);
-//     pinMode(Priza3, OUTPUT);
-
-
-//     pinMode(TapProbeSender, OUTPUT);
-//     pinMode(TapProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
-    
-//     pinMode(TemperatureSensor, INPUT);
-//     pinMode(Configuration::WatchDog, OUTPUT);
+//   // OUTPUT PINS
+// pinMode(SDCard, OUTPUT);
+//   pinMode(PrizaDreapta, OUTPUT);
+//   pinMode(PrizaStanga, OUTPUT);
+//   pinMode(CurrentSensor, INPUT);
 // }
 // void Configuration::initializePins()
 // {  
 //     digitalWrite(SDCard, HIGH); // Disable SD Card 
-//     digitalWrite(Priza8, HIGH); 
-//     digitalWrite(Priza7, HIGH); 
-//     digitalWrite(Priza6, HIGH); 
-//     digitalWrite(Priza5, HIGH); 
-//     digitalWrite(Priza3, HIGH); // decuplat
-//     digitalWrite(Priza4, HIGH); 
-
-//     digitalWrite(TapProbeSender, HIGH); // This will be our ground when probing, until then let it HIGH
+//   digitalWrite(PrizaDreapta, HIGH); // Decuplat
+//   digitalWrite(PrizaStanga, HIGH); // Decuplat 
 // }
 
 // //--------DEVICE SPECIFIC---------------------------

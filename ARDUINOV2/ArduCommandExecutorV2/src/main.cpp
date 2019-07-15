@@ -192,44 +192,46 @@ void constructPinStatesJSON(const char* deviceName,
   {
       constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
   }
-char* appendCmdResult(char* res, char* cmd, int value)
+void appendCmdResult(char* res, char* cmd, int value)
 {
-  char* result;
-  char buffer [17]; //max int on 16bit processor
-  char* sVal = itoa(value, buffer, 10);
-  size_t resLen = strlen(res);
-  size_t cmdLen = strlen(cmd);
-  size_t valLen = strlen(sVal);
-  if((result = (char*) malloc(cmdLen+resLen+valLen+1+1+1)) != NULL)
-  {
-    result[0]='\0';
-    strcat(result,res);
-    strcat(result,"|");
-    strcat(result,cmd);
-    strcat(result,":");
-    strcat(result,sVal);
-  }
-  else
-  {
-    Logger::debugln("Error malloc");
-  }
-  
-  free(res); //deallocate old pointer
-  res=NULL;
-  return result;
-
-  // size_t len = strlen(res);
-  // if(len>0){
-  //   res[len] = '|';
-  //   res[len+1] = '\0';
+  // /*malloc*/
+  // char* result;
+  // char buffer [17]; //max int on 16bit processor
+  // char* sVal = itoa(value, buffer, 10);
+  // size_t resLen = strlen(res);
+  // size_t cmdLen = strlen(cmd);
+  // size_t valLen = strlen(sVal);
+  // if((result = (char*) malloc(cmdLen+resLen+valLen+1+1+1)) != NULL)
+  // {
+  //   result[0]='\0';
+  //   strcat(result,res);
+  //   strcat(result,"|");
+  //   strcat(result,cmd);
+  //   strcat(result,":");
+  //   strcat(result,sVal);
   // }
-  // strcat(res, cmd); //append cmd in res
-  // len = strlen(res);
-  // res[len] = ':';
-  // res[len+1] = '\0';
-  // char buffer [5]; //reads cannot be more than 4 chars
+  // else
+  // {
+  //   Logger::debugln("Error malloc");
+  // }
+  
+  // free(res); //deallocate old pointer
+  // res=NULL;
+  // return result;
+  // /*malloc*/
 
-  // strcat(res, itoa(value, buffer, 10));
+  size_t len = strlen(res);
+  if(len>0){
+    res[len] = '|';
+    res[len+1] = '\0';
+  }
+  strcat(res, cmd); //append cmd in res
+  len = strlen(res);
+  res[len] = ':';
+  res[len+1] = '\0';
+  char buffer [17]; //reads cannot be more than 4 chars
+
+  strcat(res, itoa(value, buffer, 10));
 }
 int getPin(const char* key)
 {
@@ -277,7 +279,7 @@ int getCmdParam(char* cmd, byte paramIndex, bool returnAsPin)
   return atoi(res);
 }
 
-char* parseCommand(char* plainJson)
+void parseCommand(char* plainJson)
 {
   // [=3:0.25:2] - set analog 3 to 0.25 for 2 ms (setdigital if digital pin)
   // [~3:0.25:2] - set digital 3 to 0.25 for 2 ms 
@@ -293,8 +295,7 @@ Serial.println(freeMemory());
 
 size_t len = strlen(plainJson);
 char cmd[len] = "";
-//char res[len] = ""; //return get pin values
-char* res;
+char res[MAXBUFFERSIZE] = ""; //return get pin values
 
 if(plainJson[0]=='['&&plainJson[len-1]==']')
 {
@@ -345,10 +346,10 @@ if(plainJson[0]=='['&&plainJson[len-1]==']')
         }
         
         if(cmd[0]=='?'){
-          res = appendCmdResult(res, cmd, digitalRead(pin));
+          appendCmdResult(res, cmd, digitalRead(pin));
         }
         if(cmd[0]=='#'){
-          res = appendCmdResult(res, cmd, (pin<=13 ? digitalRead(pin) : analogRead(pin)));
+          appendCmdResult(res, cmd, (pin<=13 ? digitalRead(pin) : analogRead(pin)));
         }
         if(cmd[0]=='!'){ // Cmd wait
           wait(value);
@@ -357,9 +358,9 @@ if(plainJson[0]=='['&&plainJson[len-1]==']')
           if(pin==0)
             f0();
           if(pin==1)
-            res = appendCmdResult(res,cmd,f1());
+            appendCmdResult(res,cmd,f1());
           if(pin==2)
-            res = appendCmdResult(res,cmd,f2());
+            appendCmdResult(res,cmd,f2());
         }
         
         // Clear received temp to be prepared to receive next command
@@ -381,8 +382,7 @@ if(plainJson[0]=='['&&plainJson[len-1]==']')
   Logger::debugln("Deserialize received message failed.");
 }
 
-//strcpy(plainJson, res);
-return res;
+strcpy(plainJson, res);
 
 Serial.println(freeMemory());
 
@@ -412,7 +412,7 @@ void listenSerial()
         buffer[bufferSize+1]='\0';
         bufferSize++;
         
-        if(c==']' || bufferSize+1>=MAXBUFFERSIZE)
+        if(c==']' || bufferSize+1>=SerialSize)
         {
           endCmd=true;
           break;
@@ -428,12 +428,9 @@ void listenSerial()
       //TODO: Test - this executes actual commands and blocks the thread until done
       if(endCmd)
       {
-        char* result = parseCommand(buffer);//this fills buffer with results
-
-        Logger::debugln(result);
+        parseCommand(buffer);//this fills buffer with results
+        Logger::debugln(buffer);
         
-        free(result);
-        result = NULL;
         buffer[0]=0;
         bufferSize=0;
       }

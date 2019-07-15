@@ -51,8 +51,6 @@ ACS712 sensor(ACS712_30A, A1);
 float zeroCurrent = 0;
 
 static const unsigned int MAXBUFFERSIZE = 200;
-char buffer[MAXBUFFERSIZE] = ""; 
-unsigned int bufferSize = 0;
 
 EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
@@ -194,23 +192,63 @@ void constructPinStatesJSON(const char* deviceName,
   {
       constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
   }
-void appendCmdResult(char* res, char* cmd, int value)
+char* appendCmdResult(char* res, char* cmd, int value)
 {
-  size_t len = strlen(res);
-  if(len>0){
-    res[len] = '|';
-    res[len+1] = '\0';
+  char* result;
+  char buffer [17]; //max int on 16bit processor
+  char* sVal = itoa(value, buffer, 10);
+  size_t resLen = strlen(res);
+  size_t cmdLen = strlen(cmd);
+  size_t valLen = strlen(sVal);
+  if((result = (char*) malloc(cmdLen+resLen+valLen+1+1+1)) != NULL)
+  {
+    result[0]='\0';
+    strcat(result,res);
+    strcat(result,"|");
+    strcat(result,cmd);
+    strcat(result,":");
+    strcat(result,sVal);
   }
-  strcat(res, cmd); //append cmd in res
-  len = strlen(res);
-  res[len] = ':';
-  res[len+1] = '\0';
-  char buffer [33]; //reads cannot be more than 4 chars
+  else
+  {
+    Logger::debugln("Error malloc");
+  }
   
-  Serial.print(res);Serial.println(value);
-  strcat(res, itoa(value, buffer, 10));
+  free(res); //deallocate old pointer
+  res=NULL;
+  return result;
+
+  // size_t len = strlen(res);
+  // if(len>0){
+  //   res[len] = '|';
+  //   res[len+1] = '\0';
+  // }
+  // strcat(res, cmd); //append cmd in res
+  // len = strlen(res);
+  // res[len] = ':';
+  // res[len+1] = '\0';
+  // char buffer [5]; //reads cannot be more than 4 chars
+
+  // strcat(res, itoa(value, buffer, 10));
 }
-int getCmdParam(char* cmd, byte paramIndex)
+int getPin(const char* key)
+{
+  char sPin[4]="";
+  bool isAnalogPin = (key[0]=='A'||key[0]=='a');
+  
+  byte i= 0; //Start from second character id analog
+  byte index = (isAnalogPin ? 1 : 0);
+  while(key[index+i]){
+    sPin[i]=key[index+i];
+    i++;
+  }
+  sPin[i] = '\0';
+  
+  int pinNo = atoi(sPin);
+  //return isAnalogPin ? (pinNo<2 ? pinNo+16 : pinNo+18) : pinNo;
+  return isAnalogPin ? pinNo+14 : pinNo; //A0 is 14, A1 is 15...
+}
+int getCmdParam(char* cmd, byte paramIndex, bool returnAsPin)
 {
   byte i = 1; //First char is cmd char
   byte index = 0;
@@ -233,26 +271,13 @@ int getCmdParam(char* cmd, byte paramIndex)
     i++;
   }
 
+  if(returnAsPin)
+    return getPin(res);
+
   return atoi(res);
 }
-int getPin(const char* key)
-{
-  char sPin[4]="";
-  bool isAnalogPin = (key[0]=='A'||key[0]=='a');
-  
-  byte i= 0; //Start from second character id analog
-  byte index = (isAnalogPin ? 1 : 0);
-  while(key[index+i]){
-    sPin[i]=key[index+i];
-    i++;
-  }
-  sPin[i] = '\0';
-  
-  int pinNo = atoi(sPin);
-  //return isAnalogPin ? (pinNo<2 ? pinNo+16 : pinNo+18) : pinNo;
-  return isAnalogPin ? pinNo+14 : pinNo; //A0 is 14, A1 is 15...
-}
-void parseCommand(char* plainJson)
+
+char* parseCommand(char* plainJson)
 {
   // [=3:0.25:2] - set analog 3 to 0.25 for 2 ms (setdigital if digital pin)
   // [~3:0.25:2] - set digital 3 to 0.25 for 2 ms 
@@ -268,7 +293,8 @@ Serial.println(freeMemory());
 
 size_t len = strlen(plainJson);
 char cmd[len] = "";
-char res[len] = ""; //return get pin values
+//char res[len] = ""; //return get pin values
+char* res;
 
 if(plainJson[0]=='['&&plainJson[len-1]==']')
 {
@@ -281,20 +307,20 @@ if(plainJson[0]=='['&&plainJson[len-1]==']')
     {
         Serial.println(cmd);
 
-        byte pin = getCmdParam(cmd,0);
-        int value = getCmdParam(cmd,1);
-        int interval = getCmdParam(cmd,2);
+        byte pin = getCmdParam(cmd,0, true);
+        int value = getCmdParam(cmd,1, false);
+        int interval = getCmdParam(cmd,2, false);
 
       Serial.print("pin");Serial.print(pin);
       Serial.print("value");Serial.print(value);
-      Serial.print("interv");Serial.print(interval);
+      Serial.print("interv");Serial.println(interval);
 
         // execute
-        if(strncmp(cmd,"=",1)==0 || 
-              strncmp(cmd,"~",1)==0) //Cmd set
+        if(cmd[0]=='=' || 
+              cmd[0]=='~') //Cmd set
         {
           if(interval>0){ // Cmd set temp for x ms
-            if(strncmp(cmd,"~",1)==0) 
+            if(cmd[0]=='~') 
             { 
               setDigitalPinTemp(pin,value,interval);
             }
@@ -306,7 +332,7 @@ if(plainJson[0]=='['&&plainJson[len-1]==']')
           }
           else // Cmd permanent set
           {
-            if(strncmp(cmd,"~",1)==0) 
+            if(cmd[0]=='~') 
             {
               setDigitalPin(pin, value);
             }
@@ -318,22 +344,22 @@ if(plainJson[0]=='['&&plainJson[len-1]==']')
           }
         }
         
-        if(strncmp(cmd,"?",1)==0){
-          appendCmdResult(res, cmd, digitalRead(pin));
+        if(cmd[0]=='?'){
+          res = appendCmdResult(res, cmd, digitalRead(pin));
         }
-        if(strncmp(cmd,"#",1)==0){
-          appendCmdResult(res, cmd, (pin<=13 ? digitalRead(pin) : analogRead(pin)));
+        if(cmd[0]=='#'){
+          res = appendCmdResult(res, cmd, (pin<=13 ? digitalRead(pin) : analogRead(pin)));
         }
-        if(strncmp(cmd,"!",1)==0){ // Cmd wait
+        if(cmd[0]=='!'){ // Cmd wait
           wait(value);
         }
-        if(strncmp(cmd,"F",1)==0){ // Cmd function
+        if(cmd[0]=='F'){ // Cmd function
           if(pin==0)
             f0();
           if(pin==1)
-            appendCmdResult(res,cmd,f1());
+            res = appendCmdResult(res,cmd,f1());
           if(pin==2)
-            appendCmdResult(res,cmd,f2());
+            res = appendCmdResult(res,cmd,f2());
         }
         
         // Clear received temp to be prepared to receive next command
@@ -355,13 +381,17 @@ if(plainJson[0]=='['&&plainJson[len-1]==']')
   Logger::debugln("Deserialize received message failed.");
 }
 
-Serial.println(freeMemory());
+//strcpy(plainJson, res);
+return res;
 
-strcpy(plainJson, res);
+Serial.println(freeMemory());
 
 }
 void listenSerial()
 {
+  char buffer[MAXBUFFERSIZE] = ""; 
+  unsigned int bufferSize = 0;
+
   Serial.println("Listen Serial");
   char endChar = '\n';
   const byte SerialSize = 64; // This is Serial.read limit
@@ -398,9 +428,12 @@ void listenSerial()
       //TODO: Test - this executes actual commands and blocks the thread until done
       if(endCmd)
       {
-        parseCommand(buffer);//this fills buffer with results
-        Serial.println(buffer);
+        char* result = parseCommand(buffer);//this fills buffer with results
+
+        Logger::debugln(result);
         
+        free(result);
+        result = NULL;
         buffer[0]=0;
         bufferSize=0;
       }
@@ -413,8 +446,7 @@ void listenEthernet()
   client.setTimeout(10000);
 
   char endChar = '\n';
-  const byte SIZE = 250;
-  char receivedText[SIZE] = ""; //safe to change char text[] = "" despite char* receivedText="";
+  char receivedText[MAXBUFFERSIZE] = ""; //safe to change char text[] = "" despite char* receivedText="";
   
   if (client) 
   {
@@ -439,7 +471,7 @@ void listenEthernet()
         else
         {
           size_t len = strlen(receivedText);
-          if (len < SIZE-1)
+          if (len < MAXBUFFERSIZE-1)
           {
             receivedText[len] = receivedChar;
             receivedText[len + 1] = '\0';

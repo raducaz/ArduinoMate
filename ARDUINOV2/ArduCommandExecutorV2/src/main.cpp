@@ -178,10 +178,10 @@ void constructPinStatesJSON(const char* deviceName,
     const byte deviceState,
     byte pinType, 
     int* pinStates, byte size)
-  {
-      constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
-  }
-bool appendCmdResult(char* res, char* cmd, int value)
+{
+    constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
+}
+bool appendCmdResult(char* res, char* cmd, char* value)
 {
   // /*malloc*/
   // char* result;
@@ -211,10 +211,8 @@ bool appendCmdResult(char* res, char* cmd, int value)
 
   Log::debugln(F("FreeMem:"), freeMemory());
 
-  char buffer [5]; //max value is 4 chrs
-  char* sVal = itoa(value, buffer, 10);
   size_t resLen = strlen(res);
-  size_t valLen = strlen(sVal);
+  size_t valLen = strlen(value);
   size_t cmdLen = strlen(cmd);
 
   if(resLen + cmdLen + valLen + 3 > MAXBUFFERSIZE)
@@ -233,11 +231,81 @@ bool appendCmdResult(char* res, char* cmd, int value)
     res[resLen] = ':';
     res[resLen+1] = '\0';
     
-    strcat(res, sVal);
+    strcat(res, value);
   }
   Log::debugln(F("FreeMem:"), freeMemory());
 
   return true;
+}
+bool appendCmdResult(char* res, char* cmd, int value)
+{
+  char buffer [5]; //max value is 4 chrs
+  itoa(value, buffer, 10);
+  return appendCmdResult(res, cmd, buffer);
+}
+// reverses a string 'str' of length 'len' 
+void reverse(char *str, int len) 
+{ 
+    int i=0, j=len-1, temp; 
+    while (i<j) 
+    { 
+        temp = str[i]; 
+        str[i] = str[j]; 
+        str[j] = temp; 
+        i++; j--; 
+    } 
+} 
+// Converts a given integer x to string str[].  d is the number 
+ // of digits required in output. If d is more than the number 
+ // of digits in x, then 0s are added at the beginning. 
+int intToStr(int x, char str[], int d) 
+{ 
+    int i = 0; 
+    while (x) 
+    { 
+        str[i++] = (x%10) + '0'; 
+        x = x/10; 
+    } 
+  
+    // If number of digits required is more, then 
+    // add 0s at the beginning 
+    while (i < d) 
+        str[i++] = '0'; 
+  
+    reverse(str, i); 
+    str[i] = '\0'; 
+    return i; 
+} 
+// Converts a floating point number to string. 
+void ftoa(float n, char *res, int afterpoint) 
+{ 
+    // Extract integer part 
+    int ipart = (int)n; 
+  
+    // Extract floating part 
+    float fpart = n - (float)ipart; 
+  
+    // convert integer part to string 
+    int i = intToStr(ipart, res, 0); 
+  
+    // check for display option after point 
+    if (afterpoint != 0) 
+    { 
+        res[i] = '.';  // add dot 
+  
+        // Get the value of fraction part upto given no. 
+        // of points after dot. The third parameter is needed 
+        // to handle cases like 233.007 
+        fpart = fpart * pow(10, afterpoint); 
+  
+        intToStr((int)fpart, res + i + 1, afterpoint); 
+    } 
+} 
+bool appendCmdResult(char* res, char* cmd, float value)
+{
+  char buffer[10]; 
+  ftoa(value, buffer, 2);
+  return appendCmdResult(res, cmd, buffer);
 }
 int getPin(const char* key)
 {
@@ -337,7 +405,7 @@ void parseCommand(char* plainJson)
             Log::debugln(F("value:"), value);
             Log::debugln(F("interval:"), interval);
 
-            if(pin<0 || value<0 || interval<0){
+            if(pin<0 || value<0){
               strcpy(res, "PARSE_ERROR");
               break;
             }

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <MemoryFree.h>
 
 #include <Ethernet.h>
 #include <EthernetClient.h>
@@ -7,29 +8,11 @@
 #include <SPI.h>
 #include <ACS712.h>
 #include <configuration.h>
-#include "logger.h"
+#include "Log.h"
 #include <ArduinoJson.h>
 
 #include "Adafruit_Sensor.h"
 #include "DHT.h"
-
-#ifdef __arm__
-// should use uinstd.h to define sbrk but Due causes a conflict
-extern "C" char* sbrk(int incr);
-#else  // __ARM__
-extern char *__brkval;
-#endif  // __arm__
-
-int freeMemory() {
-  char top;
-#ifdef __arm__
-  return &top - reinterpret_cast<char*>(sbrk(0));
-#elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
-  return &top - __brkval;
-#else  // __arm__
-  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
-#endif  // __arm__
-}
 
 #define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
 DHT dht(Configuration::TemperatureSensor, DHTTYPE);
@@ -50,7 +33,7 @@ const char ANALOG[11] = "analogPins";
 ACS712 sensor(ACS712_30A, A1);
 float zeroCurrent = 0;
 
-static const unsigned int MAXBUFFERSIZE = 200;
+static const unsigned int MAXBUFFERSIZE = 250; //for input and output - same size
 
 EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
@@ -101,36 +84,41 @@ int f2()
 
 void wait(unsigned int msInterval)
 {
-    Logger::debug("wait for ");Logger::debug(msInterval);Logger::debugln(" ms");
-    unsigned long waitStart = millis();
+  if(msInterval>9000) msInterval = 9000; //limit wait to 9sec
 
-    unsigned long current = millis();
-    while((current - waitStart)< msInterval) 
-    {
-      current = millis();
-    }; 
+  Log::debugln(F("wait for "),msInterval);
+
+  unsigned long waitStart = millis();
+  unsigned long current = millis();
+  while((current - waitStart)< msInterval) 
+  {
+    current = millis();
+  }; 
 }  
 
 void sendToServer(const char* msg)
 {
   arduinoClient.println(msg);
 
-  Logger::debugln(msg);
+  Log::debugln(msg);
 }
 void setDigitalPin(byte pin, byte state)
 {
-  Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
+  Log::debugln(F("setPin:"),pin);
+  Log::debugln(F(" to "),state);
   digitalWrite(pin, state);
 }
 void setAnalogPin(byte pin, int state)
 {
-  Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
+  Log::debugln(F("setPin:"),pin);
+  Log::debugln(F(" to "),state);
   analogWrite(pin, state);
 }
 void setDigitalPinTemp(byte pin, byte state, unsigned int interval)
 {
-  Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
-  Logger::debug(" for ");Logger::debugln(interval);
+  Log::debugln(F("setPinTemp:"),pin);
+  Log::debugln(F(" to "),state);
+  Log::debugln(F(" for "),interval);
 
   byte state1 = digitalRead(pin);
   digitalWrite(pin, state);
@@ -140,8 +128,9 @@ void setDigitalPinTemp(byte pin, byte state, unsigned int interval)
 
 void setAnalogPinTemp(byte pin, int state, unsigned int interval)
 {
-  Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
-  Logger::debug(" for ");Logger::debugln(interval);
+  Log::debugln(F("setPinTemp:"),pin);
+  Log::debugln(F(" to "),state);
+  Log::debugln(F(" for "), interval);
 
   int state1 = analogRead(pin);
   analogWrite(pin, state);
@@ -157,7 +146,7 @@ void constructPinStatesJSON(const char* deviceName,
   {
       StaticJsonBuffer<300> _buffer;
       
-      Serial.println(freeMemory());
+      Log::debugln(F("FreeMem:"), freeMemory());
 
       JsonObject& _root = _buffer.createObject();
       if(strcmp(msg,"") != 0)
@@ -165,7 +154,7 @@ void constructPinStatesJSON(const char* deviceName,
       _root[NAME] = deviceName;
       _root[DEVICESTATE] = deviceState;
 
-      Serial.println(freeMemory());
+      Log::debugln(F("FreeMem:"), freeMemory());
 
       JsonArray& psArr = _root.createNestedArray(pinType==0?DIGITAL:ANALOG);
       for(byte i=0;i<size;i++)
@@ -173,17 +162,17 @@ void constructPinStatesJSON(const char* deviceName,
           psArr.add(pinStates[i]);
       }
 
-      Serial.println(freeMemory());
+      Log::debugln(F("FreeMem:"), freeMemory());
 
       _root.printTo(arduinoClient);
       arduinoClient.println();
 
-Serial.println(freeMemory());
+      Log::debugln(F("FreeMem:"), freeMemory());
 
       _root.printTo(Serial);
       Serial.println();
 
-      Serial.println(freeMemory());
+      Log::debugln(F("FreeMem:"), freeMemory());
   }
 void constructPinStatesJSON(const char* deviceName,
     const byte deviceState,
@@ -192,7 +181,7 @@ void constructPinStatesJSON(const char* deviceName,
   {
       constructPinStatesJSON(deviceName, deviceState, pinType, pinStates, size, "");
   }
-void appendCmdResult(char* res, char* cmd, int value)
+bool appendCmdResult(char* res, char* cmd, int value)
 {
   // /*malloc*/
   // char* result;
@@ -212,7 +201,7 @@ void appendCmdResult(char* res, char* cmd, int value)
   // }
   // else
   // {
-  //   Logger::debugln("Error malloc");
+  //   Log::debugln("Error malloc");
   // }
   
   // free(res); //deallocate old pointer
@@ -220,25 +209,42 @@ void appendCmdResult(char* res, char* cmd, int value)
   // return result;
   // /*malloc*/
 
-  size_t len = strlen(res);
-  if(len>0){
-    res[len] = '|';
-    res[len+1] = '\0';
-  }
-  strcat(res, cmd); //append cmd in res
-  len = strlen(res);
-  res[len] = ':';
-  res[len+1] = '\0';
-  char buffer [17]; //reads cannot be more than 4 chars
+  Log::debugln(F("FreeMem:"), freeMemory());
 
-  strcat(res, itoa(value, buffer, 10));
+  char buffer [5]; //max value is 4 chrs
+  char* sVal = itoa(value, buffer, 10);
+  size_t resLen = strlen(res);
+  size_t valLen = strlen(sVal);
+  size_t cmdLen = strlen(cmd);
+
+  if(resLen + cmdLen + valLen + 3 > MAXBUFFERSIZE)
+  {
+    strcpy(res, "RESPONSE_OVERFLOW");
+    return false;
+  }
+  else
+  {
+    if(resLen>1){
+      res[resLen] = '|';
+      res[resLen+1] = '\0';
+    }
+    strcat(res, cmd); //append cmd in res 
+    resLen = strlen(res);
+    res[resLen] = ':';
+    res[resLen+1] = '\0';
+    
+    strcat(res, sVal);
+  }
+  Log::debugln(F("FreeMem:"), freeMemory());
+
+  return true;
 }
 int getPin(const char* key)
 {
   char sPin[4]="";
   bool isAnalogPin = (key[0]=='A'||key[0]=='a');
   
-  byte i= 0; //Start from second character id analog
+  byte i= 0; 
   byte index = (isAnalogPin ? 1 : 0);
   while(key[index+i]){
     sPin[i]=key[index+i];
@@ -252,17 +258,19 @@ int getPin(const char* key)
 }
 int getCmdParam(char* cmd, byte paramIndex, bool returnAsPin)
 {
-  byte i = 1; //First char is cmd char
+  int cmdLen = strlen(cmd);
+  
+  byte i = 1; //First char is cmd char followed by first argument =3:1:12
   byte index = 0;
-  char res[strlen(cmd)] = "";
+  char res[cmdLen] = "";
   const char separator = ':';
   while(cmd[i]>0){
 
+    if(index>paramIndex)
+        break;
+
     if(cmd[i]==separator){
       index++;
-
-      if(index>paramIndex)
-        break;
 
     } else if(index==paramIndex){
       size_t len = strlen(res);
@@ -273,10 +281,21 @@ int getCmdParam(char* cmd, byte paramIndex, bool returnAsPin)
     i++;
   }
 
-  if(returnAsPin)
-    return getPin(res);
+  int iRes = returnAsPin ? getPin(res) : atoi(res);
+  Log::debugln(F("iRes:"),iRes);
+  char buffer[6]=""; //can be !2000\0
+  char* sRes = itoa(iRes,buffer,10);
+  Log::debugln(F("sRes:"),sRes);
+  Log::debugln(F("res:"),res);
 
-  return atoi(res);
+  if(iRes==0 && strcmp(res,"0")!=0){
+      return -1;
+  }
+  else{
+    return iRes;
+  }
+    
+  
 }
 
 void parseCommand(char* plainJson)
@@ -285,106 +304,146 @@ void parseCommand(char* plainJson)
   // [~3:0.25:2] - set digital 3 to 0.25 for 2 ms 
   // [=3:0.25] - set analog 2 to ...
   // [~3:0.25] - set digital
-  // [!:20] - wait for 20 ms
-  // [?:3] - digital read (including analog pins)
-  // [#:3] - analog read if analog
+  // [!20] - wait for 20 ms
+  // [?3] - digital read (including analog pins)
+  // [#3] - analog read if analog
   // [F0] - run f0()
-  // [=3:0.25:2|!20|?:3]
+  // [=A3:1023:2|!20|?A3]
 
-Serial.println(freeMemory());
+  Log::debugln(F("FreeMem:"), freeMemory());
 
-size_t len = strlen(plainJson);
-char cmd[len] = "";
-char res[MAXBUFFERSIZE] = ""; //return get pin values
+  size_t len = strlen(plainJson);
+  char cmd[15] = ""; //ex: =3:13:2000
+  char res[MAXBUFFERSIZE] = "["; //return get pin values
 
-if(plainJson[0]=='['&&plainJson[len-1]==']')
-{
-  byte i = 0;
-  while(plainJson[i]>0)
+  if(plainJson[0]=='['&&plainJson[len-1]==']')
   {
-    Serial.print(plainJson[i]);
-
-    if(plainJson[i]=='|' || plainJson[i]==']') // cmd terminator
+    byte i = 0;
+    while(plainJson[i]>0)
     {
-        Serial.println(cmd);
+      if(plainJson[i]=='|' || plainJson[i]==']') // cmd terminator
+      {
+          if(strlen(cmd)==0) //empty command
+            break;
 
-        byte pin = getCmdParam(cmd,0, true);
-        int value = getCmdParam(cmd,1, false);
-        int interval = getCmdParam(cmd,2, false);
-
-      Serial.print("pin");Serial.print(pin);
-      Serial.print("value");Serial.print(value);
-      Serial.print("interv");Serial.println(interval);
-
-        // execute
-        if(cmd[0]=='=' || 
-              cmd[0]=='~') //Cmd set
-        {
-          if(interval>0){ // Cmd set temp for x ms
-            if(cmd[0]=='~') 
-            { 
-              setDigitalPinTemp(pin,value,interval);
-            }
-            else
-            {
-              if(pin<=13) setDigitalPinTemp(pin,value,interval);
-              else setAnalogPinTemp(pin,value,interval);  
-            }
-          }
-          else // Cmd permanent set
+          // SET
+          if(cmd[0]=='=' || 
+                cmd[0]=='~') //Cmd set
           {
-            if(cmd[0]=='~') 
-            {
-              setDigitalPin(pin, value);
+            int pin = getCmdParam(cmd,0, true);
+            int value = getCmdParam(cmd,1, false);
+            int interval = getCmdParam(cmd,2, false);
+            Log::debugln(F("pin:"), pin);
+            Log::debugln(F("value:"), value);
+            Log::debugln(F("interval:"), interval);
+
+            if(pin<0 || value<0 || interval<0){
+              strcpy(res, "PARSE_ERROR");
+              break;
             }
-            else
+
+            if(interval>0){ 
+              // Cmd set temp for x ms
+              if(cmd[0]=='~') 
+              { 
+                setDigitalPinTemp(pin,value,interval);
+              }
+              else
+              {
+                if(pin<=13) setDigitalPinTemp(pin,value,interval);
+                else setAnalogPinTemp(pin,value,interval);  
+              }
+            }
+            else // Cmd permanent set
             {
-              if(pin<=13) setDigitalPin(pin, value);
-              else setAnalogPin(pin, value);
+              if(cmd[0]=='~') 
+              {
+                setDigitalPin(pin, value);
+              }
+              else
+              {
+                if(pin<=13) setDigitalPin(pin, value);
+                else setAnalogPin(pin, value);
+              }
             }
           }
-        }
-        
-        if(cmd[0]=='?'){
-          appendCmdResult(res, cmd, digitalRead(pin));
-        }
-        if(cmd[0]=='#'){
-          appendCmdResult(res, cmd, (pin<=13 ? digitalRead(pin) : analogRead(pin)));
-        }
-        if(cmd[0]=='!'){ // Cmd wait
-          wait(value);
-        }
-        if(cmd[0]=='F'){ // Cmd function
-          if(pin==0)
-            f0();
-          if(pin==1)
-            appendCmdResult(res,cmd,f1());
-          if(pin==2)
-            appendCmdResult(res,cmd,f2());
-        }
-        
-        // Clear received temp to be prepared to receive next command
-        strcpy(cmd, "\0");
-    }
-    else{
-      if(plainJson[i]!='['){
-        size_t len = strlen(cmd);
-        cmd[len] = plainJson[i];
-        cmd[len + 1] = '\0';
+          
+          // GET
+          if(cmd[0]=='?'){
+            int pin = getCmdParam(cmd,0, true);
+            Log::debugln(F("pin:"), pin);
+            if(pin<0){
+              strcpy(res, "PARSE_ERROR");
+              break;
+            }
+
+            if(!appendCmdResult(res, cmd, digitalRead(pin)))
+              break;
+          }
+          // GET
+          if(cmd[0]=='#'){
+            int pin = getCmdParam(cmd,0, true);
+            Log::debugln(F("pin:"), pin);
+            if(pin<0){
+              strcpy(res, "PARSE_ERROR");
+              break;
+            }
+            if(!appendCmdResult(res, cmd, (pin<=13 ? digitalRead(pin) : analogRead(pin))))
+              break;
+          }
+          // WAIT
+          if(cmd[0]=='!'){ // Cmd wait
+            int interval = getCmdParam(cmd,0, false);
+            Log::debugln(F("interval:"), interval);
+            if(interval<0){
+              strcpy(res, "PARSE_ERROR");
+              break;
+            }
+            wait(interval);
+          }
+          // FUNCTIONS
+          if(cmd[0]=='F'){ 
+            // Cmd function
+            int fctNo = getCmdParam(cmd,0, false);
+            Log::debugln(F("fct:"), fctNo);
+            if(fctNo<0){
+              strcpy(res, "PARSE_ERROR");
+              break;
+            }
+            if(fctNo==0)
+              f0();
+            if(fctNo==1)
+              if(!appendCmdResult(res,cmd,f1()))
+                break;
+            if(fctNo==2)
+              if(!appendCmdResult(res,cmd,f2()))
+                break;
+          }
+          
+          // Clear received temp to be prepared to receive next command
+          strcpy(cmd, "\0");
       }
+      else{
+        if(plainJson[i]!='['){
+          size_t len = strlen(cmd);
+          cmd[len] = plainJson[i];
+          cmd[len + 1] = '\0';
+        }
+      }
+
+      i++;
     }
 
-    i++;
+    strcat(res,"]"); //End output message for completeness controll
+    
+  } else {
+    Log::debugln("Deserialize received message failed.");
+    strcat(res, "PARSE_ERROR]");
   }
-  
-} else {
-  strcat(res, "Error parsing message");
-  Logger::debugln("Deserialize received message failed.");
-}
 
-strcpy(plainJson, res);
+  strcpy(plainJson, res);
 
-Serial.println(freeMemory());
+  Log::debugln(F("FreeMem:"), freeMemory());
 
 }
 void listenSerial()
@@ -392,14 +451,15 @@ void listenSerial()
   char buffer[MAXBUFFERSIZE] = ""; 
   unsigned int bufferSize = 0;
 
-  Serial.println("Listen Serial");
+  Log::debugln("Listen Serial");
+
   char endChar = '\n';
   const byte SerialSize = 64; // This is Serial.read limit
   
   if(Serial){
 
     if (Serial.available()!=0) {
-      Serial.println("Serial available");
+      Log::debugln("Serial available");
 
       char c = 0;
       bool endCmd = false;
@@ -412,7 +472,7 @@ void listenSerial()
         buffer[bufferSize+1]='\0';
         bufferSize++;
         
-        if(c==']' || bufferSize+1>=SerialSize)
+        if(c==']' || bufferSize+1>=SerialSize || bufferSize+1>=MAXBUFFERSIZE)
         {
           endCmd=true;
           break;
@@ -421,15 +481,14 @@ void listenSerial()
         i++;
       }
         
-      //Logger::debugln(receivedText.as<char*>());
-      Serial.println("");
-      Serial.println(buffer);
+      //Log::debugln(receivedText.as<char*>());
 
       //TODO: Test - this executes actual commands and blocks the thread until done
       if(endCmd)
       {
         parseCommand(buffer);//this fills buffer with results
-        Logger::debugln(buffer);
+        
+        Log::debugln(F("Serial received:"),buffer);
         
         buffer[0]=0;
         bufferSize=0;
@@ -447,20 +506,21 @@ void listenEthernet()
   
   if (client) 
   {
-    Logger::debugln("Client connected");
+    Log::debugln("Client connected");
     while (client.connected()) 
     {
       if (client.available()) 
       {
         char receivedChar = client.read();
-        //Logger::debugln(receivedChar);
+        //Log::debugln(receivedChar);
 
         if (receivedChar==endChar)
         {
           //!!!This blocks current thread until command is done
-          parseCommand(receivedText); //Fills receivesText with results
-          client.println(receivedText);
-          Serial.println(receivedText);
+          parseCommand(receivedText); //Fills receivedText with results
+          client.println(receivedText); // Sends the results to Ethernet client
+
+          Log::debugln(F("Ethernet received:"), receivedText);
          
           // Clear received temp to be prepared to receive next command
           strcpy(receivedText, "\0");
@@ -475,20 +535,20 @@ void listenEthernet()
           }
           else
           {
-            Serial.println("Max received message len reached.");
+            client.println("COMMAND_OVERFLOW"); // Send Error message
+            Log::debugln("Max received message len reached.");
           }
         } 
       } 
     }
 
-    Serial.println();
-    Serial.println("CLOSE CONNECTION"); 
+    Log::debugln("CLOSE CONNECTION"); 
+
     client.stop();
-  
   }
   else
   {
-    Logger::debugln("No client, server stopped");
+    Log::debugln("No client, server stopped");
   }  
 }
 void serverThreadCallback()
@@ -496,8 +556,7 @@ void serverThreadCallback()
     if(Configuration::useEthernet()){
       listenEthernet();
     }
-    else
-    {
+    else{
       listenSerial();
     }
 }
@@ -509,7 +568,8 @@ bool ConnectToServer(const byte* ip, const int port)
     {
       arduinoClient.stop();
       
-      Logger::debugln("MON: Reconnecting...");
+      Log::debugln("MON: Reconnecting...");
+
       if (arduinoClient.connect(ip, port)) {    
         return arduinoClient.connected();
       }
@@ -526,7 +586,8 @@ bool ConnectToServer(const byte* ip, const int port)
   }
   else
   {
-    Logger::debugln("MON: Connecting...");
+    Log::debugln("MON: Connecting...");
+
     arduinoClient.connect(ip, port);
     return arduinoClient.connected();
   }
@@ -541,16 +602,19 @@ void clientThreadCallback()
   }
   if(!arduinoClient.connected())
   {
-    Logger::debugln("MON: Check connection to gateway.");
+    Log::debugln("MON: Check connection to gateway.");
+
     if(!ConnectToServer(gateway, 80))
     {
-      Logger::debugln("MON: Cannot connect, reinitialize ethernet.");
+      Log::debugln("MON: Cannot connect, reinitialize ethernet.");
+
       Ethernet.begin(mac, ip, dns, gateway, subnet);
     }
   } else
   {
     // Send status all the time
-    Logger::debug("MON: Sending status from ...");Logger::debugln(Ethernet.localIP());
+    Log::debugln(F("MON: Sending status from ..."), Ethernet.localIP());
+
     byte state = 0;
     if(isRestarted)
     { 
@@ -595,16 +659,17 @@ void setupThread()
 }
 void setup() {
   delay(250);
+
+  Serial.begin(9600);
+  Log::logln("Entering Setup");
+
+  Log::debugln(F("FreeMem:"), freeMemory());
   
+  delay(1000);
   // Sensor initialization
   calibrateCurrentSensor();
   dht.begin();
-// Sensor initialization
-
-  delay(1000);
-  
-  Serial.begin(9600);
-  Logger::logln("Entering Setup");
+  // Sensor initialization
 
   Configuration::setupPins();
   Configuration::initializePins();
@@ -613,11 +678,10 @@ void setup() {
   Ethernet.begin(mac, ip, dns, gateway, subnet);
 
   delay(1000);
-  Logger::log("My IP address: ");
-  Logger::logln(Ethernet.localIP());
+  Log::debugln(F("My IP address: "), Ethernet.localIP());
   
   server.begin();
-  Logger::debugln("Server started...listening...");
+  Log::debugln(F("Server started"));
 
   setupThread();
 }
@@ -640,9 +704,9 @@ void loop() {
     noLoopRuns = 0;
   }
 
-
   // Send ImAlive to WatchDog
-  Logger::logln("I'm alive !");
+  Log::logln("I'm alive !");
+
   digitalWrite(Configuration::WatchDog, digitalRead(Configuration::WatchDog)==0?1:0);
   delay(500);
   Serial.println(f2());

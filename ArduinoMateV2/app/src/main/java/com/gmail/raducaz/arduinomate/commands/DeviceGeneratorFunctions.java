@@ -50,7 +50,7 @@ public class DeviceGeneratorFunctions {
         }
         catch (Exception exc)
         {
-            Log.e("isCurrentAbove", exc.getMessage());
+            Log.e("getTemperature", exc.getMessage());
             return -50;
         }
     }

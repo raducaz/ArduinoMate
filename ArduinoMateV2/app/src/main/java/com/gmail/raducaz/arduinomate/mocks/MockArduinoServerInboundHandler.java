@@ -124,87 +124,267 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
         }
     }
 
+    private String appendCmdResult(String res, String cmd, int value)
+    {
+        return appendCmdResult(res, cmd, Integer.toString(value));
+    }
+    private String appendCmdResult(String res, String cmd, double value)
+    {
+        return appendCmdResult(res, cmd, Double.toString(value));
+    }
+    private String appendCmdResult(String res, String cmd, String value)
+    {
+        if(res.isEmpty())
+            return res + cmd + ":" + value;
+        else
+            return "|" + res + cmd + ":" + value;
+    }
+    private int getCmdParam(String cmd, int paramIndex, boolean returnAsPin)
+    {
+        int cmdLen = cmd.length();
+
+        byte i = 1; //First char is cmd char followed by first argument =3:1:12
+        byte index = 0;
+        String res = "";
+        char separator = ':';
+
+        while(i<cmd.length()){
+
+            if(index>paramIndex)
+                break;
+
+            if(cmd.charAt(i)==separator){
+                index++;
+
+            } else if(index==paramIndex){
+                res += cmd.charAt(i);
+            }
+            i++;
+        }
+
+        try {
+            int iRes = returnAsPin ? getPin(0, res) : Integer.parseInt(res);
+
+            String sRes = Integer.toString(iRes);
+
+            if (iRes == 0 && !res.equals("0")) {
+                return -1;
+            } else {
+                return iRes;
+            }
+        }catch (Exception exc)
+        {
+            return -1;
+        }
+    }
     private String ProcessCommand(String msg)
     {
         try
         {
-            JSONArray cmd = new JSONArray(msg);
+            String res = "";
+            String cmd = "";
 
-            for (int i=0;i<cmd.length();i++) {
-
-                JSONObject obj = cmd.getJSONObject(i);
-                String key = "";
-                Iterator<String> keys = obj.keys();
-
-                while (keys.hasNext()) {
-
-                    int pin = 0;
-                    key = keys.next();
-                    //keys.remove();
-
-                    if (key.startsWith("=") ||
-                            key.startsWith("~")) // Cmd set
+            if(msg.charAt(0)=='['&&msg.charAt(msg.length()-1)==']')
+            {
+                byte i = 0;
+                while(i<msg.length())
+                {
+                    if(msg.charAt(i)=='|' || msg.charAt(i)==']') // cmd terminator
                     {
-                        pin = getPin(1, key);
-                        if (obj.has("@")) // Cmd set temp for x ms
+                        if(cmd.length()==0) //empty command
+                            break;
+
+                        // SET
+                        if(cmd.charAt(0)=='=' ||
+                                cmd.charAt(0)=='~') //Cmd set
                         {
-                            if (key.startsWith("~")) {
-                                setDigitalPinStateTemp(pin, obj.optDouble(key), obj.optInt("@"), pin>13);
-                            } else {
-                                if(pin<=13)
-                                    setDigitalPinStateTemp(pin, obj.optDouble(key),obj.optInt("@"), false);
+                            int pin = getCmdParam(cmd,0, true);
+                            int value = getCmdParam(cmd,1, false);
+                            int interval = getCmdParam(cmd,2, false);
+
+                            if(pin<0 || value<0){
+                                res = "PARSE_ERROR";
+                                break;
+                            }
+
+                            if(interval>0){
+                                // Cmd set temp for x ms
+                                if(cmd.charAt(0)=='~')
+                                {
+                                    setDigitalPinStateTemp(pin,value,interval, pin>13);
+                                }
                                 else
-                                    setAnalogPinStateTemp(pin, obj.optDouble(key),obj.optInt("@"));
+                                {
+                                    if(pin<=13) setDigitalPinStateTemp(pin,value,interval,false);
+                                    else setAnalogPinStateTemp(pin,value,interval);
+                                }
+                            }
+                            else // Cmd permanent set
+                            {
+                                if(cmd.charAt(0)=='~')
+                                {
+                                    setDigitalPinState(pin, value, pin>13);
+                                }
+                                else
+                                {
+                                    if(pin<=13) setDigitalPinState(pin, value, pin>13);
+                                    else setAnalogPinState(pin, value);
+                                }
                             }
                         }
-                        else // Cmd permanent set
-                        {
-                            if (key.startsWith("~")) {
-                                setDigitalPinState(pin, obj.optDouble(key), pin>13);
-                            } else {
-                                if(pin<=13)
-                                    setDigitalPinState(pin, obj.optDouble(key), false);
-                                else
-                                    setAnalogPinState(pin, obj.optDouble(key));
+
+                        // GET
+                        if(cmd.charAt(0)=='?'){
+                            int pin = getCmdParam(cmd,0, true);
+                            if(pin<0){
+                                res="PARSE_ERROR";
+                                break;
                             }
+
+                            res = appendCmdResult(res, cmd, getDigitalPinState(pin, pin>13));
                         }
-                    }
-                    if (key.startsWith("?") ||
-                            key.startsWith("#")) // Cmd get
-                    {
-                        pin = getPin(1, key);
-                        if (key.startsWith("#")) { // get digital
-                            obj.put(key, getDigitalPinState(pin, pin>13));
+                        // GET
+                        if(cmd.charAt(0)=='#'){
+                            int pin = getCmdParam(cmd,0, true);
+
+                            if(pin<0){
+                                res="PARSE_ERROR";
+                                break;
+                            }
+                            res = appendCmdResult(res, cmd, (pin<=13 ? getDigitalPinState(pin, false) : getAnalogPinState(pin)));
                         }
-                        else {
-                            obj.put(key, pin<=13 ? getDigitalPinState(pin, false) : getAnalogPinState(pin));
+                        // WAIT
+                        if(cmd.charAt(0)=='!'){ // Cmd wait
+                            int interval = getCmdParam(cmd,0, false);
+                            if(interval<0){
+                                res="PARSE_ERROR";
+                            }
+                            Thread.sleep(interval);
                         }
+                        // FUNCTIONS
+                        if(cmd.charAt(0)=='F'){
+                            // Cmd function
+                            int fctNo = getCmdParam(cmd,0, false);
+
+                            if(fctNo<0){
+                                res="PARSE_ERROR";
+                                break;
+                            }
+                            if(fctNo==0)
+                                setAnalogPinState(20, 3);
+                            if(fctNo==1)
+                                res = appendCmdResult(res,cmd,0.23);
+                            if(fctNo==2)
+                                res = appendCmdResult(res,cmd,-100);
+                        }
+
+                        // Clear received temp to be prepared to receive next command
+                        cmd="";
                     }
-                    if (key.startsWith("!")) // Cmd set
-                    {
-                        Thread.sleep(obj.getInt(key));
-                    }
-                    if (key.equals("F1")) // Cmd function
-                    {
-                        obj.put(key,getAnalogPinState(15));
-                    }
-                    if (key.equals("F0")) // Cmd function restart
-                    {
-                        setAnalogPinState(20, 3);
+                    else{
+                        if(msg.charAt(i)!='['){
+                            cmd += msg.charAt(i);
+                        }
                     }
 
+                    i++;
                 }
 
-                obj.put(">", 1);
+                res+="]"; //End output message for completeness controll
+
+            } else {
+                res+="PARSE_ERROR]";
             }
 
-            return cmd.toString();
+            return res;
         }
         catch (Exception exc)
         {
             return msg;
         }
     }
+
+//    private String ProcessCommand(String msg)
+//    {
+//        try
+//        {
+//            JSONArray cmd = new JSONArray(msg);
+//
+//            for (int i=0;i<cmd.length();i++) {
+//
+//                JSONObject obj = cmd.getJSONObject(i);
+//                String key = "";
+//                Iterator<String> keys = obj.keys();
+//
+//                while (keys.hasNext()) {
+//
+//                    int pin = 0;
+//                    key = keys.next();
+//                    //keys.remove();
+//
+//                    if (key.startsWith("=") ||
+//                            key.startsWith("~")) // Cmd set
+//                    {
+//                        pin = getPin(1, key);
+//                        if (obj.has("@")) // Cmd set temp for x ms
+//                        {
+//                            if (key.startsWith("~")) {
+//                                setDigitalPinStateTemp(pin, obj.optDouble(key), obj.optInt("@"), pin>13);
+//                            } else {
+//                                if(pin<=13)
+//                                    setDigitalPinStateTemp(pin, obj.optDouble(key),obj.optInt("@"), false);
+//                                else
+//                                    setAnalogPinStateTemp(pin, obj.optDouble(key),obj.optInt("@"));
+//                            }
+//                        }
+//                        else // Cmd permanent set
+//                        {
+//                            if (key.startsWith("~")) {
+//                                setDigitalPinState(pin, obj.optDouble(key), pin>13);
+//                            } else {
+//                                if(pin<=13)
+//                                    setDigitalPinState(pin, obj.optDouble(key), false);
+//                                else
+//                                    setAnalogPinState(pin, obj.optDouble(key));
+//                            }
+//                        }
+//                    }
+//                    if (key.startsWith("?") ||
+//                            key.startsWith("#")) // Cmd get
+//                    {
+//                        pin = getPin(1, key);
+//                        if (key.startsWith("#")) { // get digital
+//                            obj.put(key, getDigitalPinState(pin, pin>13));
+//                        }
+//                        else {
+//                            obj.put(key, pin<=13 ? getDigitalPinState(pin, false) : getAnalogPinState(pin));
+//                        }
+//                    }
+//                    if (key.startsWith("!")) // Cmd set
+//                    {
+//                        Thread.sleep(obj.getInt(key));
+//                    }
+//                    if (key.equals("F1")) // Cmd function
+//                    {
+//                        obj.put(key,getAnalogPinState(15));
+//                    }
+//                    if (key.equals("F0")) // Cmd function restart
+//                    {
+//                        setAnalogPinState(20, 3);
+//                    }
+//
+//                }
+//
+//                obj.put(">", 1);
+//            }
+//
+//            return cmd.toString();
+//        }
+//        catch (Exception exc)
+//        {
+//            return msg;
+//        }
+//    }
 
     private int getPin(int startIndex, String key) {
 
@@ -222,16 +402,16 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
         return isAnalogPin ? pinNo + 14 : pinNo; //A0 is 14, A1 is 15...
     }
 
-    private double getDigitalPinState(int pinNo, boolean isAnalog)
+    private int getDigitalPinState(int pinNo, boolean isAnalog)
     {
         MockPinStateEntity pin = dataRepository.loadMockDevicePinStateSync(deviceName, pinNo);
-        double state = pin.getState();
+        int state = (int)pin.getState();
         return isAnalog ? (state >= 1023 ? 1 : 0) : state;
     }
-    private double getAnalogPinState(int pinNo)
+    private int getAnalogPinState(int pinNo)
     {
         MockPinStateEntity pin = dataRepository.loadMockDevicePinStateSync(deviceName, pinNo);
-        return pin.getState();
+        return (int)pin.getState();
     }
     private void setDigitalPinState(int pinNo, double state, boolean isAnalog)
     {

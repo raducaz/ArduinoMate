@@ -25,18 +25,20 @@ public class Parser {
     {
         // [F2:-100|F1:1|?2:0|#2:0|#A4:1019]
         // key = #2, F1 etc.
+        int keyLen = key.length();
         int start = result.indexOf(key);
         if(start == -1)
             return "";
 
-        if(start+1<result.length())
+        if(start+keyLen<result.length())
         {
-            String partRes = result.substring(start+1);
-            int end = result.indexOf("|");
-            if(end == -1) end = result.indexOf("]");
+            String partRes = result.substring(start+keyLen);
+            partRes = partRes.replace(":","");
+            int end = partRes.indexOf("|");
+            if(end == -1) end = partRes.indexOf("]");
 
-            if(end-1>=0)
-                return partRes.substring(0, end-1);
+            if(end>=0)
+                return partRes.substring(0, end);
             else
                 return "";
         }

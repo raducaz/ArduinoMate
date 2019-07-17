@@ -20,7 +20,7 @@ public class DeviceBoilerFunctions {
         String TAG = "boilerON";
 
         // TODO: check the actual pin and state need to be in
-        String command = "[{\"=7\":0}]";
+        String command = "[=7:0]";
         String result = arduinoCommander.SendCommand(command);
 
         //TODO: check also the current consumption
@@ -32,7 +32,7 @@ public class DeviceBoilerFunctions {
         String TAG = "boilerOFF";
 
         // TODO: check the actual pin and state need to be in
-        String command = "[{\"=7\":1}]";
+        String command = "[=7:1]";
         String result = arduinoCommander.SendCommand(command);
 
         return true;

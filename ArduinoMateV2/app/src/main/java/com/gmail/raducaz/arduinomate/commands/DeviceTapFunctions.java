@@ -26,7 +26,7 @@ public class DeviceTapFunctions {
         String TAG = "tapOpen";
 
         // Open selected pin -- cannot send the wait command now, because tap will open in 45s
-        String command = "[{\"=7\":0}]";
+        String command = "[=7:0]";
         String result = arduinoCommander.SendCommand(command);
 
         if(isContactOn()) {
@@ -51,7 +51,7 @@ public class DeviceTapFunctions {
             return true;
         else {
             // Open selected pin -- cannot send the wait command now, because tap will open in 45s
-            String command = "[{\"=7\":1}]";
+            String command = "[=7:1]";
             String result = arduinoCommander.SendCommand(command);
 
             if (!isContactOn()) {
@@ -83,7 +83,7 @@ public class DeviceTapFunctions {
     private boolean isPinOn(String pin) throws Exception {
         String TAG = "isPinOn";
 
-        String command = "[{\"?" + pin + "\":0}]";
+        String command = "[?" + pin + "]";
         String result = arduinoCommander.SendCommand(command);
 
         // Read command results
@@ -98,7 +98,7 @@ public class DeviceTapFunctions {
         String TAG = "tapOpenState";
 
             // Send probe and see if contact is ON => tap is OPEN
-            String command = "[{\"~A3\":0},{\"#A4\":0},{\"~A3\":1}]"; // A4 is receiver
+            String command = "[~A3:0|#A4|~A3:1]"; // A4 is receiver
             String result = arduinoCommander.SendCommand(command);
 
             try {
@@ -116,7 +116,7 @@ public class DeviceTapFunctions {
     public boolean tapIrrigationLeftCLOSE() {
         String TAG = "tapIrrigationLeftCLOSE";
 
-        String command = "[{\"=3\":1}]";
+        String command = "[=3:1]";
         String result = arduinoCommander.SendCommand(command);
 
         return true;
@@ -124,7 +124,7 @@ public class DeviceTapFunctions {
     public boolean tapIrrigationLeftOPEN() {
         String TAG = "tapIrrigationLeftOPEN";
 
-        String command = "[{\"=3\":0}]";
+        String command = "[=3:0]";
         String result = arduinoCommander.SendCommand(command);
 
         return true;
@@ -133,7 +133,7 @@ public class DeviceTapFunctions {
     public boolean tapIrrigationRightCLOSE() {
         String TAG = "tapIrrigationLeftCLOSE";
 
-        String command = "[{\"=2\":1}]";
+        String command = "[=2:1]";
         String result = arduinoCommander.SendCommand(command);
 
         return true;
@@ -141,7 +141,7 @@ public class DeviceTapFunctions {
     public boolean tapIrrigationRightOPEN() {
         String TAG = "tapIrrigationLeftOPEN";
 
-        String command = "[{\"=2\":0}]";
+        String command = "[=2:0]";
         String result = arduinoCommander.SendCommand(command);
 
         return true;

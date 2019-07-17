@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <MemoryFree.h>
 
+#include <math.h>
 #include <Ethernet.h>
 #include <EthernetClient.h>
 #include <EthernetServer.h>
@@ -277,7 +278,7 @@ int intToStr(int x, char str[], int d)
     return i; 
 } 
 // Converts a floating point number to string. 
-void ftoa(float n, char *res, int afterpoint) 
+void ftoaold(float n, char *res, int afterpoint) 
 { 
     // Extract integer part 
     int ipart = (int)n; 
@@ -304,7 +305,9 @@ void ftoa(float n, char *res, int afterpoint)
 bool appendCmdResult(char* res, char* cmd, float value)
 {
   char buffer[10]; 
-  ftoa(value, buffer, 2);
+  //gcvt(value, 2, buffer);
+  dtostrf(value, '.', 2, buffer);
+  //ftoa()
   return appendCmdResult(res, cmd, buffer);
 }
 int getPin(const char* key)

@@ -24,7 +24,7 @@ public class DeviceGeneratorFunctions {
     {
         try {
             // Check AC current - if high then it's on
-            String command = "[{\"F1\":0}]";
+            String command = "[F1]";
             String result = arduinoCommander.SendCommand(command);
             if (new Parser(result).getDouble("F1") >= threshold)
                 return true;
@@ -41,7 +41,7 @@ public class DeviceGeneratorFunctions {
     {
         try {
             // Check AC current - if high then it's on
-            String command = "[{\"F2\":0}]";
+            String command = "[F2]";
             String result = arduinoCommander.SendCommand(command);
             double temp = 0;
             temp = new Parser(result).getDouble("F2");
@@ -59,7 +59,7 @@ public class DeviceGeneratorFunctions {
     public boolean testLongRun() {
         String TAG = "testLongRun";
 
-        String command = "[{\"=6\":0,\"@\":500},{\"!\":1000},{\"=2\":0},{\"!\":1000},{\"=8\":1,\"@\":2000},{\"=7\":0,\"@\":500}]";
+        String command = "[=6:0:500|!:1000|=2:0|!:1000|=8:1:2000|=7:0:500]";
         String result = arduinoCommander.SendCommand(command);
 
         try {

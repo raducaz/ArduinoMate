@@ -41,8 +41,8 @@ void loop() {
         clients[b][1] = millis();
       }
 
-      Serial.print("same");Serial.print(currentState);Serial.print(clients[b][0]);Serial.print("-");
-      Serial.println((millis() - clients[b][1])/1000);
+      // Serial.print("same");Serial.print(currentState);Serial.print(clients[b][0]);Serial.print("-");
+      // Serial.println((millis() - clients[b][1])/1000);
 
     } 
     if(currentState!=clients[b][0])
@@ -61,5 +61,4 @@ void loop() {
     delay(100);
    resetFunc();
   }
-
 }

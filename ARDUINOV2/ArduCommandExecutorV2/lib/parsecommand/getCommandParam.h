@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 #include <math.h>
-#include "Log.h"
+#include "log.h"
 #include <MemoryFree.h>
 
 int getPin(const char* key);

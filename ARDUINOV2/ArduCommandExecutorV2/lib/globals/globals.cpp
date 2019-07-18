@@ -7,7 +7,7 @@
     int arduinoPort = 8080; //This needs to match the name configured on Android App
     char arduinoName[] = "Generator"; //This needs to match the name configured on Android App
     //--------DEVICE SPECIFIC---------------------------
-    byte serverIp[] = { 192, 168, 1, 12 }; // Android device IP
+    byte serverIp[] = { 192, 168, 1, 10 }; // Android device IP
     byte gateway[] = { 192, 168, 1, 1 };
     byte dns[] = { 192, 168, 1, 1 };
 
@@ -27,9 +27,9 @@
     byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x71 };
     const byte ip[] = { 192, 168, 1, 101 }; //This needs to match the name configured on Android App
     int arduinoPort = 8081; //This needs to match the name configured on Android App
-    char arduinoName[] = "TAP"; //This needs to match the name configured on Android App
+    char arduinoName[] = "Tap"; //This needs to match the name configured on Android App
     //--------DEVICE SPECIFIC---------------------------
-    byte serverIp[] = { 192, 168, 1, 12 }; // Android device IP
+    byte serverIp[] = { 192, 168, 1, 10 }; // Android device IP
     byte gateway[] = { 192, 168, 1, 1 };
     byte dns[] = { 192, 168, 1, 1 };
 
@@ -47,9 +47,9 @@
     byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x70 };
     const byte ip[] = { 192, 168, 1, 102 }; //This needs to match the name configured on Android App
     int arduinoPort = 8082; //This needs to match the name configured on Android App
-    char arduinoName[] = "TAP"; //This needs to match the name configured on Android App
+    char arduinoName[] = "Boiler"; //This needs to match the name configured on Android App
     //--------DEVICE SPECIFIC---------------------------
-    byte serverIp[] = { 192, 168, 1, 12 }; // Android device IP
+    byte serverIp[] = { 192, 168, 1, 10 }; // Android device IP
     byte gateway[] = { 192, 168, 1, 1 };
     byte dns[] = { 192, 168, 1, 1 };
 

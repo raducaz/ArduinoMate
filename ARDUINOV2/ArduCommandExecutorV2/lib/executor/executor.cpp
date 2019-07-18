@@ -1,52 +1,35 @@
-#include "executor.h"
+#include <executor.h>
 
-#include <Arduino.h>
-#include <Ethernet.h>
-#include <EthernetClient.h>
-#include <EthernetServer.h>
-#include <ArduinoJson.h>
-#include "logger.h"
-
-void MyExecutor::wait(unsigned int msInterval)
+void wait(unsigned int msInterval)
 {
-    Logger::debug("wait for ");Logger::debug(msInterval);Logger::debugln(" ms");
-    unsigned long waitStart = millis();
+  if(msInterval>9000) msInterval = 9000; //limit wait to 9sec
 
-    unsigned long current = millis();
-    while((current - waitStart)< msInterval) 
-    {
-      current = millis();
-    }; 
+  Log::debugln(F("wait for "),msInterval);
+
+  unsigned long waitStart = millis();
+  unsigned long current = millis();
+  while((current - waitStart)< msInterval) 
+  {
+    current = millis();
+  }; 
 }  
-
-void MyExecutor::sendToServer(const char* msg, EthernetClient& client)
+void setDigitalPin(byte pin, byte state)
 {
-  client.println(msg);
-
-  Logger::debugln(msg);
-}
-void MyExecutor::sendToServer(JsonObject& json, EthernetClient& client)
-{
-  json.printTo(client);
-  client.println();
-
-  json.printTo(Serial);
-  Serial.println();
-}
-void MyExecutor::setDigitalPin(byte pin, byte state)
-{
-  Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
+  Log::debugln(F("setPin:"),pin);
+  Log::debugln(F(" to "),state);
   digitalWrite(pin, state);
 }
-void MyExecutor::setAnalogPin(byte pin, float state)
+void setAnalogPin(byte pin, int state)
 {
-  Logger::debug("setPin:"); Logger::debug(pin);Logger::debug(" to ");Logger::debugln(state);
+  Log::debugln(F("setPin:"),pin);
+  Log::debugln(F(" to "),state);
   analogWrite(pin, state);
 }
-void MyExecutor::setDigitalPinTemp(byte pin, byte state, unsigned int interval)
+void setDigitalPinTemp(byte pin, byte state, unsigned int interval)
 {
-  Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
-  Logger::debug(" for ");Logger::debugln(interval);
+  Log::debugln(F("setPinTemp:"),pin);
+  Log::debugln(F(" to "),state);
+  Log::debugln(F(" for "),interval);
 
   byte state1 = digitalRead(pin);
   digitalWrite(pin, state);
@@ -54,10 +37,11 @@ void MyExecutor::setDigitalPinTemp(byte pin, byte state, unsigned int interval)
   digitalWrite(pin, state1);
 }
 
-void MyExecutor::setAnalogPinTemp(byte pin, float state, unsigned int interval)
+void setAnalogPinTemp(byte pin, int state, unsigned int interval)
 {
-  Logger::debug("setPinTemp:");Logger::debug(pin);Logger::debug(" to ");Logger::debug(state);
-  Logger::debug(" for ");Logger::debugln(interval);
+  Log::debugln(F("setPinTemp:"),pin);
+  Log::debugln(F(" to "),state);
+  Log::debugln(F(" for "), interval);
 
   int state1 = analogRead(pin);
   analogWrite(pin, state);

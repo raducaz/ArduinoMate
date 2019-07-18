@@ -20,6 +20,8 @@ import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionList.FunctionViewHolder> {
 
@@ -109,10 +111,12 @@ public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionLis
 //                    Snackbar.make(v, "Share " + binding.getFunction().getName(),
 //                            Snackbar.LENGTH_LONG).show();
 
+//                    ExecutorService taskExecutor = Executors.newFixedThreadPool(4);
                     TaskFunctionCaller functionCaller = new TaskFunctionCaller(
                             application.getRepository(),
-                            (FunctionEntity) binding.getFunction());
-                    new TaskExecutor().execute(functionCaller);
+                            binding.getFunction().getId());
+                    application.getNetworkExecutor().execute(functionCaller);
+//                    new TaskExecutor().execute(functionCaller);
                 }
             });
         }

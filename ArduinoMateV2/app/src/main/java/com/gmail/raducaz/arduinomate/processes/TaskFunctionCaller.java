@@ -11,7 +11,7 @@ import com.gmail.raducaz.arduinomate.remote.RemoteFunctionCommand;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 /// Entry point for all function executions
-public class TaskFunctionCaller implements TaskInterface {
+public class TaskFunctionCaller implements Runnable {
 
     private String TAG = "TaskFunctionCaller";
 
@@ -20,7 +20,7 @@ public class TaskFunctionCaller implements TaskInterface {
     private String functionName;
 
     private DeviceEntity device;
-    private FunctionEntity function;
+    private long functionId;
     private final DataRepository mRepository;
     private FunctionResultStateEnum desiredFunctionResult;
 
@@ -38,9 +38,8 @@ public class TaskFunctionCaller implements TaskInterface {
     private String reasonDetails;
 
     // This is used by the UI
-    public TaskFunctionCaller(DataRepository dataRepository, FunctionEntity function) {
-        this.function = function;
-        this.functionName = function.getName();
+    public TaskFunctionCaller(DataRepository dataRepository, long functionId) {
+        this.functionId = functionId;
 
         mRepository = dataRepository;
         this.desiredFunctionResult = FunctionResultStateEnum.NA;
@@ -63,8 +62,15 @@ public class TaskFunctionCaller implements TaskInterface {
         this.reasonDetails = reasonDetails;
     }
 
-    public void execute() {
+    public void run() {
+        FunctionEntity function = null;
         try {
+            if(functionId > 0)
+            {
+                function = mRepository.loadFunctionSync(functionId);
+                functionName = function.getName();
+            }
+
             if(deviceName == null) {
                 device = mRepository.loadDeviceSync(function.getDeviceId());
                 deviceName = device.getName();

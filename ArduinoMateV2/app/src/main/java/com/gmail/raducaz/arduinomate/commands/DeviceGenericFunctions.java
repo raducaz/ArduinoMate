@@ -26,7 +26,7 @@ public class DeviceGenericFunctions {
     public boolean restartDevice()
     {
         try {
-            String command = "[{\"F0\":0}]";
+            String command = "[F0]";
             String result = arduinoCommander.SendCommand(command);
 
             return true;

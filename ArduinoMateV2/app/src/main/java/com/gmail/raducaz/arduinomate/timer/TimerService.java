@@ -131,15 +131,15 @@ public class TimerService implements Runnable {
 
                                 // Set function in error state to prevent rerunning it automatically - let user check before continue
                                 generatorOnOff.setResultState(FunctionResultStateEnum.ERROR.getId());
+                                dataRepository.updateFunction(generatorOnOff); //This sets initial callState as well !!!
                             }
                             catch (Exception exc) {
                                 Log.e(TAG, exc.getMessage());
                             }
                         }
                         //dataRepository.insertExecutionLogOnLastFunctionExecution(generatorOnOff.getId(), "Temperature is " + temperature);
-                        generatorOnOff.setLog("At " + hourofday+ ":"+minute+":" +second + " temp is " + temperature);
-                        dataRepository.updateFunction(generatorOnOff);
-                        //dataRepository.insertExecutionLogOnLastFunctionExecution(generatorOnOff.getId(), "Temperature is " + temperature);
+                        dataRepository.updateFunctionLog(generatorOnOff.getId(),
+                                "At " + hourofday+ ":"+minute+":" +second + " temp is " + temperature); //Prevent updating with old CallState if using updateFunction
 
 
                         //TODO: Check Level of water in garden tanks: if is maximum then Close Main Tap => close pump and generator automatically

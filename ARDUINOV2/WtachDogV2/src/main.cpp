@@ -31,7 +31,7 @@ void loop() {
     unsigned long currentState = (unsigned long) digitalRead(clientIN);
     if(currentState==clients[b][0])
     {
-      if(millis() - clients[b][1] > 10*pow(10, 3))
+      if(millis() - clients[b][1] > 120*pow(10, 3))
       {
         Serial.println("reset");
         // reset client
@@ -41,10 +41,8 @@ void loop() {
         clients[b][1] = millis();
       }
 
-      Serial.print("same");Serial.print(currentState);Serial.print(clients[b][0]);Serial.print("-");
-      Serial.println((millis() - clients[b][1])/1000);
-    
-      
+      // Serial.print("same");Serial.print(currentState);Serial.print(clients[b][0]);Serial.print("-");
+      // Serial.println((millis() - clients[b][1])/1000);
 
     } 
     if(currentState!=clients[b][0])

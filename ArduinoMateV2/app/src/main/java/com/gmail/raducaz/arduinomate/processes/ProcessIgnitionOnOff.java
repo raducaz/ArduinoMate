@@ -3,6 +3,7 @@ package com.gmail.raducaz.arduinomate.processes;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
+import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 public class ProcessIgnitionOnOff extends Process {
@@ -34,6 +35,7 @@ public class ProcessIgnitionOnOff extends Process {
         logInfo("Mark GeneratorOnOff function state to OFF");
         FunctionEntity generatorOnOff = dataRepository.loadFunctionSync(deviceEntity.getId(),"GeneratorOnOff");
         generatorOnOff.setResultState(FunctionResultStateEnum.OFF.getId());
+        generatorOnOff.setCallState(FunctionCallStateEnum.READY.getId());
         dataRepository.updateFunction(generatorOnOff);
 
         logInfo("Contact ON");
@@ -43,6 +45,7 @@ public class ProcessIgnitionOnOff extends Process {
 
         logInfo("Mark GeneratorOnOff function state to ON");
         generatorOnOff.setResultState(FunctionResultStateEnum.ON.getId());
+        generatorOnOff.setCallState(FunctionCallStateEnum.READY.getId());
         dataRepository.updateFunction(generatorOnOff);
 
         return super.on(isOnDemand);

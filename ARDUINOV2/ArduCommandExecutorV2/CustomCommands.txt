@@ -1,0 +1,8 @@
+[=3:0.25:2] - set analog 3 to 0.25 for 2 ms (setdigital if digital pin)
+[~3:0.25:2] - set digital 3 to 0.25 for 2 ms 
+[=3:0.25] - set analog 2 to ...
+[~3:0.25] - set digital
+[!:20] - wait for 20 ms
+[?:3] - digital read (including analog pins)
+[#:3] - analog read if analog
+[=3:0.25:2|!20|?:3]

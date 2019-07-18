@@ -1,6 +1,10 @@
 {
     "terminal.integrated.env.linux": {
-        "PATH": "/home/radu/.platformio/penv/bin:/home/radu/.platformio/penv:/sbin:/bin:/usr/bin:/usr/local/bin",
+        "PATH": "/home/radu/.platformio/penv/bin:/home/radu/.platformio/penv:/sbin:/bin:/usr/bin:/usr/local/bin:/Users/radu/bin",
+        "PLATFORMIO_CALLER": "vscode"
+    },
+    "terminal.integrated.env.windows": {
+        "PATH": "C:\\Users\\radu.cazacu\\.platformio\\penv\\Scripts;C:\\Users\\radu.cazacu\\.platformio\\penv;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\Python27\\;C:\\Python27\\Scripts;C:\\ProgramData\\Boxstarter;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\xampp\\php;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs\\;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\Java\\jdk-10.0.2\\bin;C:\\Program Files\\Java\\jre-10.0.2\\bin;C:\\Program Files\\TortoiseGit\\bin;C:\\Users\\radu.cazacu\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\radu.cazacu\\AppData\\Roaming\\npm;C:\\Users\\radu.cazacu\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\Python27\\;C:\\Python27\\Scripts;C:\\ProgramData\\Boxstarter;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\xampp\\php;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs\\;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\Java\\jdk-10.0.2\\bin;C:\\Program Files\\Java\\jre-10.0.2\\bin;C:\\Program Files\\TortoiseGit\\bin;C:\\Users\\radu.cazacu\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\radu.cazacu\\AppData\\Roaming\\npm;C:\\Users\\radu.cazacu\\AppData\\Local\\Programs\\Microsoft VS Code\\bin",
         "PLATFORMIO_CALLER": "vscode"
     }
 }

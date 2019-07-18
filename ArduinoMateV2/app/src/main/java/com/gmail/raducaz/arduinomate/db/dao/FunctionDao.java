@@ -49,6 +49,12 @@ public interface FunctionDao {
                     "WHERE id = :id"
     )
     void updateAutoEnabled(long id, boolean isChecked);
+    @Query(
+            "UPDATE function SET " +
+                    "log = :log " +
+                    "WHERE id = :id"
+    )
+    void updateLog(long id, String log);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(FunctionEntity function);
@@ -61,6 +67,9 @@ public interface FunctionDao {
 
     @Query("SELECT * FROM function where deviceId = :deviceId")
     List<FunctionEntity> loadDeviceFunctionsSync(long deviceId);
+
+    @Query("SELECT * FROM function ")
+    List<FunctionEntity> loadAllFunctionsSync();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<FunctionEntity> functions);

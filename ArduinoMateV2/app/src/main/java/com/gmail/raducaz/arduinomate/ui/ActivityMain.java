@@ -19,6 +19,7 @@ import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 
 
 /**
@@ -182,7 +183,9 @@ public class ActivityMain extends AppCompatActivity {
             new TaskExecutor().execute(functionReset);
         }else if (id==R.id.action_sync_all)
         {
-            // TODO: Send command to controller to send all data
+            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+            TaskFunctionSync caller = new TaskFunctionSync(application.getRepository());
+            new TaskExecutor().execute(caller);
         }
         else if (id == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);

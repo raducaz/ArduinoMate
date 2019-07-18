@@ -97,6 +97,8 @@ public class FunctionExecutionEntity implements FunctionExecution, Serializable 
     }
 
     public FunctionExecutionEntity() {
+        this.callState = FunctionCallStateEnum.NA.getId();
+        this.resultState = FunctionResultStateEnum.NA.getId();
     }
 
     @Ignore

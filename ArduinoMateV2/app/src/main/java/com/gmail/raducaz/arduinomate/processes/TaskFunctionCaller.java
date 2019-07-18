@@ -11,7 +11,7 @@ import com.gmail.raducaz.arduinomate.remote.RemoteFunctionCommand;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 /// Entry point for all function executions
-public class TaskFunctionCaller implements TaskInterface {
+public class TaskFunctionCaller implements Runnable {
 
     private String TAG = "TaskFunctionCaller";
 
@@ -63,7 +63,7 @@ public class TaskFunctionCaller implements TaskInterface {
         this.reasonDetails = reasonDetails;
     }
 
-    public void execute() {
+    public void run() {
         try {
             if(deviceName == null) {
                 device = mRepository.loadDeviceSync(function.getDeviceId());

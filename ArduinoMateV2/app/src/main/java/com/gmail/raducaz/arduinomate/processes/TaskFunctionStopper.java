@@ -40,7 +40,7 @@ public class TaskFunctionStopper implements TaskInterface {
                             f.getName(), FunctionResultStateEnum.OFF, "Device restarted");
                     caller.setAutoExecution(false);
                     caller.setOnDemand(true);
-                    caller.execute();
+                    caller.run();
                 }
 
                 //mRepository.updateDeviceFunctionsStates(deviceEntity.getId(), FunctionCallStateEnum.READY.getId(), FunctionResultStateEnum.OFF.getId());

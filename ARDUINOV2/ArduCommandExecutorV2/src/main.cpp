@@ -7,7 +7,7 @@
 #include <EthernetServer.h>
 #include "globals.h"
 #include <SPI.h>
-#include "Log.h"
+#include "log.h"
 
 #ifdef HASTEMP
   #include "Adafruit_Sensor.h"

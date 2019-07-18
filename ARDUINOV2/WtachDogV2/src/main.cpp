@@ -5,18 +5,6 @@
 // clients[1] = [0,1234234] - client on pin 4 is 0 from 1234234 timestamp
 unsigned long clients[6][2];
 
-int availableMemory() 
-{
- int size = 1024;
- byte *buf;
-
- while ((buf = (byte *) malloc(--size)) == NULL)
-   ;
-
- free(buf);
-
- return size;
-}
 void setup() {
   Serial.begin(9600);
   Serial.println("Entering Setup");
@@ -75,6 +63,4 @@ void loop() {
     delay(100);
    resetFunc();
   }
-
-  availableMemory();
 }

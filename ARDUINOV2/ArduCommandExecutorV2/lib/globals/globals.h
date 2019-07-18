@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define TEST
+#define TAP
 #define HASTEMP
 #define HASCURRENT
 

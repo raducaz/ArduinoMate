@@ -153,6 +153,9 @@ public class DataRepository {
     public List<FunctionEntity> loadFunctionsSync(final long deviceId) {
         return mDatabase.functionDao().loadDeviceFunctionsSync(deviceId);
     }
+    public List<FunctionEntity> loadAllFunctionsSync() {
+        return mDatabase.functionDao().loadAllFunctionsSync();
+    }
     public LiveData<FunctionEntity> loadFunction(final long functionId) {
         return mDatabase.functionDao().loadFunction(functionId);
     }

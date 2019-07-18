@@ -4,6 +4,10 @@
     <string name="action_reset_all">Reset all functions</string>
     <string name="action_sync_all">Sync all</string>
 
+    <string name="action_reset">Reset</string>
+    <string name="action_restart">Restart</string>
+    <string name="action_sync">Sync</string>
+
     <string name="item_title">Palais Garnier</string>
     <string name="item_desc">The Palais Garnier which locates in Paris was built from 1861 for
         the Paris Opera.

@@ -20,7 +20,7 @@ public class TaskFunctionCaller implements Runnable {
     private String functionName;
 
     private DeviceEntity device;
-    private FunctionEntity function;
+    private long functionId;
     private final DataRepository mRepository;
     private FunctionResultStateEnum desiredFunctionResult;
 
@@ -38,9 +38,8 @@ public class TaskFunctionCaller implements Runnable {
     private String reasonDetails;
 
     // This is used by the UI
-    public TaskFunctionCaller(DataRepository dataRepository, FunctionEntity function) {
-        this.function = function;
-        this.functionName = function.getName();
+    public TaskFunctionCaller(DataRepository dataRepository, long functionId) {
+        this.functionId = functionId;
 
         mRepository = dataRepository;
         this.desiredFunctionResult = FunctionResultStateEnum.NA;
@@ -64,7 +63,14 @@ public class TaskFunctionCaller implements Runnable {
     }
 
     public void run() {
+        FunctionEntity function = null;
         try {
+            if(functionId > 0)
+            {
+                function = mRepository.loadFunctionSync(functionId);
+                functionName = function.getName();
+            }
+
             if(deviceName == null) {
                 device = mRepository.loadDeviceSync(function.getDeviceId());
                 deviceName = device.getName();

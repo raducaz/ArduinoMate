@@ -26,15 +26,22 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.ViewPagerBottomSheetBehavior;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.R;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 
 /**
  * Provides UI for the Detail page with Collapsing Toolbar.
@@ -77,6 +84,17 @@ public class ActivityDetail extends AppCompatActivity {
 
 
         FloatingActionButton fab = findViewById(R.id.executeFABButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                TaskFunctionCaller functionCaller = new TaskFunctionCaller(
+                        application.getRepository(),
+                        functionId);
+                application.getNetworkExecutor().execute(functionCaller);
+            }
+        });
+
         View llBottomSheet = findViewById(R.id.bottom_sheet);
         // init the bottom sheet behavior
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
@@ -85,7 +103,7 @@ public class ActivityDetail extends AppCompatActivity {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
-                    fab.animate().scaleX(1).scaleY(1).setDuration(300).start();
+//                    fab.animate().scaleX(1).scaleY(1).setDuration(300).start();
 
                     tabs.setVisibility(View.GONE);
                     viewPager.setVisibility(View.GONE);
@@ -93,7 +111,7 @@ public class ActivityDetail extends AppCompatActivity {
                     TextView tv = findViewById(R.id.header);
                     tv.setVisibility(View.VISIBLE);
                 } else if(BottomSheetBehavior.STATE_DRAGGING == newState){
-                    fab.show();
+//                    fab.show();
                     TextView tv = findViewById(R.id.header);
                     tv.setVisibility(View.GONE);
 
@@ -104,7 +122,8 @@ public class ActivityDetail extends AppCompatActivity {
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                fab.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
+                // Micsorare buton cand se face expand
+//                fab.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
             }
         });
 
@@ -114,7 +133,6 @@ public class ActivityDetail extends AppCompatActivity {
 
         tabs.setVisibility(View.VISIBLE);
         viewPager.setVisibility(View.VISIBLE);
-        fab.hide();
     }
 
     // Add Fragments to Tabs
@@ -189,6 +207,39 @@ public class ActivityDetail extends AppCompatActivity {
 
             }
         };
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_reset) {
+            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, false);
+            new TaskExecutor().execute(functionReset);
+        }else if (id==R.id.action_restart)
+        {
+            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, true);
+            new TaskExecutor().execute(functionReset);
+        }else if (id==R.id.action_sync)
+        {
+            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+            TaskFunctionSync caller = new TaskFunctionSync(application.getRepository(), functionId);
+            new TaskExecutor().execute(caller);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }

@@ -55,47 +55,6 @@ public class FragmentFunctionViewItem extends Fragment {
 
         subscribeToModel(model);
 
-        Button buttonExecute = mBinding.getRoot().findViewById(R.id.execute_button);
-        buttonExecute.setOnClickListener(new OnClickListener() {
-            public void onClick(View b) {
-
-                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionCaller functionCaller = new TaskFunctionCaller(
-                        application.getRepository(),
-                        model.function.get());
-                new TaskExecutor().execute(functionCaller);
-            }
-        });
-
-        Button buttonSync = mBinding.getRoot().findViewById(R.id.sync_button);
-        buttonSync.setOnClickListener(new OnClickListener() {
-            public void onClick(View b) {
-
-                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionSync execution = new TaskFunctionSync(application.getRepository(), model.function.get());
-                new TaskExecutor().execute(execution);
-            }
-        });
-        Button buttonRestart = mBinding.getRoot().findViewById(R.id.restart_button);
-        buttonRestart.setOnClickListener(new OnClickListener() {
-            public void onClick(View b) {
-
-                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionReset execution = new TaskFunctionReset(application.getRepository(), model.function.get(), true);
-                new TaskExecutor().execute(execution);
-            }
-        });
-
-        Button buttonReset = mBinding.getRoot().findViewById(R.id.reset_button);
-        buttonReset.setOnClickListener(new OnClickListener() {
-            public void onClick(View b) {
-
-                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
-                TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), model.function.get(), false);
-                new TaskExecutor().execute(functionReset);
-            }
-        });
-
         CheckBox autoCheckBox = mBinding.getRoot().findViewById(R.id.auto_checkbox);
         autoCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

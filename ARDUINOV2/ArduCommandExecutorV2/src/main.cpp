@@ -483,7 +483,7 @@ void setup() {
   Log::debugln(F("My IP address: "), Ethernet.localIP());
   
   server.begin();
-  Log::debugln(F("Server started"));
+  Serial.println(F("Server started"));
 
   setupThread();
 }

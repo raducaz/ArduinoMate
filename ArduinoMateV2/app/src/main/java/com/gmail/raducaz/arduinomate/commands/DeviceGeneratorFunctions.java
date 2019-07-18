@@ -80,11 +80,11 @@ public class DeviceGeneratorFunctions {
 
         // Generate command - set A3 to 0 to see if A4 becomes 0 too
         // If becomes 0 => A3 is connected to A4 => pressure sensor is activated => pressure low
-        String command = "[~A3:0|#A4|~A3:1]";
+        String command = "[~A3:0|?A4|~A3:1]";
         String result = arduinoCommander.SendCommand(command);
 
         // Read command results
-        if (new Parser(result).getInt("#A4") == 0)
+        if (new Parser(result).getInt("?A4") == 0) //(if read with #A4 it returns 15 not exact 0)
             return true;
         else
             return false;

@@ -3,9 +3,11 @@
 
 #include <Arduino.h>
 
+// #define GEN
+// #define HASTEMP
+// #define HASCURRENT
+
 #define TAP
-#define HASTEMP
-#define HASCURRENT
 
 //--------DEVICE SPECIFIC GENERATOR---------------------------
 extern byte mac[];

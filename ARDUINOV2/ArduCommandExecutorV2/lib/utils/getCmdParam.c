@@ -29,11 +29,11 @@ int getCmdParam(char* cmd, byte paramIndex, bool returnAsPin)
   }
 
   int iRes = returnAsPin ? getPin(res) : atoi(res);
-  Log::debugln(F("iRes:"),iRes);
+  // Log::debugln(F("iRes:"),iRes);
   char buffer[6]=""; //can be !2000\0
   char* sRes = itoa(iRes,buffer,10);
-  Log::debugln(F("sRes:"),sRes);
-  Log::debugln(F("res:"),res);
+  // Log::debugln(F("sRes:"),sRes);
+  // Log::debugln(F("res:"),res);
 
   if(iRes==0 && strcmp(res,"0")!=0){
       return -1;

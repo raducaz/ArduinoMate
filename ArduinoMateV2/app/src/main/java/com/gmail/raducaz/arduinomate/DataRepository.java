@@ -199,6 +199,9 @@ public class DataRepository {
     public void updateFunctionAutoEnabled(final long functionId, boolean isChecked) {
         mDatabase.functionDao().updateAutoEnabled(functionId, isChecked);
     }
+    public void updateFunctionLog(final long functionId, String log) {
+        mDatabase.functionDao().updateLog(functionId, log);
+    }
     //endregion Function
 
     //region FunctionExecution

@@ -232,7 +232,7 @@ void parseCommand(char* plainJson)
     strcat(res,"]"); //End output message for completeness controll
     
   } else {
-    Log::debugln("Deserialize received message failed.");
+    Log::debugln(F("Deserialize received message failed."));
     strcat(res, "PARSE_ERROR]");
   }
 
@@ -246,7 +246,7 @@ void listenSerial()
   char buffer[MAXBUFFERSIZE] = ""; 
   unsigned int bufferSize = 0;
 
-  Log::debugln("Listen Serial");
+  Log::debugln(F("Listen Serial"));
 
   char endChar = '\n';
   const byte SerialSize = 64; // This is Serial.read limit
@@ -254,7 +254,7 @@ void listenSerial()
   if(Serial){
 
     if (Serial.available()!=0) {
-      Log::debugln("Serial available");
+      Log::debugln(F("Serial available"));
 
       char c = 0;
       bool endCmd = false;
@@ -299,7 +299,7 @@ void listenEthernet()
   
   if (client) 
   {
-    Log::debugln("Client connected");
+    Log::debugln(F("Client connected"));
     while (client.connected()) 
     {
       if (client.available()) 
@@ -310,10 +310,11 @@ void listenEthernet()
         if (receivedChar==endChar)
         {
           //!!!This blocks current thread until command is done
-          parseCommand(receivedText); //Fills receivedText with results
-          client.println(receivedText); // Sends the results to Ethernet client
 
           Log::debugln(F("Ethernet received:"), receivedText);
+          parseCommand(receivedText); //Fills receivedText with results
+          client.println(receivedText); // Sends the results to Ethernet client
+          Log::debugln(F("Ethernet response:"), receivedText);
          
           // Clear received temp to be prepared to receive next command
           strcpy(receivedText, "\0");
@@ -329,19 +330,19 @@ void listenEthernet()
           else
           {
             client.println("COMMAND_OVERFLOW"); // Send Error message
-            Log::debugln("Max received message len reached.");
+            Log::debugln(F("Max received message len reached."));
           }
         } 
       } 
     }
 
-    Log::debugln("CLOSE CONNECTION"); 
+    Log::debugln(F("CLOSE CONNECTION")); 
 
     client.stop();
   }
   else
   {
-    Log::debugln("No client, server stopped");
+    Log::debugln(F("No client, server stopped"));
   }  
 }
 void serverThreadCallback()
@@ -359,7 +360,7 @@ bool ConnectToServer(const byte* ip, const int port)
     if(!arduinoClient.connected()){
       arduinoClient.stop();
 
-      Log::debugln("MON: Reconnecting...");
+      Log::debugln(F("MON: Reconnecting..."));
 
       if (arduinoClient.connect(ip, port)) {    
         return arduinoClient.connected();
@@ -373,7 +374,7 @@ bool ConnectToServer(const byte* ip, const int port)
     } 
   }
   else{
-    Log::debugln("MON: Connecting...");
+    Log::debugln(F("MON: Connecting..."));
 
     arduinoClient.connect(ip, port);
     return arduinoClient.connected();
@@ -389,11 +390,11 @@ void clientThreadCallback()
   }
   if(!arduinoClient.connected())
   {
-    Log::debugln("MON: Check connection to gateway.");
+    Log::debugln(F("MON: Check connection to gateway."));
 
     if(!ConnectToServer(gateway, 80))
     {
-      Log::debugln("MON: Cannot connect, reinitialize ethernet.");
+      Log::debugln(F("MON: Cannot connect, reinitialize ethernet."));
 
       Ethernet.begin(mac, ip, dns, gateway, subnet);
       server.begin();
@@ -456,7 +457,7 @@ void setup() {
   delay(250);
 
   Serial.begin(9600);
-  Log::logln("Entering Setup");
+  Log::debugln(F("Entering Setup"));
 
   Log::debugln(F("FreeMem:"), freeMemory());
   
@@ -504,7 +505,7 @@ void loop() {
   }
 
   // Send ImAlive to WatchDog
-  Log::logln("I'm alive !");
+  Log::debugln(F("I'm alive !"));
 
   digitalWrite(WatchDog, digitalRead(WatchDog)==0?1:0);
 }

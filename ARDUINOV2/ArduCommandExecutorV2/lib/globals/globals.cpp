@@ -64,7 +64,7 @@
     int arduinoPort = 8080; //This needs to match the name configured on Android App
     char arduinoName[] = "Generator"; //This needs to match the name configured on Android App
     //--------DEVICE SPECIFIC---------------------------
-    byte serverIp[] = { 192, 168, 100, 12 }; // Android device IP
+    byte serverIp[] = { 192, 168, 100, 3 }; // Android device IP
     byte gateway[] = { 192, 168, 100, 1 };
     byte dns[] = { 192, 168, 100, 1 };
 
@@ -96,7 +96,7 @@ bool isDebug()
 }
 bool useEthernet()
 {
-  return false;
+  return true;
 }
 void setupPins()
 {

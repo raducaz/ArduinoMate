@@ -130,10 +130,12 @@ public class FunctionEntity implements Function, Serializable {
     public String getCallStateText() {
         if(callState==FunctionCallStateEnum.EXECUTING.getId())
             return "EXEC..";
-        else if(isAutoEnabled)
-            return "AUTO";
-        else
+        else {
+            if(callState==FunctionCallStateEnum.READY.getId() && isAutoEnabled)
+                return "AUTO";
+
             return String.valueOf(FunctionCallStateEnum.forInt(callState));
+        }
     }
 
     @Override

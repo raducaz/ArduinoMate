@@ -49,6 +49,12 @@ public interface FunctionDao {
                     "WHERE id = :id"
     )
     void updateAutoEnabled(long id, boolean isChecked);
+    @Query(
+            "UPDATE function SET " +
+                    "log = :log " +
+                    "WHERE id = :id"
+    )
+    void updateLog(long id, String log);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(FunctionEntity function);

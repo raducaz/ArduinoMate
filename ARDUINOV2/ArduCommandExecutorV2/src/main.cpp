@@ -33,7 +33,7 @@
 
 
 byte noLoopRuns = 0;
-bool isRestarted = true;
+bool isRestarted = false;
 EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
 
@@ -455,6 +455,7 @@ void setupThread()
 }
 void setup() {
   delay(250);
+  isRestarted=true;
 
   Serial.begin(9600);
   Log::debugln(F("Entering Setup"));

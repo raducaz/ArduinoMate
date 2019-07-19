@@ -63,7 +63,7 @@ public class FragmentFunctionViewItem extends Fragment {
                 TaskFunctionCaller functionCaller = new TaskFunctionCaller(
                         application.getRepository(),
                         model.function.get());
-                new TaskExecutor().execute(functionCaller);
+                application.getNetworkExecutor().execute(functionCaller);
             }
         });
 

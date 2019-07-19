@@ -119,7 +119,8 @@ public class CommandToControllerConsumerService implements Runnable {
                                         RemoteResetCommand command = (RemoteResetCommand)bodyObject;
                                         TaskFunctionReset functionReset = new TaskFunctionReset(
                                                 mRepository,
-                                                command.function.getId(), command.alsoRestart);
+                                                command.function != null ? command.function.getId() : 0,
+                                                command.alsoRestart);
 
                                         new TaskExecutor().execute(functionReset);
                                     }
@@ -128,7 +129,7 @@ public class CommandToControllerConsumerService implements Runnable {
                                         RemoteSyncCommand command = (RemoteSyncCommand)bodyObject;
                                         TaskFunctionSync functionSync = new TaskFunctionSync(
                                                 mRepository,
-                                                command.function.getId());
+                                                command.function != null ? command.function.getId() : 0);
 
                                         new TaskExecutor().execute(functionSync);
                                     }

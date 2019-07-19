@@ -18,10 +18,10 @@ public class ProcessWaterSupplyTapOnOff extends Process {
 
     @Override
     protected boolean on(boolean isOnDemand) throws Exception {
-        DeviceTapFunctions deviceGeneratorFunctions = new DeviceTapFunctions(dataRepository, deviceEntity.getName());
+        DeviceTapFunctions deviceTapFunctions = new DeviceTapFunctions(dataRepository, deviceEntity.getName());
 
         logInfo("OPEN main tap");
-        if(!deviceGeneratorFunctions.tapOPEN())
+        if(!deviceTapFunctions.tapOPEN())
         {
             throw new Exception("Problem opening tap.");
         }

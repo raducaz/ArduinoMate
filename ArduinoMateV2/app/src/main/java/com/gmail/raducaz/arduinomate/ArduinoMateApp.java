@@ -2,6 +2,7 @@ package com.gmail.raducaz.arduinomate;
 
 import android.app.Application;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
@@ -162,6 +163,7 @@ public class ArduinoMateApp extends Application {
         catch (Exception exc)
         {
             Log.e("InitAMQConnection", "", exc);
+            //Snackbar.make(this, exc.getMessage(), Snackbar.LENGTH_LONG).show();
         }
 //        // Start the tcp server or AMQ state consumer and Mocks service - More complicated way
 //        TaskServerServiceInitializer serviceInitializer = new TaskServerServiceInitializer(this);

@@ -114,7 +114,7 @@ public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionLis
 //                    ExecutorService taskExecutor = Executors.newFixedThreadPool(4);
                     TaskFunctionCaller functionCaller = new TaskFunctionCaller(
                             application.getRepository(),
-                            (FunctionEntity) binding.getFunction());
+                            binding.getFunction().getId());
                     application.getNetworkExecutor().execute(functionCaller);
 //                    new TaskExecutor().execute(functionCaller);
                 }

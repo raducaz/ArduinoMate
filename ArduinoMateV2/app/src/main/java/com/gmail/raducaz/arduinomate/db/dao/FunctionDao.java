@@ -68,6 +68,9 @@ public interface FunctionDao {
     @Query("SELECT * FROM function where deviceId = :deviceId")
     List<FunctionEntity> loadDeviceFunctionsSync(long deviceId);
 
+    @Query("SELECT * FROM function ")
+    List<FunctionEntity> loadAllFunctionsSync();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<FunctionEntity> functions);
 

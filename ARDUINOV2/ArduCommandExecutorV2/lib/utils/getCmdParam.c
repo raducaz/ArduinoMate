@@ -1,7 +1,7 @@
 #include <utils.h>
 #include <Arduino.h>
 #include <math.h>
-#include "Log.h"
+#include "log.h"
 
 int getCmdParam(char* cmd, byte paramIndex, bool returnAsPin)
 {

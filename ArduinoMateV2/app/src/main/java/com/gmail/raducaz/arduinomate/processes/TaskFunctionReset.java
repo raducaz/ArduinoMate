@@ -18,19 +18,19 @@ public class TaskFunctionReset implements TaskInterface {
 
     private String TAG = "TaskFunctionReset";
 
-    private final FunctionEntity function;
+    private final long functionId;
     private final DataRepository mRepository;
     private boolean alsoRestart = false;
 
-    public TaskFunctionReset(final DataRepository repository, FunctionEntity function, boolean alsoRestart) {
-        this.function = function;
+    public TaskFunctionReset(final DataRepository repository, long functionId, boolean alsoRestart) {
+        this.functionId = functionId;
         this.alsoRestart = alsoRestart;
 
         mRepository = repository;
     }
     // Use this constructor to reset all functions
     public TaskFunctionReset(final DataRepository repository) {
-        function = null;
+        functionId = 0;
 
         mRepository = repository;
     }
@@ -38,6 +38,9 @@ public class TaskFunctionReset implements TaskInterface {
     public void execute() {
 
         try {
+            FunctionEntity function = null;
+            if(functionId>0) function = mRepository.loadFunctionSync(functionId);
+
             // If client redirect the command to controller
             if(!mRepository.getSettingsSync().getIsController())
             {

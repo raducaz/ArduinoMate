@@ -27,17 +27,17 @@ public class TaskFunctionSync implements TaskInterface {
 
     private String TAG = "TaskFunctionSync";
 
-    private final FunctionEntity function;
+    private final long functionId;
     private final DataRepository mRepository;
 
-    public TaskFunctionSync(final DataRepository repository, FunctionEntity function) {
-        this.function = function;
+    public TaskFunctionSync(final DataRepository repository, long functionId) {
+        this.functionId = functionId;
 
         mRepository = repository;
     }
     // Use this constructor to reset all functions
     public TaskFunctionSync(final DataRepository repository) {
-        function = null;
+        functionId = 0;
 
         mRepository = repository;
     }
@@ -53,6 +53,9 @@ public class TaskFunctionSync implements TaskInterface {
     public void execute() {
 
         try {
+            FunctionEntity function = null;
+            if(functionId>0) function = mRepository.loadFunctionSync(functionId);
+
             // If client redirect the command to controller
             if(!mRepository.getSettingsSync().getIsController())
             {
@@ -66,24 +69,40 @@ public class TaskFunctionSync implements TaskInterface {
             } else {
                 // Execute on controller the sync command
 
-                // Get last execution for function
-                FunctionExecutionEntity functionExecutionEntity = mRepository.loadLastFunctionExecutionSync(function.getId());
-                SendStateToRemoteClients(new RemoteStateUpdate(functionExecutionEntity, "insertFunctionExecution"));
-
-                // Get logs for last execution
-                List<ExecutionLogEntity> logs = mRepository.loadExecutionLogSync(functionExecutionEntity.getId());
-                for (ExecutionLogEntity log: logs) {
-                    SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+                if(function != null)
+                {
+                    syncFunction(function);
                 }
-
-                // Get function states
-                SendStateToRemoteClients(new RemoteStateUpdate(function, "updateFunction"));
+                else
+                {
+                    List<FunctionEntity> functions = mRepository.loadAllFunctionsSync();
+                    for(FunctionEntity f :functions)
+                    {
+                        syncFunction(f);
+                    }
+                }
             }
 
         } catch (Exception exc) {
 
             Log.e(TAG, exc.getMessage());
         }
+    }
+
+    public void syncFunction(FunctionEntity function)
+    {
+        // Get last execution for function
+        FunctionExecutionEntity functionExecutionEntity = mRepository.loadLastFunctionExecutionSync(function.getId());
+        SendStateToRemoteClients(new RemoteStateUpdate(functionExecutionEntity, "insertFunctionExecution"));
+
+        // Get logs for last execution
+        List<ExecutionLogEntity> logs = mRepository.loadExecutionLogSync(functionExecutionEntity.getId());
+        for (ExecutionLogEntity log: logs) {
+            SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+        }
+
+        // Get function states
+        SendStateToRemoteClients(new RemoteStateUpdate(function, "updateFunction"));
     }
 
 }

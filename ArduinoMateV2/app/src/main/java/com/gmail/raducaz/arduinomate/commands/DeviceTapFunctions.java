@@ -98,11 +98,11 @@ public class DeviceTapFunctions {
         String TAG = "tapOpenState";
 
             // Send probe and see if contact is ON => tap is OPEN
-            String command = "[~A3:0|#A4|~A3:1]"; // A4 is receiver
+            String command = "[~A3:0|?A4|~A3:1]"; // A4 is receiver (if read with #A4 it returns 15 not exact 0)
             String result = arduinoCommander.SendCommand(command);
 
             try {
-                if (new Parser(result).getInt("#A4") == 0)
+                if (new Parser(result).getInt("?A4") == 0)
                     return FunctionResultStateEnum.ON;
                 else
                     return FunctionResultStateEnum.OFF;

@@ -7,7 +7,7 @@
 #include <EthernetServer.h>
 #include "globals.h"
 #include <SPI.h>
-#include "Log.h"
+#include "log.h"
 
 #ifdef HASTEMP
   #include "Adafruit_Sensor.h"
@@ -33,7 +33,7 @@
 
 
 byte noLoopRuns = 0;
-bool isRestarted = true;
+bool isRestarted = false;
 EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
 
@@ -415,6 +415,7 @@ void clientThreadCallback()
     if(isRestarted)
     { 
       state = 3;
+      Serial.println(F("DEVICE RESTARTED"));
     }
     // Send the state of the pins
     int digitalPinStates[14];
@@ -434,7 +435,7 @@ void clientThreadCallback()
     analogPinStates[1] = f1();
     //--------DEVICE SPECIFIC---------------------------
 
-    constructPinStatesJSON(arduinoName, state, 1, analogPinStates, 6, arduinoClient);
+    constructPinStatesJSON(arduinoName, 0, 1, analogPinStates, 6, arduinoClient);
   
     isRestarted=false;
     
@@ -455,6 +456,7 @@ void setupThread()
 }
 void setup() {
   delay(250);
+  isRestarted=true;
 
   Serial.begin(9600);
   Log::debugln(F("Entering Setup"));
@@ -483,7 +485,7 @@ void setup() {
   Log::debugln(F("My IP address: "), Ethernet.localIP());
   
   server.begin();
-  Log::debugln(F("Server started"));
+  Serial.println(F("Server started"));
 
   setupThread();
 }
@@ -505,7 +507,8 @@ void loop() {
   }
 
   // Send ImAlive to WatchDog
-  Log::debugln(F("I'm alive !"));
+  Serial.print(arduinoName);
+  Serial.println(F("I'm alive !"));
 
   digitalWrite(WatchDog, digitalRead(WatchDog)==0?1:0);
 }

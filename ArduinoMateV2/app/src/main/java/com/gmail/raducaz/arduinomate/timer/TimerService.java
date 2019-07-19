@@ -170,7 +170,7 @@ public class TimerService implements Runnable {
                         Log.e(TAG, exc.getMessage());
                     }
                 }
-            }, 1000, 5000);
+            }, 1000, 30000);
         }
     }
 

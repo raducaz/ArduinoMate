@@ -1,0 +1,13 @@
+platformio original:
+avrdude -v -p atmega328p -C /home/radu/.platformio/packages/tool-avrdude/avrdude.conf -c arduino -b 115200 -D -P "/dev/ttyACM1" -U flash:w:.pio/build/uno/firmware.hex:i
+
+avrdude -v -p atmega328p -C /home/radu/.platformio/packages/tool-avrdude/avrdude.conf -c avrispmkII -b 115200 -D -P "/dev/ttyACM1" -U flash:w:.pio/build/uno/firmware.hex:i
+
+avrdude -v -p atmega328p -C /media/radu/EXT_Data/ARDUINO/arduinoIDE/hardware/tools/avr/etc/avrdude.conf -c avrispmkII -b 115200 -D -P "/dev/ttyACM1" -U flash:w:.pio/build/uno/firmware.hex:i
+
+
+avrdude -v -p atmega328p -c arduino -b 57600 -D -P "/dev/ttyACM1" -U flash:w:.pio/build/uno/firmware.hex:i
+
+
+arduino ide
+/media/radu/EXT_Data/ARDUINO/arduinoIDE/hardware/tools/avr/bin/avrdude -C/media/radu/EXT_Data/ARDUINO/arduinoIDE/hardware/tools/avr/etc/avrdude.conf -v -patmega328p -carduino -P/dev/ttyACM0 -b115200 -D -Uflash:w:/tmp/arduino_build_723228/WatchDogReset.ino.hex:i 

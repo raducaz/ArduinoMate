@@ -128,7 +128,7 @@ public class CommandToControllerConsumerService implements Runnable {
                                         RemoteSyncCommand command = (RemoteSyncCommand)bodyObject;
                                         TaskFunctionSync functionSync = new TaskFunctionSync(
                                                 mRepository,
-                                                command.function.getId());
+                                                command.function != null ? command.function.getId() : 0);
 
                                         new TaskExecutor().execute(functionSync);
                                     }

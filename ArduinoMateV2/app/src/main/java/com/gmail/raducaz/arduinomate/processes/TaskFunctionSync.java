@@ -94,14 +94,16 @@ public class TaskFunctionSync implements TaskInterface {
     {
         // Get last execution for function
         FunctionExecutionEntity functionExecutionEntity = mRepository.loadLastFunctionExecutionSync(function.getId());
-        SendStateToRemoteClients(new RemoteStateUpdate(functionExecutionEntity, "insertFunctionExecution"));
 
-        // Get logs for last execution
-        List<ExecutionLogEntity> logs = mRepository.loadExecutionLogSync(functionExecutionEntity.getId());
-        for (ExecutionLogEntity log: logs) {
-            SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+        if(functionExecutionEntity != null) {
+            SendStateToRemoteClients(new RemoteStateUpdate(functionExecutionEntity, "insertFunctionExecution"));
+
+            // Get logs for last execution
+            List<ExecutionLogEntity> logs = mRepository.loadExecutionLogSync(functionExecutionEntity.getId());
+            for (ExecutionLogEntity log : logs) {
+                SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+            }
         }
-
         // Get function states
         SendStateToRemoteClients(new RemoteStateUpdate(function, "updateFunction"));
     }

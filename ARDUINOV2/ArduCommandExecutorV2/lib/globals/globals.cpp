@@ -92,7 +92,7 @@ const byte SDCard = 4;
 
 bool isDebug()
 {
-  return false;
+  return true;
 }
 bool useEthernet()
 {

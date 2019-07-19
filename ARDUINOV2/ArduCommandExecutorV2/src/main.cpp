@@ -463,7 +463,7 @@ void setup() {
 
   Log::debugln(F("FreeMem:"), freeMemory());
   
-  delay(1000);
+  delay(8000);
   
   // Sensor initialization
   #ifdef HASCURRENT

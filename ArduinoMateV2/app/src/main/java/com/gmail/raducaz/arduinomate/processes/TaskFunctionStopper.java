@@ -35,11 +35,15 @@ public class TaskFunctionStopper implements TaskInterface {
                 List<FunctionEntity> deviceFunctions = mRepository.loadFunctionsSync(deviceEntity.getId());
                 for (FunctionEntity f : deviceFunctions)
                 {
-                    TaskFunctionCaller caller = new TaskFunctionCaller(mRepository, deviceEntity.getName(),
-                            f.getName(), FunctionResultStateEnum.OFF, "Device restarted");
-                    caller.setAutoExecution(false);
-                    caller.setOnDemand(true);
-                    caller.run();
+                    f.setCallState(0);
+                    f.setResultState(0);
+                    mRepository.updateFunction(f);
+                    mRepository.insertExecutionLogOnLastFunctionExecution(f.getId(), "DEVICE RESTARTED");
+//                    TaskFunctionCaller caller = new TaskFunctionCaller(mRepository, deviceEntity.getName(),
+//                            f.getName(), FunctionResultStateEnum.OFF, "Device restarted");
+//                    caller.setAutoExecution(false);
+//                    caller.setOnDemand(true);
+//                    caller.run();
                 }
 
                 //mRepository.updateDeviceFunctionsStates(deviceEntity.getId(), FunctionCallStateEnum.READY.getId(), FunctionResultStateEnum.OFF.getId());

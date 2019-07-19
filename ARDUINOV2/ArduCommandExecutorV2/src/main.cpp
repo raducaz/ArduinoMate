@@ -415,6 +415,7 @@ void clientThreadCallback()
     if(isRestarted)
     { 
       state = 3;
+      Serial.println(F("DEVICE RESTARTED"));
     }
     // Send the state of the pins
     int digitalPinStates[14];
@@ -434,7 +435,7 @@ void clientThreadCallback()
     analogPinStates[1] = f1();
     //--------DEVICE SPECIFIC---------------------------
 
-    constructPinStatesJSON(arduinoName, state, 1, analogPinStates, 6, arduinoClient);
+    constructPinStatesJSON(arduinoName, 0, 1, analogPinStates, 6, arduinoClient);
   
     isRestarted=false;
     
@@ -506,7 +507,8 @@ void loop() {
   }
 
   // Send ImAlive to WatchDog
-  Log::debugln(F("I'm alive !"));
+  Serial.print(arduinoName);
+  Serial.println(F("I'm alive !"));
 
   digitalWrite(WatchDog, digitalRead(WatchDog)==0?1:0);
 }

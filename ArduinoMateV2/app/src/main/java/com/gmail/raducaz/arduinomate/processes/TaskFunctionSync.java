@@ -64,7 +64,9 @@ public class TaskFunctionSync implements TaskInterface {
 
                 RemoteSyncCommand cmd = new RemoteSyncCommand(function);
                 sender.SendCommand(cmd, 5);
-                mRepository.insertExecutionLogOnLastFunctionExecution(function.getId(),
+
+                if(function!= null)
+                    mRepository.insertExecutionLogOnLastFunctionExecution(function.getId(),
                         "Sync cmd sent remotely...");
             } else {
                 // Execute on controller the sync command

@@ -21,7 +21,6 @@ public class TaskFunctionStopper implements TaskInterface {
     private final DataRepository mRepository;
     private final DeviceEntity deviceEntity;
 
-    // Use this constructor to reset all functions of a device
     public TaskFunctionStopper(final DataRepository repository, DeviceEntity deviceEntity) {
 
         mRepository = repository;

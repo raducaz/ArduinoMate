@@ -42,8 +42,8 @@ void constructPinStatesJSON(const char* deviceName,
 
       Log::debugln(F("FreeMem:"), freeMemory());
 
-      _root.printTo(Serial);
-      Serial.println();
+    //   _root.printTo(Serial);
+    //   Serial.println();
 
       Log::debugln(F("FreeMem:"), freeMemory());
   }

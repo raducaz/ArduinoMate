@@ -7,7 +7,7 @@ unsigned long clients[6][2];
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Entering Setup");
+  Serial.println(F("Entering Setup"));
   for(byte b=0;b<6;b++)
   {
     pinMode(2*(b+1), INPUT_PULLUP);
@@ -24,7 +24,7 @@ void loop() {
 
   for(byte b=0;b<6;b++)
   {
-    Serial.println(b);
+    Serial.print(b);Serial.print(F(":"));
 
     byte clientIN = 2*(b+1);
     byte clientOUT = clientIN+1;
@@ -33,7 +33,7 @@ void loop() {
     {
       if(millis() - clients[b][1] > 120*pow(10, 3))
       {
-        Serial.println("reset");
+        Serial.println(F("reset"));
         // reset client
         digitalWrite(clientOUT, 0);
         delay(1000);
@@ -42,7 +42,7 @@ void loop() {
       }
 
       // Serial.print("same");Serial.print(currentState);Serial.print(clients[b][0]);Serial.print("-");
-      // Serial.println((millis() - clients[b][1])/1000);
+      Serial.println((millis() - clients[b][1])/1000);
 
     } 
     if(currentState!=clients[b][0])
@@ -57,7 +57,7 @@ void loop() {
   // Reset self if millis > 1 day - is not working this way
   if(millis() > (unsigned long)24*3600*pow(10, 3))
   {
-    Serial.println("Reset self");
+    Serial.println(F("Reset self"));
     delay(100);
    resetFunc();
   }

@@ -25,13 +25,13 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class CommandToControllerConsumerServiceWorker extends Worker {
+public class CommandToControllerConsumerWorker extends Worker {
 
     private String TAG = "CommandConsumerServiceWork";
 
     private DataRepository mRepository;
 
-    public CommandToControllerConsumerServiceWorker(
+    public CommandToControllerConsumerWorker(
             @NonNull Context appContext,
             @NonNull WorkerParameters workerParams) {
         super(appContext, workerParams);
@@ -45,7 +45,6 @@ public class CommandToControllerConsumerServiceWorker extends Worker {
     public Result doWork() {
 
         Connection connection;
-        String uri = getInputData().getString("uri");
         String queueName = getInputData().getString("queue");
 
         try {

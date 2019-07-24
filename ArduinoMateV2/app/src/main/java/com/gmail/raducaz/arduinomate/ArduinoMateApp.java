@@ -10,11 +10,10 @@ import androidx.work.WorkManager;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
-import com.gmail.raducaz.arduinomate.remote.CommandToControllerConsumerService;
-import com.gmail.raducaz.arduinomate.remote.CommandToControllerConsumerServiceWorker;
-import com.gmail.raducaz.arduinomate.remote.StateFromControllerConsumerService;
-import com.gmail.raducaz.arduinomate.mocks.MockArduinoServerService;
-import com.gmail.raducaz.arduinomate.tcpserver.TcpServerService;
+import com.gmail.raducaz.arduinomate.mocks.MockArduinoServerWorker;
+import com.gmail.raducaz.arduinomate.remote.CommandToControllerConsumerWorker;
+import com.gmail.raducaz.arduinomate.remote.StateFromControllerConsumerWorker;
+import com.gmail.raducaz.arduinomate.tcpserver.TcpServerWorker;
 import com.gmail.raducaz.arduinomate.timer.TimerService;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.CsvFormatStrategy;
@@ -34,7 +33,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Radu.Cazacu on 11/27/2017.
@@ -179,9 +177,19 @@ public class ArduinoMateApp extends Application {
             // Start AMQ state consumer
             try
             {
-                StateFromControllerConsumerService consumerService = StateFromControllerConsumerService.getInstance(getRepository(),
-                        AmqConnection, STATES_EXCHANGE);
-                this.getNetworkExecutor().execute(consumerService);
+//                StateFromControllerConsumerService consumerService = StateFromControllerConsumerService.getInstance(getRepository(),
+//                        AmqConnection, STATES_EXCHANGE);
+//                this.getNetworkExecutor().execute(consumerService);
+
+                Data.Builder builder = new Data.Builder();
+                builder.putString("exchangeName", STATES_EXCHANGE);
+                Data input = builder.build();
+
+                mWorkManager = WorkManager.getInstance(this.getApplicationContext());
+                OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(StateFromControllerConsumerWorker.class)
+                        .setInputData(input)
+                        .build();
+                mWorkManager.enqueue(workRequest);
             }
             catch (Exception exc)
             {
@@ -192,10 +200,20 @@ public class ArduinoMateApp extends Application {
         {
             // Start tcp service server
             try {
-                TcpServerService tcpServerService = TcpServerService.getInstance(getRepository());
-                this.getNetworkExecutor().execute(tcpServerService);
+//                TcpServerService tcpServerService = TcpServerService.getInstance(getRepository());
+//                this.getNetworkExecutor().execute(tcpServerService);
+
+                Data.Builder builder = new Data.Builder();
+                builder.putInt("PORT", 9090);
+                Data input = builder.build();
+
+                mWorkManager = WorkManager.getInstance(this.getApplicationContext());
+                OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(TcpServerWorker.class)
+                        .setInputData(input)
+                        .build();
+                mWorkManager.enqueue(workRequest);
             }
-            catch (IOException exc)
+            catch (Exception exc)
             {
                 Log.e("StartTcpServer", "", exc);
             }
@@ -209,9 +227,14 @@ public class ArduinoMateApp extends Application {
 //                            COMMAND_QUEUE, getRepository());
 //                    this.getNetworkExecutor().execute(consumerService);
 
+                    Data.Builder builder = new Data.Builder();
+                    builder.putString("uri", uri);
+                    builder.putString("queue", COMMAND_QUEUE);
+                    Data input = builder.build();
+
                     mWorkManager = WorkManager.getInstance(this.getApplicationContext());
-                    OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(CommandToControllerConsumerServiceWorker.class)
-                            .setInputData(createInputDataForWorker())
+                    OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(CommandToControllerConsumerWorker.class)
+                            .setInputData(input)
                             .build();
                     mWorkManager.enqueue(workRequest);
 
@@ -235,14 +258,46 @@ public class ArduinoMateApp extends Application {
                 // MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK  Start the arduino mocks
                 try {
 
-                    MockArduinoServerService mockArduinoServerService = new MockArduinoServerService(getRepository(), 8080, "Generator");
-                    this.getNetworkExecutor().execute(mockArduinoServerService);
+//                    MockArduinoServerService mockArduinoServerService = new MockArduinoServerService(getRepository(), 8080, "Generator");
+//                    this.getNetworkExecutor().execute(mockArduinoServerService);
+//
+//                    mockArduinoServerService = new MockArduinoServerService(getRepository(), 8081, "Tap");
+//                    this.getNetworkExecutor().execute(mockArduinoServerService);
+//
+//                    mockArduinoServerService = new MockArduinoServerService(getRepository(), 8082, "Boiler");
+//                    this.getNetworkExecutor().execute(mockArduinoServerService);
 
-                    mockArduinoServerService = new MockArduinoServerService(getRepository(), 8081, "Tap");
-                    this.getNetworkExecutor().execute(mockArduinoServerService);
+                    mWorkManager = WorkManager.getInstance(this.getApplicationContext());
 
-                    mockArduinoServerService = new MockArduinoServerService(getRepository(), 8082, "Boiler");
-                    this.getNetworkExecutor().execute(mockArduinoServerService);
+                    Data.Builder builder = new Data.Builder();
+                    builder.putInt("PORT", 8080);
+                    builder.putString("NAME", "Generator");
+                    Data input = builder.build();
+
+                    OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(MockArduinoServerWorker.class)
+                            .setInputData(input)
+                            .build();
+                    mWorkManager.enqueue(workRequest);
+
+                    builder = new Data.Builder();
+                    builder.putInt("PORT", 8081);
+                    builder.putString("NAME", "Tap");
+                    input = builder.build();
+
+                    workRequest = new OneTimeWorkRequest.Builder(MockArduinoServerWorker.class)
+                            .setInputData(input)
+                            .build();
+                    mWorkManager.enqueue(workRequest);
+
+                    builder = new Data.Builder();
+                    builder.putInt("PORT", 8082);
+                    builder.putString("NAME", "Boiler");
+                    input = builder.build();
+
+                    workRequest = new OneTimeWorkRequest.Builder(MockArduinoServerWorker.class)
+                            .setInputData(input)
+                            .build();
+                    mWorkManager.enqueue(workRequest);
                 }
                 catch (Exception exc)
                 {
@@ -272,11 +327,4 @@ public class ArduinoMateApp extends Application {
         return DataRepository.getInstance(getDatabase());
     }
 
-
-    private Data createInputDataForWorker() {
-        Data.Builder builder = new Data.Builder();
-        builder.putString("uri", uri);
-        builder.putString("queue", COMMAND_QUEUE);
-        return builder.build();
-    }
 }

@@ -1,12 +1,11 @@
 package com.gmail.raducaz.arduinomate.db.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.VariableState;
-
 import java.io.Serializable;
 import java.util.Date;
 

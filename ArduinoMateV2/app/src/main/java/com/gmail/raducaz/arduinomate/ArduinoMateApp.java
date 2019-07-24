@@ -2,12 +2,16 @@ package com.gmail.raducaz.arduinomate;
 
 import android.app.Application;
 import android.os.Environment;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
+
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
 import com.gmail.raducaz.arduinomate.remote.CommandToControllerConsumerService;
+import com.gmail.raducaz.arduinomate.remote.CommandToControllerConsumerServiceWorker;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerConsumerService;
 import com.gmail.raducaz.arduinomate.mocks.MockArduinoServerService;
 import com.gmail.raducaz.arduinomate.tcpserver.TcpServerService;
@@ -53,6 +57,7 @@ public class ArduinoMateApp extends Application {
 
     private AppExecutors mAppExecutors;
     private TimerService timerService;
+    private WorkManager mWorkManager;
 
     @Override
     public void onCreate() {
@@ -119,7 +124,7 @@ public class ArduinoMateApp extends Application {
                     factory.setUri(uri);
                     //Recommended settings
                     factory.setRequestedHeartbeat(30);
-                    factory.setConnectionTimeout(30000);
+                    factory.setConnectionTimeout(10000);
 
                     return factory.newConnection();
                 }
@@ -200,9 +205,16 @@ public class ArduinoMateApp extends Application {
 
                 // Start AMQ remote command consumer
                 try {
-                    CommandToControllerConsumerService consumerService = CommandToControllerConsumerService.getInstance(AmqConnection,
-                            COMMAND_QUEUE, getRepository());
-                    this.getNetworkExecutor().execute(consumerService);
+//                    CommandToControllerConsumerService consumerService = CommandToControllerConsumerService.getInstance(AmqConnection,
+//                            COMMAND_QUEUE, getRepository());
+//                    this.getNetworkExecutor().execute(consumerService);
+
+                    mWorkManager = WorkManager.getInstance(this.getApplicationContext());
+                    OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(CommandToControllerConsumerServiceWorker.class)
+                            .setInputData(createInputDataForWorker())
+                            .build();
+                    mWorkManager.enqueue(workRequest);
+
                 } catch (Exception exc) {
                     Log.e("StartCommandConsumer", "", exc);
                 }
@@ -261,4 +273,10 @@ public class ArduinoMateApp extends Application {
     }
 
 
+    private Data createInputDataForWorker() {
+        Data.Builder builder = new Data.Builder();
+        builder.putString("uri", uri);
+        builder.putString("queue", COMMAND_QUEUE);
+        return builder.build();
+    }
 }

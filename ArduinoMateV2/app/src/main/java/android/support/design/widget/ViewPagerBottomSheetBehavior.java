@@ -1,9 +1,13 @@
 package android.support.design.widget;
 
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.ViewCompat;
+import androidx.viewpager.widget.ViewPager;
+
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.lang.ref.WeakReference;
 
@@ -15,35 +19,35 @@ import java.lang.ref.WeakReference;
  */
 public class ViewPagerBottomSheetBehavior<V extends View> extends BottomSheetBehavior<V> {
 
-    @Override
-    View findScrollingChild(View view) {
-        if (ViewCompat.isNestedScrollingEnabled(view)) {
-            return view;
-        }
+//    @Override
+//    View findScrollingChild(View view) {
+//        if (ViewCompat.isNestedScrollingEnabled(view)) {
+//            return view;
+//        }
+//
+//        if (view instanceof ViewPager) {
+//            ViewPager viewPager = (ViewPager) view;
+//            View currentViewPagerChild = viewPager.getChildAt(viewPager.getCurrentItem());
+//            View scrollingChild = findScrollingChild(currentViewPagerChild);
+//            if (scrollingChild != null) {
+//                return scrollingChild;
+//            }
+//        } else if (view instanceof ViewGroup) {
+//            ViewGroup group = (ViewGroup) view;
+//            for (int i = 0, count = group.getChildCount(); i < count; i++) {
+//                View scrollingChild = findScrollingChild(group.getChildAt(i));
+//                if (scrollingChild != null) {
+//                    return scrollingChild;
+//                }
+//            }
+//        }
+//        return null;
+//    }
 
-        if (view instanceof ViewPager) {
-            ViewPager viewPager = (ViewPager) view;
-            View currentViewPagerChild = viewPager.getChildAt(viewPager.getCurrentItem());
-            View scrollingChild = findScrollingChild(currentViewPagerChild);
-            if (scrollingChild != null) {
-                return scrollingChild;
-            }
-        } else if (view instanceof ViewGroup) {
-            ViewGroup group = (ViewGroup) view;
-            for (int i = 0, count = group.getChildCount(); i < count; i++) {
-                View scrollingChild = findScrollingChild(group.getChildAt(i));
-                if (scrollingChild != null) {
-                    return scrollingChild;
-                }
-            }
-        }
-        return null;
-    }
-
-    public void updateScrollingChild() {
-        final View scrollingChild = findScrollingChild(viewRef.get());
-        nestedScrollingChildRef = new WeakReference<>(scrollingChild);
-    }
+//    public void updateScrollingChild() {
+//        final View scrollingChild = findScrollingChild(viewRef.get());
+//        nestedScrollingChildRef = new WeakReference<>(scrollingChild);
+//    }
 
     /**
      * A utility function to get the {@link ViewPagerBottomSheetBehavior} associated with the {@code view}.

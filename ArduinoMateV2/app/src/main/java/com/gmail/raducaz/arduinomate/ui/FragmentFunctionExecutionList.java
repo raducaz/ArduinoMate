@@ -1,29 +1,21 @@
 package com.gmail.raducaz.arduinomate.ui;
 
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.databinding.RecyclerViewBinding;
-import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
-import com.gmail.raducaz.arduinomate.model.Function;
 import com.gmail.raducaz.arduinomate.model.FunctionExecution;
-import com.gmail.raducaz.arduinomate.viewmodel.DeviceViewModel;
 import com.gmail.raducaz.arduinomate.viewmodel.FunctionExecutionListViewModel;
-import com.gmail.raducaz.arduinomate.viewmodel.FunctionListViewModel;
-import com.gmail.raducaz.arduinomate.viewmodel.FunctionViewModel;
 
 import java.util.List;
 

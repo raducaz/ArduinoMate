@@ -4,8 +4,8 @@ package com.gmail.raducaz.arduinomate;
  * Created by Radu.Cazacu on 11/27/2017.
  */
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
 import com.gmail.raducaz.arduinomate.db.converter.DateConverter;

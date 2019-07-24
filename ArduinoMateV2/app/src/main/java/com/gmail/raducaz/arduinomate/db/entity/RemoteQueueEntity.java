@@ -4,11 +4,10 @@ package com.gmail.raducaz.arduinomate.db.entity;
  * Created by Radu.Cazacu on 11/27/2017.
  */
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.RemoteQueue;
-import com.gmail.raducaz.arduinomate.model.Settings;
 
 import java.io.Serializable;
 import java.util.Date;

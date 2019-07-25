@@ -10,8 +10,11 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import androidx.viewpager.widget.ViewPager;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +25,8 @@ import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.List;
 
 
 /**
@@ -35,6 +40,11 @@ public class ActivityMain extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        LiveData<List<WorkInfo>> commandWorkerState;
+        WorkManager mWorkManager = WorkManager.getInstance(this.getApplicationContext());
+        commandWorkerState = mWorkManager.getWorkInfosByTagLiveData("COMMAND_WORKER");
+        commandWorkerState.observe(this, listOfWorkInfos -> {});
 
         // Adding Toolbar to Main screen
         Toolbar toolbar = findViewById(R.id.toolbar);

@@ -4,8 +4,10 @@ import android.app.Application;
 import android.os.Environment;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
@@ -29,6 +31,7 @@ import com.rabbitmq.client.ShutdownListener;
 import com.rabbitmq.client.ShutdownSignalException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -235,6 +238,7 @@ public class ArduinoMateApp extends Application {
                     mWorkManager = WorkManager.getInstance(this.getApplicationContext());
                     OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(CommandToControllerConsumerWorker.class)
                             .setInputData(input)
+                            .addTag("COMMAND_WORKER")
                             .build();
                     mWorkManager.enqueue(workRequest);
 
@@ -247,8 +251,13 @@ public class ArduinoMateApp extends Application {
             try {
                 timerService = TimerService.getInstance(this.getRepository());
                 this.getNetworkExecutor().execute(timerService);
+
+//                mWorkManager = WorkManager.getInstance(this.getApplicationContext());
+//                OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(TimerWorker.class)
+//                        .build();
+//                mWorkManager.enqueue(workRequest);
             }
-            catch (IOException exc)
+            catch (Exception exc)
             {
                 Log.e("StartTimer", exc.getMessage());
             }
@@ -307,7 +316,21 @@ public class ArduinoMateApp extends Application {
             }
         }
 
+        LiveData<List<WorkInfo>> commandWorkerState;
+        commandWorkerState = mWorkManager.getWorkInfosByTagLiveData("COMMAND_WORKER");
+        commandWorkerState.observe(this, listOfWorkInfos -> {
+            if(listOfWorkInfos == null || listOfWorkInfos.isEmpty())
+            {
+                return;
+            }
 
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+            boolean finished = workInfo.getState().isFinished();
+            if(finished)
+            {
+                // Start worker again
+            }
+        });
 
     }
 

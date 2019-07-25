@@ -316,21 +316,22 @@ public class ArduinoMateApp extends Application {
             }
         }
 
-        LiveData<List<WorkInfo>> commandWorkerState;
-        commandWorkerState = mWorkManager.getWorkInfosByTagLiveData("COMMAND_WORKER");
-        commandWorkerState.observe(this, listOfWorkInfos -> {
-            if(listOfWorkInfos == null || listOfWorkInfos.isEmpty())
-            {
-                return;
-            }
-
-            WorkInfo workInfo = listOfWorkInfos.get(0);
-            boolean finished = workInfo.getState().isFinished();
-            if(finished)
-            {
-                // Start worker again
-            }
-        });
+        // TODO determine if Worker finished (stopped) and restart again - maybe is better to use a periodic Worker instead
+//        LiveData<List<WorkInfo>> commandWorkerState;
+//        commandWorkerState = mWorkManager.getWorkInfosByTagLiveData("COMMAND_WORKER");
+//        commandWorkerState.observe(this, listOfWorkInfos -> {
+//            if(listOfWorkInfos == null || listOfWorkInfos.isEmpty())
+//            {
+//                return;
+//            }
+//
+//            WorkInfo workInfo = listOfWorkInfos.get(0);
+//            boolean finished = workInfo.getState().isFinished();
+//            if(finished)
+//            {
+//                // Start worker again
+//            }
+//        });
 
     }
 

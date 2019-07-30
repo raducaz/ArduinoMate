@@ -16,6 +16,7 @@ import com.gmail.raducaz.arduinomate.remote.RemoteStateUpdate;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
+import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -97,7 +98,7 @@ public class TimerService implements Runnable {
                     }
                     catch (Exception exc)
                     {
-                        Log.e(TAG, "", exc);
+                        Logger.e(TAG+ exc.getMessage());
                     }
                     try {
                         // Check the pressure periodically by probing, if pressure low start generator and pump
@@ -111,13 +112,13 @@ public class TimerService implements Runnable {
                                         "Pressure is LOW");
                                 new TaskExecutor().execute(functionCaller);
                             } catch (Exception exc) {
-                                Log.e(TAG, exc.getMessage());
+                                Logger.e(TAG+ exc.getMessage());
                             }
                         }
                     }
                     catch(Exception exc)
                     {
-                        Log.e(TAG, "", exc);
+                        Logger.e(TAG+ exc.getMessage());
                     }
                     try {
                         FunctionEntity generatorOnOff = dataRepository.loadDeviceFunctionSync("Generator", "GeneratorOnOff");
@@ -139,7 +140,7 @@ public class TimerService implements Runnable {
                                 generatorOnOff.setResultState(FunctionResultStateEnum.ERROR.getId());
                                 dataRepository.updateFunction(generatorOnOff); //This sets initial callState as well !!!
                             } catch (Exception exc) {
-                                Log.e(TAG, exc.getMessage());
+                                Logger.e(TAG+ exc.getMessage());
                             }
                         }
                         //dataRepository.insertExecutionLogOnLastFunctionExecution(generatorOnOff.getId(), "Temperature is " + temperature);
@@ -151,7 +152,7 @@ public class TimerService implements Runnable {
                     }
                     catch (Exception exc)
                     {
-                        Log.e(TAG, "", exc);
+                        Logger.e(TAG+ exc.getMessage());
                     }
                     try{
                         // Send State Update Buffer
@@ -177,7 +178,7 @@ public class TimerService implements Runnable {
 
                     }
                     catch (Exception exc) {
-                        Log.e(TAG, exc.getMessage());
+                        Logger.e(TAG+ exc.getMessage());
                     }
                 }
             }, 1000, 30000);

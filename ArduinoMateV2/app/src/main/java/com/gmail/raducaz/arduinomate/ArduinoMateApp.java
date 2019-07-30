@@ -76,7 +76,7 @@ public class ArduinoMateApp extends Application {
         Logger.addLogAdapter(new DiskLogAdapter(formatStrategy));
 
         String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        Logger.i("test Logger");
+        Logger.i("Logger started");
 
         mAppExecutors = new AppExecutors();
 
@@ -110,7 +110,7 @@ public class ArduinoMateApp extends Application {
 //            }
         }
         catch (Exception exc) {
-            Log.e(TAG, exc.getMessage());
+            Logger.e(TAG + exc.getMessage());
         }
 
         uri = settings.getAmqUri();
@@ -161,14 +161,14 @@ public class ArduinoMateApp extends Application {
                                 Channel ch = (Channel)cause.getReference();
                             }
 
-                            Log.e("InitAMQConnection", "", cause);
+                            Logger.e("InitAMQConnection" + cause.getMessage());
                         }
                     }
             );
         }
         catch (Exception exc)
         {
-            Log.e("InitAMQConnection", "", exc);
+            Logger.e("InitAMQConnection"+ exc.getMessage());
             //Snackbar.make(this, exc.getMessage(), Snackbar.LENGTH_LONG).show();
         }
 //        // Start the tcp server or AMQ state consumer and Mocks service - More complicated way
@@ -196,7 +196,7 @@ public class ArduinoMateApp extends Application {
             }
             catch (Exception exc)
             {
-                Log.e("StartStateConsumer", "", exc);
+                Logger.e("StartStateConsumer"+ exc.getMessage());
             }
         }
         else
@@ -218,7 +218,7 @@ public class ArduinoMateApp extends Application {
             }
             catch (Exception exc)
             {
-                Log.e("StartTcpServer", "", exc);
+                Logger.e("StartTcpServer"+ exc.getMessage());
             }
 
             // If controller that permits remote control
@@ -243,7 +243,7 @@ public class ArduinoMateApp extends Application {
                     mWorkManager.enqueue(workRequest);
 
                 } catch (Exception exc) {
-                    Log.e("StartCommandConsumer", "", exc);
+                    Logger.e("StartCommandConsumer"+ exc);
                 }
             }
 
@@ -259,7 +259,7 @@ public class ArduinoMateApp extends Application {
             }
             catch (Exception exc)
             {
-                Log.e("StartTimer", exc.getMessage());
+                Logger.e("StartTimer"+ exc.getMessage());
             }
 
             if(settings.getIsTestingMode())
@@ -310,7 +310,7 @@ public class ArduinoMateApp extends Application {
                 }
                 catch (Exception exc)
                 {
-                    Log.e("StartMocks", "", exc);
+                    Logger.e("StartMocks"+ exc.getMessage());
                 }
                 // MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK MOCK  Start the arduino mocks
             }

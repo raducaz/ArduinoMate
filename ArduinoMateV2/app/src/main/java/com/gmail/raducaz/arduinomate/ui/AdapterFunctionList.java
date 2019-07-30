@@ -2,10 +2,13 @@ package com.gmail.raducaz.arduinomate.ui;
 
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,7 @@ import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.databinding.FunctionListItemBinding;
 import com.gmail.raducaz.arduinomate.model.Function;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 
 import java.util.List;
 import java.util.Objects;
@@ -108,12 +112,25 @@ public class AdapterFunctionList extends RecyclerView.Adapter<AdapterFunctionLis
 //                    Snackbar.make(v, "Share " + binding.getFunction().getName(),
 //                            Snackbar.LENGTH_LONG).show();
 
-//                    ExecutorService taskExecutor = Executors.newFixedThreadPool(4);
-                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(
-                            application.getRepository(),
-                            binding.getFunction().getId());
-                    application.getNetworkExecutor().execute(functionCaller);
-//                    new TaskExecutor().execute(functionCaller);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(v.getContext(), R.style.AppTheme));
+                    builder.setMessage(R.string.confirm_fct_execute)
+                            .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    TaskFunctionCaller functionCaller = new TaskFunctionCaller(
+                                            application.getRepository(),
+                                            binding.getFunction().getId());
+                                    application.getNetworkExecutor().execute(functionCaller);
+                                }
+                            })
+                            .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // User cancelled the dialog
+                                }
+                            });
+                    // Create the AlertDialog object and return it
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
                 }
             });
         }

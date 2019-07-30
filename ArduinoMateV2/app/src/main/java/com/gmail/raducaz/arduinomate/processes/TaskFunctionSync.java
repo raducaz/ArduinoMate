@@ -17,6 +17,7 @@ import com.gmail.raducaz.arduinomate.remote.RemoteSyncCommand;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
+import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class TaskFunctionSync implements TaskInterface {
 
         } catch (Exception exc) {
 
-            Log.e(TAG, exc.getMessage());
+            Logger.e(TAG+ exc.getMessage());
         }
     }
 

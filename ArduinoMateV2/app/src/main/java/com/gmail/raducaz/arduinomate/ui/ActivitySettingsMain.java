@@ -1,6 +1,7 @@
 package com.gmail.raducaz.arduinomate.ui;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
@@ -11,11 +12,14 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gmail.raducaz.arduinomate.R;
 import com.google.android.material.navigation.NavigationView;
+
+import java.io.File;
 
 
 /**
@@ -97,8 +101,13 @@ public class ActivitySettingsMain extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_logs) {
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+            File logFile = new File(path + "/logger/log_0.csv");
+            Intent i = new Intent();
+            i.setAction(android.content.Intent.ACTION_VIEW);
+            i.setDataAndType(Uri.fromFile(logFile), "text/csv");
+            startActivity(i);
         } else if (id == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }

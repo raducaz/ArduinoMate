@@ -5,6 +5,7 @@ import android.util.Log;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
+import com.orhanobut.logger.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,7 +34,7 @@ public class DeviceGenericFunctions {
         }
         catch (Exception exc)
         {
-            Log.e("restartDevice", exc.getMessage());
+            Logger.e("restartDevice"+exc.getMessage());
             return false;
         }
     }

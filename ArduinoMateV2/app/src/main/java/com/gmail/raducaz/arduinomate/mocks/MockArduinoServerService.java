@@ -6,6 +6,7 @@ import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.model.MockPinState;
 import com.gmail.raducaz.arduinomate.tcpserver.TcpServerInboundHandler;
+import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -178,11 +179,11 @@ public class MockArduinoServerService implements Runnable {
             }
             catch(InterruptedException exc)
             {
-                Log.e(TAG, exc.getMessage());
+                Logger.e(TAG+exc.getMessage());
             }
             catch (Exception generalExc)
             {
-                Log.e(TAG, generalExc.getMessage());
+                Logger.e(TAG+generalExc.getMessage());
             }
             finally {
                 // Shut down all event loops to terminate all threads.

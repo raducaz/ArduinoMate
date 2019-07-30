@@ -8,6 +8,7 @@ import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
+import com.orhanobut.logger.Logger;
 
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class DeviceStateChangeEvent {
             }
         }
         catch (Exception exc) {
-            Log.e(TAG, exc.getMessage());
+            Logger.e(TAG+ exc.getMessage());
         }
     }
 }

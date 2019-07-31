@@ -151,7 +151,7 @@ public class MockArduinoServerWorker extends Worker {
                 setPinState(3, 1);//                digitalWrite(ContactRetea220V, HIGH); // Decuplat
                 setPinState(8, 0);//                digitalWrite(ContactDemaror12V, LOW); // Decuplat
                 setPinState(17, 1023);//                digitalWrite(PresostatProbeSender, HIGH); A3
-                setPinState(18, 1023);//                digitalWrite(PresostatProbeReceiver, HIGH);A4
+                setPinState(18, 0);//                digitalWrite(PresostatProbeReceiver, HIGH);A4
                 break;
             case "Tap":
                 break;

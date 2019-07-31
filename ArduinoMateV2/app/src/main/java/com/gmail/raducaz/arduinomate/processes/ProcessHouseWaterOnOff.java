@@ -2,6 +2,7 @@ package com.gmail.raducaz.arduinomate.processes;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
+import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 public class ProcessHouseWaterOnOff extends Process {
@@ -53,9 +54,7 @@ public class ProcessHouseWaterOnOff extends Process {
         if(pWaterSupplyTap.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason)) {
             logInfo("STOP pump");
             if (!pPump.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason)) {
-
                 throw new Exception("Problem stopping pump.");
-
             }
         }
         else

@@ -17,6 +17,7 @@ import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.ExecutionLog;
 import com.gmail.raducaz.arduinomate.service.DeviceStateUpdater;
+import com.orhanobut.logger.Logger;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -79,14 +80,14 @@ public class StateFromControllerConsumerWorker extends Worker {
                             }
 
                             String message = new String(body);
-                            Log.i(TAG, message);
+                            Log.d(TAG, message);
 
                             try {
                                 Serializable stateUpdate = (Serializable) SerializerDeserializerUtility.Deserialize(body);
                                 ProcessState(stateUpdate);
 
                             } catch (Exception exc) {
-                                Log.e(TAG, "", exc);
+                                Logger.e(TAG+ exc.getMessage());
                             } finally {
                                 // positively acknowledge a single delivery, the message will
                                 // be discarded
@@ -107,7 +108,7 @@ public class StateFromControllerConsumerWorker extends Worker {
 
             return Result.success();
         } catch (Exception exc) {
-            Log.e(TAG, exc.getMessage());
+            Logger.e(TAG+ exc.getMessage());
 
             return Result.failure();
         } finally {
@@ -213,7 +214,7 @@ public class StateFromControllerConsumerWorker extends Worker {
                     DeviceStateUpdater deviceStateUpdater = new DeviceStateUpdater(mRepository, state);
                     deviceStateUpdater.updatePinStates();
                 } catch (Exception exc) {
-                    Log.e("ProcessPinStates", "", exc);
+                    Logger.e("ProcessPinStates"+ exc.getMessage());
                 }
             }
         }

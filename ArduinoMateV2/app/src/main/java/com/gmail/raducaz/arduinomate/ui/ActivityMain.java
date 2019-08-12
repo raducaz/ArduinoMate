@@ -1,18 +1,26 @@
 package com.gmail.raducaz.arduinomate.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import androidx.viewpager.widget.ViewPager;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -22,6 +30,9 @@ import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+
+import java.io.File;
+import java.util.List;
 
 
 /**
@@ -35,6 +46,11 @@ public class ActivityMain extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        LiveData<List<WorkInfo>> commandWorkerState;
+        WorkManager mWorkManager = WorkManager.getInstance(this.getApplicationContext());
+        commandWorkerState = mWorkManager.getWorkInfosByTagLiveData("COMMAND_WORKER");
+        commandWorkerState.observe(this, listOfWorkInfos -> {});
 
         // Adding Toolbar to Main screen
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -176,18 +192,56 @@ public class ActivityMain extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logs) {
+
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+            File logFile = new File(path + "/logger/logs_0.csv");
+            Intent i = new Intent();
+            i.setAction(android.content.Intent.ACTION_VIEW);
+            i.setDataAndType(Uri.fromFile(logFile), "text/csv");
+            startActivity(i);
+
             return true;
         }else if (id==R.id.action_reset_all)
         {
-            ArduinoMateApp application = (ArduinoMateApp) getApplication();
-            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository());
-            new TaskExecutor().execute(functionReset);
+            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme));
+            builder.setMessage(R.string.confirm_reset_all)
+                    .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository());
+                            new TaskExecutor().execute(functionReset);
+                        }
+                    })
+                    .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            AlertDialog alert = builder.create();
+            alert.show();
+
         }else if (id==R.id.action_sync_all)
         {
-            ArduinoMateApp application = (ArduinoMateApp) getApplication();
-            TaskFunctionSync caller = new TaskFunctionSync(application.getRepository());
-            new TaskExecutor().execute(caller);
+            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme));
+            builder.setMessage(R.string.confirm_sync_all)
+                    .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                            TaskFunctionSync caller = new TaskFunctionSync(application.getRepository());
+                            new TaskExecutor().execute(caller);
+                        }
+                    })
+                    .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            AlertDialog alert = builder.create();
+            alert.show();
+
         }
         else if (id == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);

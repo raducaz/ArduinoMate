@@ -11,6 +11,7 @@ import com.gmail.raducaz.arduinomate.remote.CommandToControllerPublisher;
 import com.gmail.raducaz.arduinomate.remote.RemoteResetCommand;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
+import com.orhanobut.logger.Logger;
 
 import java.util.concurrent.ExecutorService;
 
@@ -82,7 +83,7 @@ public class TaskFunctionReset implements TaskInterface {
 
         } catch (Exception exc) {
 
-            Log.e(TAG, exc.getMessage());
+            Logger.e(TAG+ exc.getMessage());
         }
     }
 

@@ -1,11 +1,14 @@
 package com.gmail.raducaz.arduinomate.ui;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +22,7 @@ import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.databinding.FunctionViewItemBinding;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
+import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 import com.gmail.raducaz.arduinomate.viewmodel.FunctionViewModel;
 
 public class FragmentFunctionViewItem extends Fragment {
@@ -56,11 +60,35 @@ public class FragmentFunctionViewItem extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-
-                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
                 FunctionEntity functionEntity = mBinding.getFunctionViewModel().getObservableFunction().getValue();
-                functionEntity.setIsAutoEnabled(isChecked);
-                application.getDbExecutor().execute(new DbUpdater(functionEntity));
+
+                if(isChecked != functionEntity.getIsAutoEnabled()) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(buttonView.getContext(), R.style.AppTheme));
+                    if (isChecked)
+                        builder.setMessage(R.string.confirm_fct_auto_enable);
+                    else
+                        builder.setMessage(R.string.confirm_fct_auto_disable);
+                        builder.setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+                                functionEntity.setIsAutoEnabled(isChecked);
+                                application.getDbExecutor().execute(new DbUpdater(functionEntity));
+                            }
+                            })
+                            .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // User cancelled the dialog
+                                    ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
+                                    functionEntity.setIsAutoEnabled(!isChecked);
+                                    application.getDbExecutor().execute(new DbUpdater(functionEntity));
+                                }
+                            });
+                    // Create the AlertDialog object and return it
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+
 
 //                ArduinoMateApp application = (ArduinoMateApp) getActivity().getApplication();
 //                DataRepository repository = application.getRepository();

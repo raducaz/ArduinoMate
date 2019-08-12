@@ -14,6 +14,7 @@ import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
+import com.orhanobut.logger.Logger;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -80,7 +81,7 @@ public class CommandToControllerConsumerWorker extends Worker {
                             }
 
                             String message = new String(body);
-                            Log.i(TAG, message);
+                            Log.d(TAG, message);
 
                             try {
                                 Object bodyObject = SerializerDeserializerUtility.Deserialize(body);
@@ -120,7 +121,7 @@ public class CommandToControllerConsumerWorker extends Worker {
                                 }
                             }
                             catch (Exception exc) {
-                                Log.e(TAG, exc.getMessage());
+                                Logger.e(TAG+ exc.getMessage());
                             }
 
                             // positively acknowledge a single delivery, the message will
@@ -136,7 +137,7 @@ public class CommandToControllerConsumerWorker extends Worker {
         }
         catch (Exception exc)
         {
-            Log.e(TAG, exc.getMessage());
+            Logger.e(TAG+ exc.getMessage());
             return Result.failure();
         }
         finally {

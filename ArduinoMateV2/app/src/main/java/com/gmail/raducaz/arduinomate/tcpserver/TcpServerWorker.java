@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters;
 import com.gmail.raducaz.arduinomate.AppExecutors;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
+import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -107,13 +108,13 @@ public class TcpServerWorker extends Worker {
             }
             catch(InterruptedException exc)
             {
-                Log.e(TAG, exc.getMessage());
+                Logger.e(TAG+ exc.getMessage());
 
                 return Result.failure();
             }
             catch (Exception generalExc)
             {
-                Log.e(TAG, generalExc.getMessage());
+                Logger.e(TAG+ generalExc.getMessage());
 
                 return Result.failure();
             }

@@ -10,6 +10,7 @@ import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.processes.TaskInterface;
 import com.gmail.raducaz.arduinomate.tcpclient.FunctionChannelClientInboundHandler;
 import com.gmail.raducaz.arduinomate.tcpclient.TcpClientService;
+import com.orhanobut.logger.Logger;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -70,7 +71,7 @@ public class TaskFunctionCallerOld implements TaskInterface {
 
         } catch (Exception exc) {
 
-            Log.e(TAG, exc.getMessage());
+            Logger.e(TAG+ exc.getMessage());
             functionStateUpdater.insertExecutionLog(exc);
             functionStateUpdater.updateFunctionExecution(FunctionCallStateEnum.ERROR);
         }

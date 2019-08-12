@@ -440,6 +440,19 @@ void clientThreadCallback()
     isRestarted=false;
     
     sendToServer("END");
+
+    // // Add code to get response from server
+    // if(arduinoClient.available())
+    // {
+    //   char receivedChar = arduinoClient.read();
+    //   if(receivedChar=='K')
+    //   {
+    //     // Controller alive
+    //   }
+    //   {
+    //     // Reset pins to initial state - controller dead
+    //   }
+    // }
   }
 }
 

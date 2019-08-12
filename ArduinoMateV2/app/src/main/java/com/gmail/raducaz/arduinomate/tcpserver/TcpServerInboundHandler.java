@@ -106,15 +106,15 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
 
             Log.d(TAG, "ChannelRead0-MSG " + msg + " from " + incoming.remoteAddress());
 
-            // We do not need to write a ChannelBuffer here.
-            // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
-            ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" + msg);
-
             if (deviceStateUpdater.deviceStateInfo.getDeviceState()== DeviceStateEnum.RESTARTED) {
                 TaskFunctionStopper taskFunctionStopper = new TaskFunctionStopper(dataRepository, deviceStateUpdater.getDeviceEntity());
                 taskFunctionStopper.execute();
             }
 
+            // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
+//            ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" + msg);
+            // Send to acknowledge signal to client
+            ChannelFuture future = ctx.write("K");
             if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
                 Log.d(TAG, "ChannelRead0-END " + incoming.remoteAddress());
                 future.addListener(ChannelFutureListener.CLOSE);

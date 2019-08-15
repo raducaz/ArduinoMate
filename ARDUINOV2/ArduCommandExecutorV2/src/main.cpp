@@ -33,6 +33,7 @@
 
 
 byte noLoopRuns = 0;
+byte noUnresponsiveController = 0;
 bool isRestarted = false;
 EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
@@ -441,18 +442,34 @@ void clientThreadCallback()
     
     sendToServer("END");
 
-    // // Add code to get response from server
-    // if(arduinoClient.available())
-    // {
-    //   char receivedChar = arduinoClient.read();
-    //   if(receivedChar=='K')
-    //   {
-    //     // Controller alive
-    //   }
-    //   {
-    //     // Reset pins to initial state - controller dead
-    //   }
-    // }
+    delay(250);
+    // Add code to get response from server
+    byte i = 0;
+    char c = 0;
+    while(arduinoClient.available())
+    {
+      if(i>1) break;
+
+      c = arduinoClient.read();
+      Serial.print(c);
+    }
+    if(c=='K')
+    {
+      Log::debugln(F("Controller alive"));
+      noUnresponsiveController = 0;
+    }
+    else
+    {
+      noUnresponsiveController ++;
+      Log::debugln(F("Unresponsive controller"));
+    }
+
+    if(noUnresponsiveController > 10)
+    {
+      Log::debugln(F("Reset to default !!!"));
+      initializePins();
+    }
+    
   }
 }
 

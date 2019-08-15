@@ -208,9 +208,29 @@ public class ActivityMain extends AppCompatActivity {
             builder.setMessage(R.string.confirm_reset_all)
                     .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
-                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository());
-                            new TaskExecutor().execute(functionReset);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ActivityMain.this);
+                            builder.setMessage(R.string.confirm_also_remote)
+                                    .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), true);
+                                            new TaskExecutor().execute(functionReset);
+                                        }
+                                    })
+                                    .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), false);
+                                            new TaskExecutor().execute(functionReset);
+                                        }
+                                    });
+
+                            // Create the AlertDialog object and return it
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+
                         }
                     })
                     .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
@@ -222,7 +242,8 @@ public class ActivityMain extends AppCompatActivity {
             AlertDialog alert = builder.create();
             alert.show();
 
-        }else if (id==R.id.action_sync_all)
+        }
+        else if (id==R.id.action_sync_all)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme));
             builder.setMessage(R.string.confirm_sync_all)

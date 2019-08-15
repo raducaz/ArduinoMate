@@ -19,8 +19,10 @@ import java.util.Date;
                         parentColumns = "id",
                         childColumns = "deviceId",
                         onDelete = ForeignKey.CASCADE)},
-        indices = {@Index(value = "deviceId")
-        })
+        indices = {@Index(value = {"deviceId", "name"},
+                unique=true
+        )})
+
 public class PinStateEntity implements PinState, Serializable {
 
     @PrimaryKey(autoGenerate = true)

@@ -76,6 +76,17 @@ public class DeviceStateUpdater {
             dataRepository.insertPinState(newPinState);
         }
     }
+    public void updateOrInsertPinStateHistory(String pName, Double pState)
+    {
+        if(deviceEntity != null) {
+            // Insert a new History for this pin with the initial state
+            PinStateEntity pin = dataRepository.loadDeviceCurrentPinStateSync(deviceEntity.getId(),pName);
+            if(pin != null)
+                insertPinStateHistory(pName, pState);
+            else
+                dataRepository.updatePinState(deviceEntity.getId(), pName, pState);
+        }
+    }
     private ArrayList<PinStateChangeListener> pinStateChangeListenerList = new ArrayList<PinStateChangeListener>();
     // Register an event listener
     public synchronized void addPinStateListener(PinStateChangeListener listener) {
@@ -125,12 +136,16 @@ public class DeviceStateUpdater {
 //                    PinStateChangeListener listener = new MyPinStateChangeListener();
 //                    this.addPinStateListener(listener);
 
-                    if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() != pState) {
-                        // Update history with the date until the state was unchanged
-                        dataRepository.updatePinStateToDate(currentPinsState.get(pName).getId());
-                    }
+//                    // if Keep history
+//                    if (currentPinsState.containsKey(pName) && currentPinsState.get(pName).getState() != pState) {
+//                        // Update history with the date until the state was unchanged
+//                        dataRepository.updatePinStateToDate(currentPinsState.get(pName).getId());
+//                    }
 
-                    insertPinStateHistory(pName,pState);
+                    // Don't keep history
+                    updateOrInsertPinStateHistory(pName, pState);
+                    // Keep history
+                    //insertPinStateHistory(pName,pState);
                 }
             }
 

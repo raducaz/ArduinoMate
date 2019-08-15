@@ -120,7 +120,8 @@ public class CommandToControllerConsumerService implements Runnable {
                                         TaskFunctionReset functionReset = new TaskFunctionReset(
                                                 mRepository,
                                                 command.function != null ? command.function.getId() : 0,
-                                                command.alsoRestart);
+                                                command.alsoRestart,
+                                                true);
 
                                         new TaskExecutor().execute(functionReset);
                                     }

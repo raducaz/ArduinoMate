@@ -22,16 +22,19 @@ public class TaskFunctionReset implements TaskInterface {
     private final long functionId;
     private final DataRepository mRepository;
     private boolean alsoRestart = false;
+    private boolean resetRemote = false;
 
-    public TaskFunctionReset(final DataRepository repository, long functionId, boolean alsoRestart) {
+    public TaskFunctionReset(final DataRepository repository, long functionId, boolean alsoRestart, boolean resetRemote) {
         this.functionId = functionId;
         this.alsoRestart = alsoRestart;
+        this.resetRemote = resetRemote;
 
         mRepository = repository;
     }
     // Use this constructor to reset all functions
-    public TaskFunctionReset(final DataRepository repository) {
+    public TaskFunctionReset(final DataRepository repository, boolean resetRemote) {
         functionId = 0;
+        this.resetRemote = resetRemote;
 
         mRepository = repository;
     }
@@ -43,7 +46,7 @@ public class TaskFunctionReset implements TaskInterface {
             if(functionId>0) function = mRepository.loadFunctionSync(functionId);
 
             // If client redirect the command to controller
-            if(!mRepository.getSettingsSync().getIsController())
+            if(!mRepository.getSettingsSync().getIsController() && resetRemote)
             {
                 CommandToControllerPublisher sender = new CommandToControllerPublisher(ArduinoMateApp.AmqConnection,
                         ArduinoMateApp.COMMAND_QUEUE);

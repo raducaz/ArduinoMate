@@ -74,11 +74,15 @@ public interface PinStateDao {
             "where deviceId = :deviceId AND name = :pinName AND toDate IS NULL " +
             "LIMIT 1")
     LiveData<PinStateEntity> loadDeviceCurrentPinState(long deviceId, String pinName);
-
     @Query("SELECT * FROM pinState " +
-            "where deviceId = :deviceId AND name = :pinName AND toDate IS NULL " +
+            "where deviceId = :deviceId AND name = :pinName " +
             "LIMIT 1")
     PinStateEntity loadDeviceCurrentPinStateSync(long deviceId, String pinName);
+
+    @Query("UPDATE pinState " +
+            "SET state = :pinState " +
+            "WHERE deviceId = :deviceId AND name = :pinName ")
+    void updatePinState(long deviceId, String pinName, Double pinState);
 
     @Query("DELETE FROM pinState " +
             "WHERE deviceId IN (" +

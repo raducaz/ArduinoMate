@@ -44,6 +44,7 @@
         \nContinue ?</string>
     <string name="confirm_reset_all">This will erase all logs, executions and pin states for all functions !!!
         \nContinue ?</string>
+    <string name="confirm_also_remote">Reset also REMOTE ??? </string>
     <string name="confirm_sync_all">If client this will sync all functions execution logs and state from controller.
         \nThis action can take 1 to 5 minutes to complete depending on connection between client and controller
         \nContinue ?</string>

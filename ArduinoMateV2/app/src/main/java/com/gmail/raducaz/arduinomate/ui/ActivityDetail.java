@@ -238,9 +238,28 @@ public class ActivityDetail extends AppCompatActivity {
             builder.setMessage(R.string.confirm_reset)
                     .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
-                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, false);
-                            new TaskExecutor().execute(functionReset);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ActivityDetail.this);
+                            builder.setMessage(R.string.confirm_also_remote)
+                                    .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, false, true);
+                                            new TaskExecutor().execute(functionReset);
+                                        }
+                                    })
+                                    .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, false, false);
+                                            new TaskExecutor().execute(functionReset);
+                                        }
+                                    });
+
+                            // Create the AlertDialog object and return it
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
                         }
                     })
                     .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
@@ -259,7 +278,7 @@ public class ActivityDetail extends AppCompatActivity {
                     .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             ArduinoMateApp application = (ArduinoMateApp) getApplication();
-                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, true);
+                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, true,true);
                             new TaskExecutor().execute(functionReset);
                         }
                     })

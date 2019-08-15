@@ -16,6 +16,7 @@ import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.ExecutionLog;
+import com.gmail.raducaz.arduinomate.model.FunctionExecution;
 import com.gmail.raducaz.arduinomate.service.DeviceStateUpdater;
 import com.orhanobut.logger.Logger;
 import com.rabbitmq.client.AMQP;
@@ -169,6 +170,11 @@ public class StateFromControllerConsumerWorker extends Worker {
             }
             if (stateUpdate.methodName.equals("insertExecutionLog")) {
                 ExecutionLogEntity entity = (ExecutionLogEntity) stateUpdate.entity;
+                //Prevent FK constraint exception if execution with  doesn't exists
+                // Execution should exists in mirror with the last execution on controller (but it may have different id
+                // because some of the executions may be skipped over time
+                FunctionExecution execution = mRepository.loadLastFunctionExecutionSync(entity.getFunctionId());
+                entity.setExecutionId(execution.getId());
                 mRepository.insertExecutionLog(entity);
             }
             if (stateUpdate.methodName.equals("deleteExecutionLogs")) {

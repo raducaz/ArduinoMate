@@ -26,6 +26,7 @@ public class ExecutionLogEntity implements ExecutionLog, Serializable {
     private long executionId;
     private Date date;
     private String log;
+    private long functionId;
     private String functionName;
 
     @Override
@@ -60,6 +61,13 @@ public class ExecutionLogEntity implements ExecutionLog, Serializable {
         this.log = log;
     }
 
+    @Override
+    public long getFunctionId() {
+        return functionId;
+    }
+    public void setFunctionId(long functionId) {
+        this.functionId = functionId;
+    }
     @Override
     public String getFunctionName() {
         return functionName;

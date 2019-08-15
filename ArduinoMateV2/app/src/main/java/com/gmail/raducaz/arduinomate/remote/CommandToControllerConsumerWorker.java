@@ -30,6 +30,7 @@ public class CommandToControllerConsumerWorker extends Worker {
 
     private String TAG = "CommandConsumerServiceWork";
 
+    private AppExecutors executors;
     private DataRepository mRepository;
 
     public CommandToControllerConsumerWorker(
@@ -37,7 +38,7 @@ public class CommandToControllerConsumerWorker extends Worker {
             @NonNull WorkerParameters workerParams) {
         super(appContext, workerParams);
 
-        AppExecutors executors = new AppExecutors();
+        executors = new AppExecutors();
         mRepository = DataRepository.getInstance(AppDatabase.getInstance(appContext, executors));
     }
 
@@ -96,14 +97,15 @@ public class CommandToControllerConsumerWorker extends Worker {
                                             "Remote on demand");
                                     functionCaller.setAutoExecution(false);
                                     functionCaller.setOnDemand(true);
-                                    new TaskExecutor().execute(functionCaller);
+                                    executors.networkIO().execute(functionCaller);
                                 }
                                 if (bodyObject instanceof RemoteResetCommand) {
                                     RemoteResetCommand command = (RemoteResetCommand) bodyObject;
                                     TaskFunctionReset functionReset = new TaskFunctionReset(
                                             mRepository,
                                             command.function != null ? command.function.getId() : 0,
-                                            command.alsoRestart);
+                                            command.alsoRestart,
+                                            false);
 
                                     new TaskExecutor().execute(functionReset);
                                 }

@@ -1,7 +1,8 @@
 package com.gmail.raducaz.arduinomate.ui;
 
+import androidx.viewpager.widget.ViewPager;
+
 import android.support.design.widget.ViewPagerBottomSheetBehavior;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 
 public class BottomSheetViewPagerListener extends ViewPager.SimpleOnPageChangeListener {
@@ -18,7 +19,7 @@ public class BottomSheetViewPagerListener extends ViewPager.SimpleOnPageChangeLi
         mViewPager.post(new Runnable() {
             @Override
             public void run() {
-                mBehavior.updateScrollingChild();
+//                mBehavior.updateScrollingChild();
             }
         });
     }

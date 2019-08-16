@@ -42,23 +42,15 @@ public class ProcessGardenWaterOnOff extends Process {
         ProcessWaterSupplyTapOnOff pWaterSupplyTap = new ProcessWaterSupplyTapOnOff(dataRepository, "Tap");
         ProcessPumpOnOff pPump = new ProcessPumpOnOff(dataRepository, "Generator");
 
-        //Ensure the tap is Close so the pressure is increased before the pump will automatically
-        //be closed (because no current is consumed)
-        logInfo("CLOSE main tap");
-        if(pWaterSupplyTap.execute(false, isOnDemand, FunctionResultStateEnum.OFF, "Garden water is stopping")) {
-            // Wait for pump to be automatically be stopped
-            logInfo("Wait house water tank is filled and pump stops");
-        }
-        else
-        {
-            logInfo("tap not closed !! Stop pump");
-            // Stop the pump in case the tap is not closed successfully
-            if (!pPump.execute(false, isOnDemand, FunctionResultStateEnum.OFF, "Garden water is stopping")) {
-
-                throw new Exception("Problem stopping pump.");
-
+        logInfo("Stopping pump..");
+        // Stop the pump
+        if (!pPump.execute(false, isOnDemand, FunctionResultStateEnum.OFF, "Garden water is stopping")) {
+            throw new Exception("Problem stopping pump.");
+        }else {
+            logInfo("CLOSE main tap");
+            if (!pWaterSupplyTap.execute(false, isOnDemand, FunctionResultStateEnum.OFF, "Garden water is stopping")) {
+                throw new Exception("Water supply tap is not Closed.");
             }
-            throw new Exception("Water supply tap is not Closed.");
         }
 
         return super.off(isOnDemand);

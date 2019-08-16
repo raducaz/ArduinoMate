@@ -59,13 +59,12 @@ public class ProcessPumpOnOff extends Process {
 
         logInfo("Check if generator Contact is ON");
         if(deviceGeneratorFunctions.getPowerState()==FunctionResultStateEnum.ON) {
-            logInfo("Contact on, start power");
+            logInfo("Power on, stop power");
             pPower.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason);
-
-            logInfo("STOP generator");
-            if (!pGen.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason)) {
-                throw new Exception("Generator couldn't be stopped. Retry.");
-            }
+        }
+        logInfo("STOP generator");
+        if (!pGen.execute(false, isOnDemand, FunctionResultStateEnum.OFF, currentReason)) {
+            throw new Exception("Generator couldn't be stopped. Retry.");
         }
         return super.off(isOnDemand);
     }

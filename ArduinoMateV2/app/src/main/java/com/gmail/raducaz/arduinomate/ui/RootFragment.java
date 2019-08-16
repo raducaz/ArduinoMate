@@ -1,7 +1,9 @@
 package com.gmail.raducaz.arduinomate.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +21,7 @@ public class RootFragment extends Fragment {
             /* Inflate the layout for this fragment */
             View view = inflater.inflate(R.layout.root_fragment, container, false);
 
-            android.support.v4.app.FragmentTransaction trans = getChildFragmentManager()
+            FragmentTransaction trans = getChildFragmentManager()
                     .beginTransaction();
             trans.replace(R.id.root_frame, mReplacementFragment);
             trans.commit();

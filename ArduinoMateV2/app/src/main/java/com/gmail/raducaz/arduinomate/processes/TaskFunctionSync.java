@@ -17,6 +17,7 @@ import com.gmail.raducaz.arduinomate.remote.RemoteSyncCommand;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
+import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
@@ -64,7 +65,9 @@ public class TaskFunctionSync implements TaskInterface {
 
                 RemoteSyncCommand cmd = new RemoteSyncCommand(function);
                 sender.SendCommand(cmd, 5);
-                mRepository.insertExecutionLogOnLastFunctionExecution(function.getId(),
+
+                if(function!= null)
+                    mRepository.insertExecutionLogOnLastFunctionExecution(function.getId(),
                         "Sync cmd sent remotely...");
             } else {
                 // Execute on controller the sync command
@@ -85,7 +88,7 @@ public class TaskFunctionSync implements TaskInterface {
 
         } catch (Exception exc) {
 
-            Log.e(TAG, exc.getMessage());
+            Logger.e(TAG+ exc.getMessage());
         }
     }
 
@@ -93,14 +96,16 @@ public class TaskFunctionSync implements TaskInterface {
     {
         // Get last execution for function
         FunctionExecutionEntity functionExecutionEntity = mRepository.loadLastFunctionExecutionSync(function.getId());
-        SendStateToRemoteClients(new RemoteStateUpdate(functionExecutionEntity, "insertFunctionExecution"));
 
-        // Get logs for last execution
-        List<ExecutionLogEntity> logs = mRepository.loadExecutionLogSync(functionExecutionEntity.getId());
-        for (ExecutionLogEntity log: logs) {
-            SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+        if(functionExecutionEntity != null) {
+            SendStateToRemoteClients(new RemoteStateUpdate(functionExecutionEntity, "insertFunctionExecution"));
+
+            // Get logs for last execution
+            List<ExecutionLogEntity> logs = mRepository.loadExecutionLogSync(functionExecutionEntity.getId());
+            for (ExecutionLogEntity log : logs) {
+                SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+            }
         }
-
         // Get function states
         SendStateToRemoteClients(new RemoteStateUpdate(function, "updateFunction"));
     }

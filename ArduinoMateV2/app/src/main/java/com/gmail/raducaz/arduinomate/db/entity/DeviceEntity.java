@@ -4,9 +4,9 @@ package com.gmail.raducaz.arduinomate.db.entity;
  * Created by Radu.Cazacu on 11/27/2017.
  */
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.model.Device;
 

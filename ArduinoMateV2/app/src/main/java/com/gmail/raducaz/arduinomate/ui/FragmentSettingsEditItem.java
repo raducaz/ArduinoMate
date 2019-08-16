@@ -1,32 +1,28 @@
 package com.gmail.raducaz.arduinomate.ui;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.NavUtils;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.R;
-import com.gmail.raducaz.arduinomate.databinding.DeviceEditItemBinding;
 import com.gmail.raducaz.arduinomate.databinding.SettingsEditItemBinding;
-import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
-import com.gmail.raducaz.arduinomate.model.Settings;
-import com.gmail.raducaz.arduinomate.viewmodel.DeviceViewModel;
 import com.gmail.raducaz.arduinomate.viewmodel.SettingsViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
 public class FragmentSettingsEditItem extends Fragment {
 

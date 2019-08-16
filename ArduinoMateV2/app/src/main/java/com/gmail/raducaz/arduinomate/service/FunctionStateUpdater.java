@@ -86,6 +86,7 @@ public class FunctionStateUpdater {
         log.setExecutionId(functionExecution.getId());
         log.setLog(msg);
         log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        log.setFunctionId(functionExecution.getFunctionId());
         log.setFunctionName(functionExecution.getName());
         return dataRepository.insertExecutionLog(log);
     }
@@ -97,6 +98,7 @@ public class FunctionStateUpdater {
         log.setExecutionId(functionExecution.getId());
         log.setLog(exc.getMessage() + " " + exc.getStackTrace().toString());
         log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        log.setFunctionId(functionExecution.getFunctionId());
         log.setFunctionName(functionExecution.getName());
         return dataRepository.insertExecutionLog(log);
     }
@@ -108,6 +110,7 @@ public class FunctionStateUpdater {
         log.setExecutionId(functionExecution.getId());
         log.setLog(cause.getMessage() + " " + cause.getStackTrace().toString());
         log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+        log.setFunctionId(functionExecution.getFunctionId());
         log.setFunctionName(functionExecution.getName());
         return dataRepository.insertExecutionLog(log);
     }

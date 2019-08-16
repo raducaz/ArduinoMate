@@ -33,6 +33,7 @@
 
 
 byte noLoopRuns = 0;
+byte noUnresponsiveController = 0;
 bool isRestarted = false;
 EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
@@ -440,6 +441,35 @@ void clientThreadCallback()
     isRestarted=false;
     
     sendToServer("END");
+
+    delay(250);
+    // Add code to get response from server
+    byte i = 0;
+    char c = 0;
+    while(arduinoClient.available())
+    {
+      if(i>1) break;
+
+      c = arduinoClient.read();
+      Serial.print(c);
+    }
+    if(c=='K')
+    {
+      Log::debugln(F("Controller alive"));
+      noUnresponsiveController = 0;
+    }
+    else
+    {
+      noUnresponsiveController ++;
+      Log::debugln(F("Unresponsive controller"));
+    }
+
+    if(noUnresponsiveController > 10)
+    {
+      Log::debugln(F("Reset to default !!!"));
+      initializePins();
+    }
+    
   }
 }
 
@@ -464,7 +494,7 @@ void setup() {
 
   Log::debugln(F("FreeMem:"), freeMemory());
   
-  delay(1000);
+  delay(8000);
   
   // Sensor initialization
   #ifdef HASCURRENT

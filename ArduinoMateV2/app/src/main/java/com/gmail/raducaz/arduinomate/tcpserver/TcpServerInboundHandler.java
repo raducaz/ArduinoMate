@@ -50,15 +50,17 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
         channels.add(ctx.channel());
 
         Log.d(TAG, "ChannelActive-RemoteAddress " + incoming.remoteAddress().toString());
-        final ChannelFuture f = incoming.writeAndFlush("[Server] - " + incoming.remoteAddress() + " has joined!\r\n");
+
+        // Do not send this message - interfere with check controller is alive
+//        final ChannelFuture f = incoming.writeAndFlush("[Server] - " + incoming.remoteAddress() + " has joined!\r\n");
 
 //        final ChannelFuture f = incoming.writeAndFlush("\r\n");
 
-        f.addListener(new ChannelFutureListener() {
-            public void operationComplete(ChannelFuture future) {
-                Log.d(TAG, "Complete");
-            }
-        });
+//        f.addListener(new ChannelFutureListener() {
+//            public void operationComplete(ChannelFuture future) {
+//                Log.d(TAG, "Complete");
+//            }
+//        });
 
         for(Channel channel : channels) {
             // Send to all
@@ -71,8 +73,9 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
     public void channelInactive(ChannelHandlerContext ctx) {
 
         Channel incoming = ctx.channel();
-        incoming.writeAndFlush("[Server] - " + incoming.remoteAddress() + " has left!\r\n");
 
+        // Do not send this message - interfere with check controller is alive
+//        incoming.writeAndFlush("[Server] - " + incoming.remoteAddress() + " has left!\r\n");
         for(Channel channel : channels) {
             // Send to all
         }
@@ -106,17 +109,19 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
 
             Log.d(TAG, "ChannelRead0-MSG " + msg + " from " + incoming.remoteAddress());
 
-            // We do not need to write a ChannelBuffer here.
-            // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
-            ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" + msg);
-
             if (deviceStateUpdater.deviceStateInfo.getDeviceState()== DeviceStateEnum.RESTARTED) {
                 TaskFunctionStopper taskFunctionStopper = new TaskFunctionStopper(dataRepository, deviceStateUpdater.getDeviceEntity());
                 taskFunctionStopper.execute();
             }
 
+            // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
+//            ChannelFuture future = ctx.write("Received from " + incoming.remoteAddress() + ":" + msg);
+
             if (msg.endsWith("END") || msg.endsWith("END\r\n")) {
                 Log.d(TAG, "ChannelRead0-END " + incoming.remoteAddress());
+
+                // Send to acknowledge signal to client
+                ChannelFuture future = ctx.write("K");
                 future.addListener(ChannelFutureListener.CLOSE);
             }
         }

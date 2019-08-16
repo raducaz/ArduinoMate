@@ -5,14 +5,13 @@ package com.gmail.raducaz.arduinomate.db.dao;
  */
 
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 
-import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 
 import java.util.Date;
@@ -75,11 +74,15 @@ public interface PinStateDao {
             "where deviceId = :deviceId AND name = :pinName AND toDate IS NULL " +
             "LIMIT 1")
     LiveData<PinStateEntity> loadDeviceCurrentPinState(long deviceId, String pinName);
-
     @Query("SELECT * FROM pinState " +
-            "where deviceId = :deviceId AND name = :pinName AND toDate IS NULL " +
+            "where deviceId = :deviceId AND name = :pinName " +
             "LIMIT 1")
     PinStateEntity loadDeviceCurrentPinStateSync(long deviceId, String pinName);
+
+    @Query("UPDATE pinState " +
+            "SET state = :pinState " +
+            "WHERE deviceId = :deviceId AND name = :pinName ")
+    void updatePinState(long deviceId, String pinName, Double pinState);
 
     @Query("DELETE FROM pinState " +
             "WHERE deviceId IN (" +

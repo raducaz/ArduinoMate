@@ -8,5 +8,6 @@ public interface ExecutionLog {
     long getExecutionId();
     Date getDate();
     String getLog();
+    long getFunctionId();
     String getFunctionName();
 }

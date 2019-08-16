@@ -16,32 +16,28 @@
 
 package com.gmail.raducaz.arduinomate.ui;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
-import android.support.design.widget.ViewPagerBottomSheetBehavior;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ContextThemeWrapper;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionReset;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionSync;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
 /**
  * Provides UI for the Detail page with Collapsing Toolbar.
@@ -87,11 +83,25 @@ public class ActivityDetail extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArduinoMateApp application = (ArduinoMateApp) getApplication();
-                TaskFunctionCaller functionCaller = new TaskFunctionCaller(
-                        application.getRepository(),
-                        functionId);
-                application.getNetworkExecutor().execute(functionCaller);
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(v.getContext(), R.style.AppTheme));
+                builder.setMessage(R.string.confirm_fct_execute)
+                        .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                                TaskFunctionCaller functionCaller = new TaskFunctionCaller(
+                                        application.getRepository(),
+                                        functionId);
+                                application.getNetworkExecutor().execute(functionCaller);
+                            }
+                        })
+                        .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        });
+                // Create the AlertDialog object and return it
+                AlertDialog alert = builder.create();
+                alert.show();
             }
         });
 
@@ -172,7 +182,7 @@ public class ActivityDetail extends AppCompatActivity {
         return new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                android.support.v4.app.FragmentTransaction trans = getSupportFragmentManager()
+                FragmentTransaction trans = getSupportFragmentManager()
                         .beginTransaction();
                 /*
                  * IMPORTANT: We use the "root frame" defined in
@@ -224,19 +234,82 @@ public class ActivityDetail extends AppCompatActivity {
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_reset) {
-            ArduinoMateApp application = (ArduinoMateApp) getApplication();
-            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, false);
-            new TaskExecutor().execute(functionReset);
+            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme));
+            builder.setMessage(R.string.confirm_reset)
+                    .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ActivityDetail.this);
+                            builder.setMessage(R.string.confirm_also_remote)
+                                    .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, false, true);
+                                            new TaskExecutor().execute(functionReset);
+                                        }
+                                    })
+                                    .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, false, false);
+                                            new TaskExecutor().execute(functionReset);
+                                        }
+                                    });
+
+                            // Create the AlertDialog object and return it
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        }
+                    })
+                    .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            AlertDialog alert = builder.create();
+            alert.show();
+
         }else if (id==R.id.action_restart)
         {
-            ArduinoMateApp application = (ArduinoMateApp) getApplication();
-            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, true);
-            new TaskExecutor().execute(functionReset);
+            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme));
+            builder.setMessage(R.string.confirm_restart)
+                    .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                            TaskFunctionReset functionReset = new TaskFunctionReset(application.getRepository(), functionId, true,true);
+                            new TaskExecutor().execute(functionReset);
+                        }
+                    })
+                    .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            AlertDialog alert = builder.create();
+            alert.show();
+
         }else if (id==R.id.action_sync)
         {
-            ArduinoMateApp application = (ArduinoMateApp) getApplication();
-            TaskFunctionSync caller = new TaskFunctionSync(application.getRepository(), functionId);
-            new TaskExecutor().execute(caller);
+            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme));
+            builder.setMessage(R.string.confirm_sync)
+                    .setPositiveButton(R.string.confirm_yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ArduinoMateApp application = (ArduinoMateApp) getApplication();
+                            TaskFunctionSync caller = new TaskFunctionSync(application.getRepository(), functionId);
+                            new TaskExecutor().execute(caller);
+                        }
+                    })
+                    .setNegativeButton(R.string.confirm_no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            AlertDialog alert = builder.create();
+            alert.show();
         }
 
         return super.onOptionsItemSelected(item);

@@ -1,21 +1,16 @@
 package com.gmail.raducaz.arduinomate.ui;
 
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
 
-import android.app.Activity;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.gmail.raducaz.arduinomate.R;
 import com.gmail.raducaz.arduinomate.databinding.RecyclerViewBinding;
@@ -24,6 +19,7 @@ import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.PinState;
 import com.gmail.raducaz.arduinomate.viewmodel.FunctionViewModel;
 import com.gmail.raducaz.arduinomate.viewmodel.PinStateListViewModel;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -99,7 +95,7 @@ public class FragmentPinStateList extends Fragment {
     private final ClickCallbackPinState mPinStateClickCallback = new ClickCallbackPinState() {
         @Override
         public void onClick(View v, PinState pinState) {
-            Snackbar.make(v, "State from " + pinState.getFromDate(),
+            Snackbar.make(v, "State from " + pinState.getLastUpdate(),
                     Snackbar.LENGTH_LONG).show();
         }
     };

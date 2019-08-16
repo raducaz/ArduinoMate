@@ -6,6 +6,7 @@ import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.model.MockPinState;
 import com.gmail.raducaz.arduinomate.service.DeviceStateUpdater;
+import com.orhanobut.logger.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -119,7 +120,7 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
         catch (Exception exc)
         {
             // TODO: handle exceptions by logging them at application level log
-            Log.e(TAG, "ChannelRead0-ERROR " + exc.getMessage());
+            Logger.e(TAG + " ChannelRead0-ERROR " + exc.getMessage());
             throw exc;
         }
     }
@@ -441,7 +442,7 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
         }
         catch (Exception exc)
         {
-            Log.e(TAG, exc.getMessage(), exc);
+            Logger.e(TAG + exc.getMessage());
         }
 
     }
@@ -460,7 +461,7 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
         }
         catch (Exception exc)
         {
-            Log.e(TAG, exc.getMessage(), exc);
+            Logger.e(TAG+ exc.getMessage());
         }
 
     }
@@ -475,7 +476,7 @@ public class MockArduinoServerInboundHandler extends SimpleChannelInboundHandler
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 
         cause.printStackTrace();
-        Log.e(TAG, cause.getMessage(), cause);
+        Logger.e(TAG+ cause.getMessage());
         // Close the connection when an exception is raised.
         closeConnection();
     }

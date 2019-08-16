@@ -4,8 +4,8 @@ package com.gmail.raducaz.arduinomate;
  * Created by Radu.Cazacu on 11/27/2017.
  */
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
 import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
@@ -289,6 +289,7 @@ public class DataRepository {
             log.setExecutionId(functionExecution.getId());
             log.setLog(msg);
             log.setDate(DateConverter.toDate(System.currentTimeMillis()));
+            log.setFunctionId(functionExecution.getFunctionId());
             log.setFunctionName(functionExecution.getName());
             id = insertExecutionLog(log);
 
@@ -336,6 +337,12 @@ public class DataRepository {
     }
     public LiveData<PinStateEntity> loadDeviceCurrentPinState(final long deviceId, final String pinName) {
         return mDatabase.pinStateDao().loadDeviceCurrentPinState(deviceId, pinName);
+    }
+    public PinStateEntity loadDeviceCurrentPinStateSync(final long deviceId, final String pinName) {
+        return mDatabase.pinStateDao().loadDeviceCurrentPinStateSync(deviceId, pinName);
+    }
+    public void updatePinState(final long deviceId, final String pinName, Double pinState) {
+        mDatabase.pinStateDao().updatePinState(deviceId, pinName, pinState);
     }
     public void insertPinState(PinStateEntity pinState) {
         long id = mDatabase.pinStateDao().insert(pinState);

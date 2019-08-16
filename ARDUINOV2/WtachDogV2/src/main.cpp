@@ -31,13 +31,13 @@ void loop() {
     unsigned long currentState = (unsigned long) digitalRead(clientIN);
     if(currentState==clients[b][0])
     {
-      if(millis() - clients[b][1] > 120*pow(10, 3))
+      if(millis() - clients[b][1] > 10*pow(10, 3))
       {
         Serial.println(F("reset"));
-        // reset client
-        digitalWrite(clientOUT, 0);
-        delay(1000);
-        digitalWrite(clientOUT, 1);
+        //reset client
+        // digitalWrite(clientOUT, 0);
+        // delay(1000);
+        // digitalWrite(clientOUT, 1);
         clients[b][1] = millis();
       }
 
@@ -57,8 +57,8 @@ void loop() {
   // Reset self if millis > 1 day - is not working this way
   if(millis() > (unsigned long)24*3600*pow(10, 3))
   {
-    Serial.println(F("Reset self"));
-    delay(100);
-   resetFunc();
+  //   Serial.println(F("Reset self"));
+  //   delay(100);
+  //  resetFunc();
   }
 }

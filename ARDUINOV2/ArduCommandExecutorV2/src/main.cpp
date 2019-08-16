@@ -460,6 +460,7 @@ void setup() {
 
   Serial.begin(9600);
   Log::debugln(F("Entering Setup"));
+  delay(8000);
 
   Log::debugln(F("FreeMem:"), freeMemory());
   

@@ -3,13 +3,18 @@
 
 #include <Arduino.h>
 
-// #define GEN
-// #define HASTEMP
-// #define HASCURRENT
+// #define DEBUG /*if defined, enables debug prints*/
 
-#define TAP
+#define GEN
+#define HASTEMP
+#define HASCURRENT
 
-// #define TEST
+// if defined listen and uses ethernet shield
+#define LISTENETHERNET
+
+// #define TAP
+
+//#define TEST /* define this to upload to testing device*/
 
 //--------DEVICE SPECIFIC GENERATOR---------------------------
 extern byte mac[];
@@ -26,14 +31,10 @@ extern byte subnet[];
 
 extern const unsigned int MAXBUFFERSIZE; //for input and output - same size
 
-extern const byte WatchDog;
-
 #ifdef HASTEMP
     extern const byte TemperatureSensor;
 #endif
 
-bool isDebug();
-bool useEthernet();
 void setupPins();
 void initializePins();
 

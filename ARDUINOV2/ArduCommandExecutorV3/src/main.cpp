@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include<avr/wdt.h> /* Header for watchdog timers in AVR */
+
 #include <MemoryFree.h>
 
 #include <math.h>
@@ -34,10 +36,14 @@
 
 byte noLoopRuns = 0;
 byte noUnresponsiveController = 0;
+bool wasEthernetRestarted = false;
 bool isRestarted = false;
 EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
 
+unsigned long resetTime = 0;
+#define TIMEOUTPERIOD 40000 /* 60 seconds */
+#define doggieTickle() resetTime = millis();  // This macro will reset the timer
 // Reset function
 void(* resetFunc) (void) = 0;
 
@@ -242,6 +248,8 @@ void parseCommand(char* plainJson)
   Log::debugln(F("FreeMem:"), freeMemory());
 
 }
+
+#ifndef LISTENETHERNET
 void listenSerial()
 {
   char buffer[MAXBUFFERSIZE] = ""; 
@@ -290,6 +298,9 @@ void listenSerial()
     }
   }
 }
+#endif
+
+#ifdef LISTENETHERNET
 void listenEthernet()
 {
   EthernetClient client = server.available();
@@ -346,15 +357,17 @@ void listenEthernet()
     Log::debugln(F("No client, server stopped"));
   }  
 }
+#endif
 void serverThreadCallback()
 {
-    if(useEthernet()){
+    #ifdef LISTENETHERNET
       listenEthernet();
-    }
-    else{
+    #else
       listenSerial();
-    }
+    #endif
 }
+
+#ifdef LISTENETHERNET
 bool ConnectToServer(const byte* ip, const int port)
 {
   if(arduinoClient){ 
@@ -416,7 +429,7 @@ void clientThreadCallback()
     if(isRestarted)
     { 
       state = 3;
-      Serial.println(F("DEVICE RESTARTED"));
+      Log::debugln(F("DEVICE RESTARTED"));
     }
     // Send the state of the pins
     int digitalPinStates[14];
@@ -451,7 +464,6 @@ void clientThreadCallback()
       if(i>1) break;
 
       c = arduinoClient.read();
-      Serial.print(c);
     }
     if(c=='K')
     {
@@ -472,30 +484,80 @@ void clientThreadCallback()
     
   }
 }
+#endif
 
-void setupThread()
+#ifdef LISTENETHERNET
+void ethernetSetup()
 {
-  // serverThread.onRun(serverThreadCallback);
-	// serverThread.setInterval(1000);
-
-  // clientThread.onRun(clientThreadCallback);
-	// clientThread.setInterval(5000);
-
-  // threadsController.add(&serverThread);
-  // threadsController.add(&clientThread);
+  // start the Ethernet connection and the server:
+  Ethernet.begin(mac, ip, dns, gateway, subnet);
+  Log::debugln(F("My IP address: "), Ethernet.localIP());
+  server.begin();
+  Log::debugln(F("Server started"));
 }
+#endif
+
+void watchdogSetup()
+{
+  cli();  // disable all interrupts
+  wdt_reset(); // reset the WDT timer
+  MCUSR &= ~(1<<WDRF);  // because the data sheet said to
+  /*
+  WDTCSR configuration:
+  WDIE = 1 :Interrupt Enable
+  WDE = 1  :Reset Enable - I won't be using this on the 2560
+  WDP3 = 0 :For 1000ms Time-out
+  WDP2 = 1 :bit pattern is 
+  WDP1 = 1 :0110  change this for a different = this is 1s
+  WDP0 = 0 :timeout period.
+  */
+  // Enter Watchdog Configuration mode:
+  WDTCSR = (1<<WDCE) | (1<<WDE);
+  // Set Watchdog settings: interrupte enable, 0110 for timer
+  WDTCSR = (1<<WDIE) | (0<<WDP3) | (1<<WDP2) | (1<<WDP1) | (0<<WDP0);
+  sei();
+}
+
+ISR(WDT_vect) // Watchdog timer interrupt.
+{ 
+  if(millis() - resetTime > TIMEOUTPERIOD){
+    if(wasEthernetRestarted)
+    {
+      // Reset entire controller if ethernet restart didn't work
+      resetFunc();     // This will call location zero and cause a reboot.
+    }
+    else
+    {
+      #ifdef LISTENETHERNET
+        // Restart Ethernet first
+        ethernetSetup(); 
+      #else
+        resetFunc();
+      #endif
+    }
+    
+  }
+}
+
 void setup() {
+  wdt_disable();
+
   delay(250);
   isRestarted=true;
+  wasEthernetRestarted = false;
 
   Serial.begin(9600);
   Log::debugln(F("Entering Setup"));
-  delay(8000);
-
   Log::debugln(F("FreeMem:"), freeMemory());
   
-  delay(8000);
+  Serial.print(arduinoName); // This is always needed to determine the board we are uploading the code
   
+  delay(8000); /* Done so that the Arduino doesn't keep resetting infinitely in case of wrong configuration */
+  
+  Log::debugln(F("Watchdog Setup"));
+  watchdogSetup();
+  Log::debugln(F("Finished WDT setup"));
+
   // Sensor initialization
   #ifdef HASCURRENT
     // Sensor initialization
@@ -509,16 +571,9 @@ void setup() {
   setupPins();
   initializePins();
 
-  // start the Ethernet connection and the server:
-  Ethernet.begin(mac, ip, dns, gateway, subnet);
-
-  delay(1000);
-  Log::debugln(F("My IP address: "), Ethernet.localIP());
-  
-  server.begin();
-  Serial.println(F("Server started"));
-
-  setupThread();
+  #ifdef LISTENETHERNET
+    ethernetSetup();
+  #endif
 }
 void loop() {
   
@@ -532,14 +587,13 @@ void loop() {
     noLoopRuns++;
   }
   else{
-    // send pin status
-    clientThreadCallback();
+    #ifdef LISTENETHERNET
+      // send pin status
+      clientThreadCallback();
+    #endif
+
     noLoopRuns = 0;
   }
 
-  // Send ImAlive to WatchDog
-  Serial.print(arduinoName);
-  Serial.println(F("I'm alive !"));
-
-  digitalWrite(WatchDog, digitalRead(WatchDog)==0?1:0);
+  doggieTickle(); /* Send I'm alive to watchdog*/
 }

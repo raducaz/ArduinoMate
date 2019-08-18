@@ -5,14 +5,14 @@
 
 // #define DEBUG /*if defined, enables debug prints*/
 
-#define GEN
-#define HASTEMP
-#define HASCURRENT
+// #define GEN
+// #define HASTEMP
+// #define HASCURRENT
 
 // if defined listen and uses ethernet shield
 #define LISTENETHERNET
 
-// #define TAP
+#define TAP
 
 //#define TEST /* define this to upload to testing device*/
 

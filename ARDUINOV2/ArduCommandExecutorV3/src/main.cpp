@@ -528,6 +528,7 @@ ISR(WDT_vect) // Watchdog timer interrupt.
     }
     else
     {
+      wasEthernetRestarted = true;
       #ifdef LISTENETHERNET
         // Restart Ethernet first
         ethernetSetup(); 

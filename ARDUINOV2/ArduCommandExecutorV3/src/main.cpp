@@ -36,12 +36,13 @@
 
 byte noLoopRuns = 0;
 byte noUnresponsiveController = 0;
+bool wasEthernetRestarted = false;
 bool isRestarted = false;
 EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
 
 unsigned long resetTime = 0;
-#define TIMEOUTPERIOD 60000 /* 60 seconds */
+#define TIMEOUTPERIOD 40000 /* 60 seconds */
 #define doggieTickle() resetTime = millis();  // This macro will reset the timer
 // Reset function
 void(* resetFunc) (void) = 0;
@@ -463,7 +464,6 @@ void clientThreadCallback()
       if(i>1) break;
 
       c = arduinoClient.read();
-      Log::debug(c);
     }
     if(c=='K')
     {
@@ -483,6 +483,17 @@ void clientThreadCallback()
     }
     
   }
+}
+#endif
+
+#ifdef LISTENETHERNET
+void ethernetSetup()
+{
+  // start the Ethernet connection and the server:
+  Ethernet.begin(mac, ip, dns, gateway, subnet);
+  Log::debugln(F("My IP address: "), Ethernet.localIP());
+  server.begin();
+  Log::debugln(F("Server started"));
 }
 #endif
 
@@ -510,7 +521,21 @@ void watchdogSetup()
 ISR(WDT_vect) // Watchdog timer interrupt.
 { 
   if(millis() - resetTime > TIMEOUTPERIOD){
-    resetFunc();     // This will call location zero and cause a reboot.
+    if(wasEthernetRestarted)
+    {
+      // Reset entire controller if ethernet restart didn't work
+      resetFunc();     // This will call location zero and cause a reboot.
+    }
+    else
+    {
+      #ifdef LISTENETHERNET
+        // Restart Ethernet first
+        ethernetSetup(); 
+      #else
+        resetFunc();
+      #endif
+    }
+    
   }
 }
 
@@ -519,6 +544,7 @@ void setup() {
 
   delay(250);
   isRestarted=true;
+  wasEthernetRestarted = false;
 
   Serial.begin(9600);
   Log::debugln(F("Entering Setup"));
@@ -546,16 +572,7 @@ void setup() {
   initializePins();
 
   #ifdef LISTENETHERNET
-    // start the Ethernet connection and the server:
-    Ethernet.begin(mac, ip, dns, gateway, subnet);
-  #endif
-
-  delay(1000);
-  Log::debugln(F("My IP address: "), Ethernet.localIP());
-  
-  #ifdef LISTENETHERNET
-    server.begin();
-    Log::debugln(F("Server started"));
+    ethernetSetup();
   #endif
 }
 void loop() {

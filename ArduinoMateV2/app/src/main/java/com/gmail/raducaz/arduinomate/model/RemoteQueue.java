@@ -8,7 +8,6 @@ import java.util.Date;
 
 
 public interface RemoteQueue {
-    long getId();
     String getName();
     Date getDate();
 }

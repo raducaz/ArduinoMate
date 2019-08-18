@@ -1,6 +1,7 @@
 package com.gmail.raducaz.arduinomate.remote;
 import android.util.Log;
 
+import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;

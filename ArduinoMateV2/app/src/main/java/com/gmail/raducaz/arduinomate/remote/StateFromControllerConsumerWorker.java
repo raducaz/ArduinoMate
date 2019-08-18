@@ -10,6 +10,7 @@ import com.gmail.raducaz.arduinomate.AppExecutors;
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
+import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.ExecutionLogEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
@@ -18,6 +19,8 @@ import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.model.ExecutionLog;
 import com.gmail.raducaz.arduinomate.model.FunctionExecution;
 import com.gmail.raducaz.arduinomate.service.DeviceStateUpdater;
+import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
+import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.orhanobut.logger.Logger;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -62,6 +65,7 @@ public class StateFromControllerConsumerWorker extends Worker {
 
             channel.exchangeDeclare(exchangeName, "fanout");
             String queueName = channel.queueDeclare().getQueue();
+            ArduinoMateApp.STATES_QUEUE = queueName;
             channel.queueBind(queueName, exchangeName, "");
 
             boolean autoAck = false;
@@ -173,9 +177,7 @@ public class StateFromControllerConsumerWorker extends Worker {
                 //Prevent FK constraint exception if execution with  doesn't exists
                 // Execution should exists in mirror with the last execution on controller (but it may have different id
                 // because some of the executions may be skipped over time
-                FunctionExecution execution = mRepository.loadLastFunctionExecutionSync(entity.getFunctionId());
-                entity.setExecutionId(execution.getId());
-                mRepository.insertExecutionLog(entity);
+                mRepository.insertExecutionLogOnLastFunctionExecution(entity.getFunctionId(), entity.getFunctionName(), entity);
             }
             if (stateUpdate.methodName.equals("deleteExecutionLogs")) {
                 FunctionEntity entity = (FunctionEntity) stateUpdate.entity;

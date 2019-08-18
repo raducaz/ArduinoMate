@@ -16,7 +16,7 @@ import java.util.List;
 
 @Dao
 public interface RemoteQueueDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(RemoteQueueEntity remoteQueueEntity);
 
     @Query("SELECT * FROM remotequeue")

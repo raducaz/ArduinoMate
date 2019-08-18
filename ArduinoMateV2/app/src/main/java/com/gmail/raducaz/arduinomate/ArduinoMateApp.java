@@ -13,8 +13,10 @@ import androidx.work.WorkManager;
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
 import com.gmail.raducaz.arduinomate.mocks.MockArduinoServerWorker;
+import com.gmail.raducaz.arduinomate.processes.ProcessGeneratorOnOff;
 import com.gmail.raducaz.arduinomate.remote.CommandToControllerConsumerWorker;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerConsumerWorker;
+import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.gmail.raducaz.arduinomate.tcpserver.TcpServerWorker;
 import com.gmail.raducaz.arduinomate.timer.TimerService;
 import com.orhanobut.logger.AndroidLogAdapter;
@@ -48,6 +50,7 @@ public class ArduinoMateApp extends Application {
 
     public static final String STATES_EXCHANGE = "states";
     public static final String COMMAND_QUEUE = "commands";
+    public static String STATES_QUEUE;
     public static Connection AmqConnection;
 
     public void setUri(String uri) {
@@ -150,6 +153,13 @@ public class ArduinoMateApp extends Application {
                     new ShutdownListener() {
                         @Override
                         public void shutdownCompleted(ShutdownSignalException cause) {
+
+                            if (settings.getIsController()) {
+                                //Stop here all sensitive processes in case remote connection stopped
+                                ProcessGeneratorOnOff p = new ProcessGeneratorOnOff(repository, "Generator");
+                                p.execute(true, false, FunctionResultStateEnum.OFF, "AmqConnection is down");
+                            }
+
                             if(cause.isHardError()) {
                                 Connection conn = (Connection) cause.getReference();
                                 if (!cause.isInitiatedByApplication()) {
@@ -162,6 +172,7 @@ public class ArduinoMateApp extends Application {
                             }
 
                             Logger.e("InitAMQConnection" + cause.getMessage());
+
                         }
                     }
             );

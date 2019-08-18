@@ -2,6 +2,7 @@ package com.gmail.raducaz.arduinomate.remote;
 
 import android.util.Log;
 
+import com.gmail.raducaz.arduinomate.ArduinoMateApp;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BasicProperties;
 import com.rabbitmq.client.Channel;
@@ -52,6 +53,12 @@ public class CommandToControllerPublisher {
 
     public boolean SendCommand(Serializable command, int secondsMessageValidity) {
         try {
+
+//            //Send the state receive queue Name so that controller knows about me (the client)
+//            // Send the consumer queue name to Controller
+//            byte[] cmdMessage = SerializerDeserializerUtility.Serialize(new RemoteStateConsumerQueue(ArduinoMateApp.STATES_QUEUE));
+//            SendCommand(cmdMessage, secondsMessageValidity);
+
             byte[] cmdMessage = SerializerDeserializerUtility.Serialize(command);
             SendCommand(cmdMessage, secondsMessageValidity);
         }

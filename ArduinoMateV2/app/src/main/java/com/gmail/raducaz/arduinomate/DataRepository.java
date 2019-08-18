@@ -17,12 +17,17 @@ import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.RemoteQueueEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
+import com.gmail.raducaz.arduinomate.model.ExecutionLog;
 import com.gmail.raducaz.arduinomate.model.FunctionExecution;
 import com.gmail.raducaz.arduinomate.model.RemoteQueue;
 import com.gmail.raducaz.arduinomate.remote.RemoteStateUpdate;
 import com.gmail.raducaz.arduinomate.remote.StateFromControllerPublisher;
+import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
+import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static com.gmail.raducaz.arduinomate.ArduinoMateApp.AmqConnection;
@@ -280,23 +285,36 @@ public class DataRepository {
         return  id;
     }
     public long insertExecutionLogOnLastFunctionExecution(long functionId, String msg) {
+        FunctionEntity f = loadFunctionSync(functionId);
+        String functionName = f.getName();
 
-        FunctionExecution functionExecution = loadLastFunctionExecutionSync(functionId);
-        long id = 0;
+        ExecutionLogEntity log = new ExecutionLogEntity();
+        log.setFunctionId(functionId);
+        log.setFunctionName(functionName);
+        log.setLog(msg);
+        log.setDate(DateConverter.toDate(System.currentTimeMillis()));
 
-        if(functionExecution != null) {
-            ExecutionLogEntity log = new ExecutionLogEntity();
-            log.setExecutionId(functionExecution.getId());
-            log.setLog(msg);
-            log.setDate(DateConverter.toDate(System.currentTimeMillis()));
-            log.setFunctionId(functionExecution.getFunctionId());
-            log.setFunctionName(functionExecution.getName());
-            id = insertExecutionLog(log);
+        return insertExecutionLogOnLastFunctionExecution(functionId, functionName, log);
+    }
+    public long insertExecutionLogOnLastFunctionExecution(long functionId, String functionName, ExecutionLogEntity log) {
 
-            SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+        FunctionExecutionEntity functionExecution = loadLastFunctionExecutionSync(functionId);
+        if (functionExecution == null) {
+            // Get a date in past
+            Date date = new GregorianCalendar(2000, Calendar.JANUARY, 1).getTime();
+            functionExecution = new FunctionExecutionEntity(0, functionId, functionName,
+                    FunctionCallStateEnum.READY.getId(), FunctionResultStateEnum.NA.getId(),
+                    date, date);
+            long id = insertFunctionExecution(functionExecution);
+            functionExecution.setId(id);
         }
 
-        return  id;
+        log.setExecutionId(functionExecution.getId());
+        long id = insertExecutionLog(log);
+
+        SendStateToRemoteClients(new RemoteStateUpdate(log, "insertExecutionLog"));
+
+        return id;
     }
     public void updateExecutionLog(ExecutionLogEntity log) {
         mDatabase.executionLogDao().update(log);

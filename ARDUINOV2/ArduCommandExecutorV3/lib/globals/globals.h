@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-// #define DEBUG /*if defined, enables debug prints*/
+#define DEBUG /*if defined, enables debug prints*/
 
 // #define GEN
 // #define HASTEMP
@@ -12,9 +12,9 @@
 // if defined listen and uses ethernet shield
 #define LISTENETHERNET
 
-#define TAP
+// #define TAP
 
-//#define TEST /* define this to upload to testing device*/
+#define TEST /* define this to upload to testing device*/
 
 //--------DEVICE SPECIFIC GENERATOR---------------------------
 extern byte mac[];

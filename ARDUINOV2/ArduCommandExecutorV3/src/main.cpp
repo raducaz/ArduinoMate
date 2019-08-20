@@ -42,7 +42,7 @@ EthernetClient arduinoClient;
 EthernetServer server = EthernetServer(arduinoPort);
 
 unsigned long resetTime = 0;
-#define TIMEOUTPERIOD 40000 /* 60 seconds */
+#define TIMEOUTPERIOD 120000 /* 60 seconds */
 #define doggieTickle() resetTime = millis();  // This macro will reset the timer
 // Reset function
 void(* resetFunc) (void) = 0;
@@ -529,6 +529,7 @@ ISR(WDT_vect) // Watchdog timer interrupt.
     else
     {
       wasEthernetRestarted = true;
+      doggieTickle();
       #ifdef LISTENETHERNET
         // Restart Ethernet first
         ethernetSetup(); 

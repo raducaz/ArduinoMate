@@ -81,7 +81,7 @@ public class DeviceStateUpdater {
         if(deviceEntity != null) {
             // Insert a new History for this pin with the initial state
             PinStateEntity pin = dataRepository.loadDeviceCurrentPinStateSync(deviceEntity.getId(),pName);
-            if(pin != null)
+            if(pin == null)
                 insertPinStateHistory(pName, pState);
             else
                 dataRepository.updatePinState(deviceEntity.getId(), pName, pState);

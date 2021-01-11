@@ -23,7 +23,7 @@ public class DataGenerator {
         settings.setIsController(true);
         settings.setPermitRemoteControl(false);
         settings.setIsTestingMode(false);
-        settings.setAmqUri("amqp://lttjuzsi:pjSXi8zN4wT8Pljaq14lIEAVWpQddzxS@bulldog.rmq.cloudamqp.com/lttjuzsi");
+        settings.setAmqUri("amqps://lttjuzsi:DmSKzf8YzaNI-xip9TZAxdLfLg402CVF@bulldog.rmq.cloudamqp.com/lttjuzsi");
 
         return settings;
     }

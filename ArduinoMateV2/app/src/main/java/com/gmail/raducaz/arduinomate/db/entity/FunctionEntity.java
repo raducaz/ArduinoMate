@@ -96,11 +96,11 @@ public class FunctionEntity implements Function, Serializable {
     public int getStateColor() {
         if(callState == FunctionCallStateEnum.READY.getId()) {
             if (resultState == FunctionResultStateEnum.OFF.getId())
-                return Color.argb(100, 250,250,250);
+                return Color.argb(255, 250,250,250);
             else if (resultState == FunctionResultStateEnum.ON.getId()) {
-                return Color.argb(100, 98, 229, 118);
+                return Color.argb(255, 98, 229, 118);
             } else if(resultState == FunctionResultStateEnum.ERROR.getId()){
-                return Color.argb(100, 239, 138, 124);
+                return Color.argb(255, 239, 138, 124);
             }
             else
             {

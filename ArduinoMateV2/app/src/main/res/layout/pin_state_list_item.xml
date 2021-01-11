@@ -15,7 +15,8 @@
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/item_horizontal_margin"
         android:layout_marginEnd="@dimen/item_horizontal_margin"
-        app:cardUseCompatPadding="true">
+        app:cardUseCompatPadding="true"
+        android:backgroundTint="@{pinState.getStateColor}">
         <!--android:minHeight="@dimen/device_item_min_height"-->
 
         <RelativeLayout

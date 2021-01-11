@@ -342,7 +342,8 @@ public class DataRepository {
         return mDatabase.pinStateDao().loadDeviceCurrentPinStateSync(deviceId, pinName);
     }
     public void updatePinState(final long deviceId, final String pinName, Double pinState) {
-        mDatabase.pinStateDao().updatePinState(deviceId, pinName, pinState);
+        Date now = DateConverter.toDate(System.currentTimeMillis());
+        mDatabase.pinStateDao().updatePinState(deviceId, pinName, pinState, now);
     }
     public void insertPinState(PinStateEntity pinState) {
         long id = mDatabase.pinStateDao().insert(pinState);

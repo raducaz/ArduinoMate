@@ -62,7 +62,7 @@ public interface PinStateDao {
 
     @Query("SELECT * FROM pinState " +
             "where deviceId = :deviceId AND toDate IS NULL " +
-            "ORDER BY name")
+            "ORDER BY no")
     LiveData<List<PinStateEntity>> loadDeviceCurrentPinsState(long deviceId);
 
     @Query("SELECT * FROM pinState " +
@@ -80,9 +80,11 @@ public interface PinStateDao {
     PinStateEntity loadDeviceCurrentPinStateSync(long deviceId, String pinName);
 
     @Query("UPDATE pinState " +
-            "SET state = :pinState " +
+            "SET oldState = state," +
+            "state = :pinState," +
+            "fromDate = :stateFrom " + // Reset fromDate as pinState changed
             "WHERE deviceId = :deviceId AND name = :pinName ")
-    void updatePinState(long deviceId, String pinName, Double pinState);
+    void updatePinState(long deviceId, String pinName, Double pinState, Date stateFrom); //date('now') is not working in Query
 
     @Query("DELETE FROM pinState " +
             "WHERE deviceId IN (" +

@@ -60,13 +60,13 @@
 #ifdef TEST     
     //--------DEVICE SPECIFIC GENERATOR---------------------------
     byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x71 };
-    const byte ip[] = { 192, 168, 100, 101 }; //This needs to match the name configured on Android App
+    const byte ip[] = { 192, 168, 1, 101 }; //This needs to match the name configured on Android App
     int arduinoPort = 8081; //This needs to match the name configured on Android App
     char arduinoName[] = "Tap"; //This needs to match the name configured on Android App
     //--------DEVICE SPECIFIC---------------------------
-    byte serverIp[] = { 192, 168, 100, 7 }; // Android device IP
-    byte gateway[] = { 192, 168, 100, 1 };
-    byte dns[] = { 192, 168, 100, 1 };
+    byte serverIp[] = { 192, 168, 1, 28 }; // Android device IP
+    byte gateway[] = { 192, 168, 1, 1 };
+    byte dns[] = { 192, 168, 1, 1 };
 
     const byte Priza8 = 8; 
     const byte Priza7 = 7; 

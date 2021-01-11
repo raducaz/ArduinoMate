@@ -70,6 +70,7 @@ public class DeviceStateUpdater {
             PinStateEntity newPinState = new PinStateEntity();
             newPinState.setDeviceId(deviceEntity.getId());
             newPinState.setName(pName);
+            newPinState.setNo(Integer.parseInt(pName.replace('A', '9')));
             newPinState.setFromDate(DateConverter.toDate(System.currentTimeMillis()));
             newPinState.setLastUpdate(DateConverter.toDate(System.currentTimeMillis()));
             newPinState.setState(pState);

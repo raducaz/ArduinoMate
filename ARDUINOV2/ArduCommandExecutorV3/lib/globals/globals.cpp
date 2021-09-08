@@ -64,7 +64,7 @@
     int arduinoPort = 8081; //This needs to match the name configured on Android App
     char arduinoName[] = "Tap"; //This needs to match the name configured on Android App
     //--------DEVICE SPECIFIC---------------------------
-    byte serverIp[] = { 192, 168, 1, 28 }; // Android device IP
+    byte serverIp[] = { 192, 168, 1, 13 }; // Android device IP
     byte gateway[] = { 192, 168, 1, 1 };
     byte dns[] = { 192, 168, 1, 1 };
 

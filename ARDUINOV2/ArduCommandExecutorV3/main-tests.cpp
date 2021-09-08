@@ -5,8 +5,8 @@
 
 #include <math.h>
 #include <Ethernet.h>
-#include <EthernetClient.h>
-#include <EthernetServer.h>
+// #include <EthernetClient.h>
+// #include <EthernetServer.h>
 #include "globals.h"
 #include <SPI.h>
 #include "log.h"
@@ -38,7 +38,7 @@ byte noLoopRuns = 0;
 byte noUnresponsiveController = 0;
 bool wasEthernetRestarted = false;
 bool isRestarted = false;
-EthernetClient arduinoClient;
+EthernetClient client;
 EthernetServer server = EthernetServer(arduinoPort);
 
 unsigned long resetTime = 0;
@@ -91,13 +91,6 @@ int f2()
   #else
     return 0;
   #endif
-}
-
-void sendToServer(const char* msg)
-{
-  arduinoClient.println(msg);
-
-  Log::debugln(msg);
 }
 
 void parseCommand(char* plainJson)
@@ -368,59 +361,26 @@ void serverThreadCallback()
 }
 
 #ifdef LISTENETHERNET
-bool ConnectToServer(const byte* ip, const int port)
-{
-  if(arduinoClient){ 
-    if(!arduinoClient.connected()){
-      arduinoClient.stop();
-
-      Log::debugln(F("MON: Reconnecting..."));
-
-      if (arduinoClient.connect(ip, port)) {    
-        return arduinoClient.connected();
-      }
-      else{
-        return false;
-      }
-    }
-    else{
-      return true;
-    } 
-  }
-  else{
-    Log::debugln(F("MON: Connecting..."));
-
-    arduinoClient.connect(ip, port);
-    return arduinoClient.connected();
-  }
-}
 void clientThreadCallback()
 {
-  byte i = 0;
-  while(!(arduinoClient.connected()) && (i < 2))
+  //arduinoClient.setTimeout(10000);
+  client.stop();
+  client.connect(serverIp, serverPort);
+
+  // byte t = 0;
+  // while(!arduinoClient.connected() && t<200)
+  // {
+  //   arduinoClient.connect(serverIp, serverPort);
+  //   //delay(100);
+  //   t++;
+  // }
+  if(!client.connected())
   {
-    ConnectToServer(serverIp, serverPort);
-    i++;
+    // Log::debugln(F("MON: reinitialize network ..."));
+    // Ethernet.begin(mac, ip, dns, gateway, subnet);
+    // server.begin();
   }
-  if(!arduinoClient.connected())
-  {
-    Log::debugln(F("MON: Check connection to gateway."));
-
-    if(!ConnectToServer(gateway, 80))
-    {
-      Log::debugln(F("MON: Cannot connect, reinitialize ethernet."));
-
-      Ethernet.begin(mac, ip, dns, gateway, subnet);
-      server.begin();
-      Log::debugln(F("Server started"));
-    }
-    else
-    {
-      ConnectToServer(serverIp, serverPort);
-    }
-  } 
-
-  if(arduinoClient.connected())
+  if(client.connected())
   {
     // Send status all the time
     Log::debugln(F("MON: Sending status from ..."), Ethernet.localIP());
@@ -432,38 +392,42 @@ void clientThreadCallback()
       Log::debugln(F("DEVICE RESTARTED"));
     }
     // Send the state of the pins
-    int digitalPinStates[14];
-    for(byte i=0;i<14;i++)
-    {
-        digitalPinStates[i] = digitalRead(i);
-    }
-    constructPinStatesJSON(arduinoName, state, 0, digitalPinStates, 14, arduinoClient);
+    // int digitalPinStates[14];
+    // for(byte i=0;i<14;i++)
+    // {
+    //     digitalPinStates[i] = digitalRead(i);
+    // }
+    // constructPinStatesJSON(arduinoName, state, 0, digitalPinStates, 14, arduinoClient);
 
-    int analogPinStates[6];
-    for(byte i=0;i<=5;i++)
-    {
-        analogPinStates[i] = analogRead(i+14);
-    }
+    // int analogPinStates[6];
+    // for(byte i=0;i<=5;i++)
+    // {
+    //     analogPinStates[i] = analogRead(i+14);
+    // }
     
-    //--------DEVICE SPECIFIC---------------------------
-    analogPinStates[1] = f1();
-    //--------DEVICE SPECIFIC---------------------------
+    // //--------DEVICE SPECIFIC---------------------------
+    // analogPinStates[1] = f1();
+    // //--------DEVICE SPECIFIC---------------------------
 
-    constructPinStatesJSON(arduinoName, 0, 1, analogPinStates, 6, arduinoClient);
+    // constructPinStatesJSON(arduinoName, 0, 1, analogPinStates, 6, arduinoClient);
   
     isRestarted=false;
     
-    sendToServer("END");
+    //sendToServer("END");
+    //{\"name\":\"Tap\",\"state\":0,\"digitalPins\":[1,0,0,1,1,0,1,1,0,1,1,1,0,0]}
+    //arduinoClient.println(F("{"name":"Tap","state":0,"digitalPins":[1,0,0,1,1,0,1,1,0,1,1,1,0,0]}));
+    client.println(F("{\"name\":\"Tap\",\"state\":0,\"digitalPins\":[1,0,0,1,1,0,1,1,0,1,1,1,0,0]}"));
+    client.println("END");
 
     delay(250);
     // Add code to get response from server
     byte i = 0;
     char c = 0;
-    while(arduinoClient.available())
+    while(client.available())
     {
       if(i>1) break;
 
-      c = arduinoClient.read();
+      c = client.read();
       i++;
     }
     if(c=='K')
@@ -483,6 +447,10 @@ void clientThreadCallback()
       initializePins();
     }
     
+  }
+  else
+  {
+    Log::debugln(F("MON: Cannot connect to controller"));
   }
 }
 #endif
@@ -582,7 +550,6 @@ void loop() {
   
   delay(100);
   
-  // Sending to controller needs to be first step to work, initialize server breaks the client
   if(noLoopRuns < 5){
     noLoopRuns++;
   }
@@ -598,8 +565,6 @@ void loop() {
   // Receive commands
   serverThreadCallback();
   delay(100);
-
-  
 
   doggieTickle(); /* Send I'm alive to watchdog*/
 }

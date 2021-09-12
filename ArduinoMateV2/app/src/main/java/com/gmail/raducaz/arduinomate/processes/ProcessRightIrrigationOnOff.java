@@ -23,8 +23,8 @@ public class ProcessRightIrrigationOnOff extends Process {
 
         logInfo("Start OPEN right tap");
         tapFunctions.tapIrrigationRightOPEN();
-        logInfo("Wait 45 sec");
-        TimeUnit.SECONDS.sleep(45);
+//        logInfo("Wait 45 sec");
+//        TimeUnit.SECONDS.sleep(45);
         logInfo("Right tap OPENED");
 
         return super.on(isOnDemand);
@@ -36,8 +36,8 @@ public class ProcessRightIrrigationOnOff extends Process {
 
         logInfo("Start CLOSE right tap");
         tapFunctions.tapIrrigationRightCLOSE();
-        logInfo("Wait 45 sec");
-        TimeUnit.SECONDS.sleep(45);
+//        logInfo("Wait 45 sec");
+//        TimeUnit.SECONDS.sleep(45);
         logInfo("Right tap CLOSED");
 
         return super.off(isOnDemand);

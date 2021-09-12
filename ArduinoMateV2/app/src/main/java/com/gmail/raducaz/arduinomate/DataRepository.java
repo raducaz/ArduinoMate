@@ -14,6 +14,7 @@ import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
+import com.gmail.raducaz.arduinomate.db.entity.PinStateChangeEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.RemoteQueueEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
@@ -325,6 +326,12 @@ public class DataRepository {
     //region PinState
     public LiveData<List<PinStateEntity>> loadDeviceCurrentPinsState(final long deviceId) {
         return mDatabase.pinStateDao().loadDeviceCurrentPinsState(deviceId);
+    }
+    public LiveData<List<PinStateChangeEntity>> loadChangedPinsState() {
+        return mDatabase.pinStateDao().loadChangedPinsState();
+    }
+    public LiveData<List<PinStateChangeEntity>> loadChangedDevicePinsState(String deviceIp) {
+        return mDatabase.pinStateDao().loadChangedPinsState(deviceIp);
     }
     public List<PinStateEntity> loadDeviceCurrentPinsStateSync(final long deviceId) {
         return mDatabase.pinStateDao().loadDeviceCurrentPinsStateSync(deviceId);

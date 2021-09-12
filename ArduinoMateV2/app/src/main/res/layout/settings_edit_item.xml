@@ -80,12 +80,42 @@
                 android:contentDescription="@string/cd_device_name"
                 android:text="@={settingsViewModel.settings.amqUri}"/>
 
+            <TextView
+                android:id="@+id/ip_label"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_below="@+id/uri_text"
+                android:text="Device IP that triggers:"
+                />
+            <EditText
+                android:id="@+id/ip_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ip_label"
+                android:contentDescription="@string/cd_device_name"
+                android:text="@={settingsViewModel.settings.phoneDeviceIp}"/>
+
+            <TextView
+                android:id="@+id/phone_label"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_below="@+id/ip_text"
+                android:text="Phone to call:"
+                />
+            <EditText
+                android:id="@+id/phone_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/phone_label"
+                android:contentDescription="@string/cd_device_name"
+                android:text="@={settingsViewModel.settings.phoneNumber}"/>
+
             <Button
                 android:id="@+id/save_button"
                 android:tag="SAVE"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/uri_text"
+                android:layout_below="@+id/phone_text"
                 style="?android:attr/borderlessButtonStyle"
                 android:textColor="?attr/colorPrimary"
                 android:text="Save" />

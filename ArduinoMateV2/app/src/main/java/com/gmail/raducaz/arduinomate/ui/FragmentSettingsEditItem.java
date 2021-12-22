@@ -71,6 +71,12 @@ public class FragmentSettingsEditItem extends Fragment {
                 TextView amqUriTxt = mBinding.getRoot().findViewById(R.id.uri_text);
                 settingsEntity.setAmqUri(amqUriTxt.getText().toString());
 
+                TextView ipTxt = mBinding.getRoot().findViewById(R.id.ip_text);
+                settingsEntity.setPhoneDeviceIp(ipTxt.getText().toString());
+
+                TextView phoneTxt = mBinding.getRoot().findViewById(R.id.phone_text);
+                settingsEntity.setPhoneNumber(phoneTxt.getText().toString());
+
                 application.getDbExecutor().execute(new DbUpdater(settingsEntity));
 
                 Snackbar.make(b, "Settings saved.", Snackbar.LENGTH_LONG).show();

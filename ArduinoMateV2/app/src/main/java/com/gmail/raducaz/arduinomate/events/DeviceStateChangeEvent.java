@@ -1,12 +1,11 @@
 package com.gmail.raducaz.arduinomate.events;
 
-import android.util.Log;
-
 import com.gmail.raducaz.arduinomate.DataRepository;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.processes.TaskFunctionCaller;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
+import com.gmail.raducaz.arduinomate.ui.ActivityMain;
 import com.gmail.raducaz.arduinomate.ui.TaskExecutor;
 import com.orhanobut.logger.Logger;
 
@@ -18,6 +17,7 @@ public class DeviceStateChangeEvent {
 
     DataRepository dataRepository;
     DeviceEntity deviceEntity;
+
     public DeviceStateChangeEvent(DataRepository dataRepository, DeviceEntity deviceEntity)
     {
         this.dataRepository = dataRepository;
@@ -41,6 +41,7 @@ public class DeviceStateChangeEvent {
                     new TaskExecutor().execute(functionCaller);
                 }
             }
+
         }
         catch (Exception exc) {
             Logger.e(TAG+ exc.getMessage());

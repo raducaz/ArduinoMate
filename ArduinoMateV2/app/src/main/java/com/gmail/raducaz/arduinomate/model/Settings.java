@@ -8,6 +8,8 @@ package com.gmail.raducaz.arduinomate.model;
 public interface Settings {
     long getId();
     String getAmqUri();
+    String getPhoneNumber();
+    String getPhoneDeviceIp();
     boolean getIsController();
     boolean getPermitRemoteControl();
     boolean getIsTestingMode();

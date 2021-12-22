@@ -99,7 +99,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             BuildDatabase(appContext, executors);
                         });
                     }
-                }).build();
+                }).fallbackToDestructiveMigration().build();
     }
     /**
      * Check whether the database already exists and expose it via {@link #getDatabaseCreated()}

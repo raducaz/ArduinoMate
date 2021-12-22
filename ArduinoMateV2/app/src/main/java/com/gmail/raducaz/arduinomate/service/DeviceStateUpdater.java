@@ -5,10 +5,11 @@ import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.events.DeviceStateChangeEvent;
-import com.gmail.raducaz.arduinomate.events.PinStateChangeEvent;
-import com.gmail.raducaz.arduinomate.events.PinStateChangeListener;
+import com.gmail.raducaz.arduinomate.events.NOTUSEDPinStateChangeEvent;
+import com.gmail.raducaz.arduinomate.events.NOTUSEDPinStateChangeListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,13 +66,15 @@ public class DeviceStateUpdater {
 
     public void insertPinStateHistory(String pName, Double pState)
     {
+        Date now = DateConverter.toDate(System.currentTimeMillis());
         if(deviceEntity != null) {
             // Insert a new History for this pin with the initial state
             PinStateEntity newPinState = new PinStateEntity();
             newPinState.setDeviceId(deviceEntity.getId());
             newPinState.setName(pName);
-            newPinState.setFromDate(DateConverter.toDate(System.currentTimeMillis()));
-            newPinState.setLastUpdate(DateConverter.toDate(System.currentTimeMillis()));
+            newPinState.setNo(Integer.parseInt(pName.replace('A', '9')));
+            newPinState.setFromDate(now);
+            newPinState.setLastUpdate(now);
             newPinState.setState(pState);
             dataRepository.insertPinState(newPinState);
         }
@@ -87,24 +90,24 @@ public class DeviceStateUpdater {
                 dataRepository.updatePinState(deviceEntity.getId(), pName, pState);
         }
     }
-    private ArrayList<PinStateChangeListener> pinStateChangeListenerList = new ArrayList<PinStateChangeListener>();
+    private ArrayList<NOTUSEDPinStateChangeListener> NOTUSEDPinStateChangeListenerList = new ArrayList<NOTUSEDPinStateChangeListener>();
     // Register an event listener
-    public synchronized void addPinStateListener(PinStateChangeListener listener) {
-        if (!pinStateChangeListenerList.contains(listener)) {
-            pinStateChangeListenerList.add(listener);
+    public synchronized void addPinStateListener(NOTUSEDPinStateChangeListener listener) {
+        if (!NOTUSEDPinStateChangeListenerList.contains(listener)) {
+            NOTUSEDPinStateChangeListenerList.add(listener);
         }
     }
-    private void processPinStateChangeEvent(PinStateChangeEvent pinStateChangeEvent) {
-        ArrayList<PinStateChangeListener> tempPinStateChangeListenerList;
+    private void processPinStateChangeEvent(NOTUSEDPinStateChangeEvent pinStateChangeEvent) {
+        ArrayList<NOTUSEDPinStateChangeListener> tempNOTUSEDPinStateChangeListenerList;
 
         synchronized (this) {
-            if (pinStateChangeListenerList.size() == 0) {
+            if (NOTUSEDPinStateChangeListenerList.size() == 0) {
                 return;
             }
-            tempPinStateChangeListenerList = (ArrayList<PinStateChangeListener>) pinStateChangeListenerList.clone();
+            tempNOTUSEDPinStateChangeListenerList = (ArrayList<NOTUSEDPinStateChangeListener>) NOTUSEDPinStateChangeListenerList.clone();
         }
 
-        for (PinStateChangeListener listener : tempPinStateChangeListenerList) {
+        for (NOTUSEDPinStateChangeListener listener : tempNOTUSEDPinStateChangeListenerList) {
             listener.pinStateChanged(pinStateChangeEvent);
         }
     }
@@ -165,10 +168,10 @@ public class DeviceStateUpdater {
 //    DeviceStateUpdater deviceStateUpdater = new DeviceStateUpdater();
 //    PinStateChangeListener listener = new MyPinStateChangeListener();
 //    deviceStateUpdater.addSpeedListener(listener);
-    private static class MyPinStateChangeListener implements PinStateChangeListener {
+    private static class MyNOTUSEDPinStateChangeListener implements NOTUSEDPinStateChangeListener {
 
         @Override
-        public void pinStateChanged(PinStateChangeEvent e) {
+        public void pinStateChanged(NOTUSEDPinStateChangeEvent e) {
             // TODO: Call here logic if pin state changes
 
         }

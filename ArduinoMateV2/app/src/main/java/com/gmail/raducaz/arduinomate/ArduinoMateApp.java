@@ -1,16 +1,25 @@
 package com.gmail.raducaz.arduinomate;
 
 import android.app.Application;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.gmail.raducaz.arduinomate.db.AppDatabase;
+import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
 import com.gmail.raducaz.arduinomate.mocks.MockArduinoServerWorker;
 import com.gmail.raducaz.arduinomate.processes.ProcessGeneratorOnOff;
@@ -19,6 +28,7 @@ import com.gmail.raducaz.arduinomate.remote.StateFromControllerConsumerWorker;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 import com.gmail.raducaz.arduinomate.tcpserver.TcpServerWorker;
 import com.gmail.raducaz.arduinomate.timer.TimerService;
+import com.gmail.raducaz.arduinomate.ui.ActivityMain;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.CsvFormatStrategy;
 import com.orhanobut.logger.DiskLogAdapter;
@@ -46,7 +56,7 @@ import java.util.concurrent.Future;
 public class ArduinoMateApp extends Application {
     private String TAG = "ArduinoMateApp";
 
-    private SettingsEntity settings;
+    public SettingsEntity settings;
 
     public static final String STATES_EXCHANGE = "states";
     public static final String COMMAND_QUEUE = "commands";
@@ -62,6 +72,22 @@ public class ArduinoMateApp extends Application {
     private AppExecutors mAppExecutors;
     private TimerService timerService;
     private WorkManager mWorkManager;
+
+    public Executor getDbExecutor()
+    {
+        return mAppExecutors.diskIO();
+    }
+    public ExecutorService getNetworkExecutor()
+    {
+        return mAppExecutors.networkIO();
+    }
+    public AppDatabase getDatabase() {
+        return AppDatabase.getInstance(this, mAppExecutors);
+    }
+
+    public DataRepository getRepository() {
+        return DataRepository.getInstance(getDatabase());
+    }
 
     @Override
     public void onCreate() {
@@ -85,6 +111,10 @@ public class ArduinoMateApp extends Application {
 
         DataRepository repository = getRepository();
 
+        // When changing database structure, need to uncomment this and comment all below, run once, then comment it again.
+        // Clear app data, uninstall app (make sure AppManifest has allowBackup = false and AppDatabase.build has fallbackDestructive().
+        //return;
+
         try {
             ExecutorService executor = mAppExecutors.networkIO();
             Callable<SettingsEntity> callable = new Callable<SettingsEntity>() {
@@ -99,6 +129,11 @@ public class ArduinoMateApp extends Application {
                 }
             };
             Future<SettingsEntity> future = executor.submit(callable);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+            }
 
             //TODO: Ensure this is completed synchronous before moving on
             settings = future.get();
@@ -344,22 +379,8 @@ public class ArduinoMateApp extends Application {
 //            }
 //        });
 
+
     }
 
-    public Executor getDbExecutor()
-    {
-        return mAppExecutors.diskIO();
-    }
-    public ExecutorService getNetworkExecutor()
-    {
-        return mAppExecutors.networkIO();
-    }
-    public AppDatabase getDatabase() {
-        return AppDatabase.getInstance(this, mAppExecutors);
-    }
-
-    public DataRepository getRepository() {
-        return DataRepository.getInstance(getDatabase());
-    }
 
 }

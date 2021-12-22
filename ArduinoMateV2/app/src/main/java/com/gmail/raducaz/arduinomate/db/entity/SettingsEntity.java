@@ -20,6 +20,8 @@ public class SettingsEntity implements Settings, Serializable {
     private boolean isController;
     private boolean isTestingMode;
     private boolean permitRemoteControl;
+    private String phoneNumber;
+    private String phoneDeviceIp;
 
     @Override
     public long getId() {
@@ -61,6 +63,20 @@ public class SettingsEntity implements Settings, Serializable {
         this.permitRemoteControl = permitRemoteControl;
     }
 
+    @Override
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+    @Override
+    public String getPhoneDeviceIp() {
+        return phoneDeviceIp;
+    }
+    public void setPhoneDeviceIp(String phoneDeviceIp) {
+        this.phoneDeviceIp = phoneDeviceIp;
+    }
 
     public SettingsEntity() {
     }

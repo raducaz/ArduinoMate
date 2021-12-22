@@ -2,21 +2,19 @@ package com.gmail.raducaz.arduinomate.model;
 
 import java.util.Date;
 
-public interface PinState {
+public interface PinStateChange {
 
     long getId();
     long getDeviceId();
+    String getDeviceIp();
+    String getDeviceName();
     long getNo();
     String getName();
     double getState();
-    String getStateText();
     double getOldState();
-    String getOldStateText();
     Date getFromDate();
     Date getToDate();
     Date getLastUpdate();
     int getSecondsFromLastUpdate();
-    String getSecondsFromLastUpdateText();
     long getStateLifeDuration();
-    int getStateColor();
 }

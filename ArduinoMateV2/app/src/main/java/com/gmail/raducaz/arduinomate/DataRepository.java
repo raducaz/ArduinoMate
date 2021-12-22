@@ -14,6 +14,7 @@ import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.DeviceEntity;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionExecutionEntity;
 import com.gmail.raducaz.arduinomate.db.entity.MockPinStateEntity;
+import com.gmail.raducaz.arduinomate.db.entity.PinStateChangeEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 import com.gmail.raducaz.arduinomate.db.entity.RemoteQueueEntity;
 import com.gmail.raducaz.arduinomate.db.entity.SettingsEntity;
@@ -344,6 +345,12 @@ public class DataRepository {
     public LiveData<List<PinStateEntity>> loadDeviceCurrentPinsState(final long deviceId) {
         return mDatabase.pinStateDao().loadDeviceCurrentPinsState(deviceId);
     }
+    public LiveData<List<PinStateChangeEntity>> loadChangedPinsState() {
+        return mDatabase.pinStateDao().loadChangedPinsState();
+    }
+    public LiveData<List<PinStateChangeEntity>> loadChangedDevicePinsState(String deviceIp) {
+        return mDatabase.pinStateDao().loadChangedPinsState(deviceIp);
+    }
     public List<PinStateEntity> loadDeviceCurrentPinsStateSync(final long deviceId) {
         return mDatabase.pinStateDao().loadDeviceCurrentPinsStateSync(deviceId);
     }
@@ -360,7 +367,8 @@ public class DataRepository {
         return mDatabase.pinStateDao().loadDeviceCurrentPinStateSync(deviceId, pinName);
     }
     public void updatePinState(final long deviceId, final String pinName, Double pinState) {
-        mDatabase.pinStateDao().updatePinState(deviceId, pinName, pinState);
+        Date now = DateConverter.toDate(System.currentTimeMillis());
+        mDatabase.pinStateDao().updatePinState(deviceId, pinName, pinState, now);
     }
     public void insertPinState(PinStateEntity pinState) {
         long id = mDatabase.pinStateDao().insert(pinState);

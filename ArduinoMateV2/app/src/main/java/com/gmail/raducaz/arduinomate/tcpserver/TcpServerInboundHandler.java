@@ -1,5 +1,6 @@
 package com.gmail.raducaz.arduinomate.tcpserver;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
@@ -33,7 +34,7 @@ public class TcpServerInboundHandler extends SimpleChannelInboundHandler<String>
     static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     public TcpServerInboundHandler(DataRepository repository) {
-        dataRepository = repository;
+        this.dataRepository = repository;
     }
 
     public DataRepository getDataRepository()

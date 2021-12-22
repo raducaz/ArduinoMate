@@ -12,6 +12,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.gmail.raducaz.arduinomate.db.entity.PinStateChangeEntity;
 import com.gmail.raducaz.arduinomate.db.entity.PinStateEntity;
 
 import java.util.Date;
@@ -62,8 +63,21 @@ public interface PinStateDao {
 
     @Query("SELECT * FROM pinState " +
             "where deviceId = :deviceId AND toDate IS NULL " +
-            "ORDER BY name")
+            "ORDER BY no")
     LiveData<List<PinStateEntity>> loadDeviceCurrentPinsState(long deviceId);
+
+    // fromDate is updated when a pinState changes, lastUpdate is updated everytime a new state occurs (disrigard the value is identical)
+    @Query("SELECT pinState.*, device.ip as deviceIp, device.name as deviceName FROM pinState " +
+            "inner join device on pinState.deviceId = device.id " +
+            "where fromDate = lastUpdate " +
+            "ORDER BY deviceId")
+    LiveData<List<PinStateChangeEntity>> loadChangedPinsState();
+
+    // fromDate is updated when a pinState changes, lastUpdate is updated everytime a new state occurs (disrigard the value is identical)
+    @Query("SELECT pinState.*, device.ip as deviceIp, device.name as deviceName FROM pinState " +
+            "inner join device on pinState.deviceId = device.id " +
+            "where fromDate = lastUpdate AND device.ip = :deviceIp " )
+    LiveData<List<PinStateChangeEntity>> loadChangedPinsState(String deviceIp);
 
     @Query("SELECT * FROM pinState " +
             "where deviceId = :deviceId AND toDate IS NULL " +
@@ -80,9 +94,12 @@ public interface PinStateDao {
     PinStateEntity loadDeviceCurrentPinStateSync(long deviceId, String pinName);
 
     @Query("UPDATE pinState " +
-            "SET state = :pinState " +
+            "SET oldState = state," +
+            "state = :pinState," +
+            "fromDate = :stateFrom, " + // Reset fromDate as pinState changed
+            "lastUpdate = :stateFrom " + // Also update last update date to current date
             "WHERE deviceId = :deviceId AND name = :pinName ")
-    void updatePinState(long deviceId, String pinName, Double pinState);
+    void updatePinState(long deviceId, String pinName, Double pinState, Date stateFrom); //date('now') is not working in Query
 
     @Query("DELETE FROM pinState " +
             "WHERE deviceId IN (" +

@@ -464,7 +464,6 @@ void clientThreadCallback()
       if(i>1) break;
 
       c = arduinoClient.read();
-      i++;
     }
     if(c=='K')
     {
@@ -582,7 +581,10 @@ void loop() {
   
   delay(100);
   
-  // Sending to controller needs to be first step to work, initialize server breaks the client
+  // Receive commands
+  serverThreadCallback();
+  delay(100);
+
   if(noLoopRuns < 5){
     noLoopRuns++;
   }
@@ -594,12 +596,6 @@ void loop() {
 
     noLoopRuns = 0;
   }
-
-  // Receive commands
-  serverThreadCallback();
-  delay(100);
-
-  
 
   doggieTickle(); /* Send I'm alive to watchdog*/
 }

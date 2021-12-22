@@ -9,10 +9,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.gmail.raducaz.arduinomate.db.converter.DateConverter;
-import com.gmail.raducaz.arduinomate.model.FunctionState;
-import com.gmail.raducaz.arduinomate.model.PinState;
-import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
-import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
+import com.gmail.raducaz.arduinomate.model.PinStateChange;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -27,11 +24,14 @@ import java.util.Date;
                 unique=true
         )})
 
-public class PinStateEntity implements PinState, Serializable {
+public class PinStateChangeEntity implements PinStateChange, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long deviceId;
+    private String deviceIp;
+    private String deviceName;
+
     private long no;
     private String name;
     private double state;
@@ -57,6 +57,22 @@ public class PinStateEntity implements PinState, Serializable {
     }
 
     @Override
+    public String getDeviceIp() {
+        return deviceIp;
+    }
+    public void setDeviceIp(String deviceIp) {
+        this.deviceIp = deviceIp;
+    }
+
+    @Override
+    public String getDeviceName() {
+        return deviceName;
+    }
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    @Override
     public long getNo() {
         return no;
     }
@@ -76,10 +92,6 @@ public class PinStateEntity implements PinState, Serializable {
     public double getState() {
         return state;
     }
-    @Override
-    public String getStateText() {
-        return String.format("%.2f", state);
-    }
     public void setState(double state) {
         this.state = state;
     }
@@ -87,10 +99,6 @@ public class PinStateEntity implements PinState, Serializable {
     @Override
     public double getOldState() {
         return oldState;
-    }
-    @Override
-    public String getOldStateText() {
-        return String.format("%.2f", oldState);
     }
     public void setOldState(double oldState) {
         this.oldState = oldState;
@@ -126,11 +134,6 @@ public class PinStateEntity implements PinState, Serializable {
         long diffInMillies = now.getTime() - lastUpdate.getTime();
         return Math.round(diffInMillies/1000);
     }
-    @Override
-    public String getSecondsFromLastUpdateText() {
-        long s = getSecondsFromLastUpdate();
-        return String.valueOf(s>100?"[>100s]":"["+s+"s]");
-    }
 
     @Override
     public long getStateLifeDuration()
@@ -139,44 +142,20 @@ public class PinStateEntity implements PinState, Serializable {
         long diffInSec = Math.round((now.getTime() - fromDate.getTime())/1000);
         return diffInSec;
     }
-    @Override
-    public int getStateColor() {
-        long diffInSec = getStateLifeDuration();
 
-        if(diffInSec <= 2)
-            return Color.argb(255, 0, 204, 0);
-        else if(diffInSec <= 5)
-            return Color.argb(255, 0, 255, 0);
-        else if(diffInSec <= 10)
-            return Color.argb(255, 51, 255, 153);
-        else if(diffInSec <= 30)
-            return Color.argb(255, 0, 204, 204);
-        else if(diffInSec <= 60)
-            return Color.argb(255, 0, 255, 255);
-        else
-            return Color.TRANSPARENT;
-    }
-
-    public PinStateEntity() {
+    public PinStateChangeEntity() {
     }
 
     @Ignore
-    public PinStateEntity(long id, long deviceId, String name, int state, Date fromDate, Date toDate) {
+    public PinStateChangeEntity(long id, long deviceId, String deviceIp, String deviceName, String name, int state, Date fromDate, Date toDate) {
         this.id = id;
         this.deviceId = deviceId;
+        this.deviceIp = deviceIp;
+        this.deviceName = deviceName;
         this.name = name;
         this.state = state;
         this.fromDate = fromDate;
         this.toDate = toDate;
     }
 
-    @Ignore
-    public PinStateEntity(FunctionState state) {
-        this.id = state.getId();
-        this.deviceId = state.getDeviceId();
-        this.name = state.getName();
-        this.state = state.getState();
-        this.fromDate = state.getFromDate();
-        this.toDate = state.getToDate();
-    }
 }

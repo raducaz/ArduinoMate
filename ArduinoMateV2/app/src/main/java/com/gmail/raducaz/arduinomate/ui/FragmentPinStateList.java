@@ -21,6 +21,8 @@ import com.gmail.raducaz.arduinomate.viewmodel.FunctionViewModel;
 import com.gmail.raducaz.arduinomate.viewmodel.PinStateListViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class FragmentPinStateList extends Fragment {
@@ -95,7 +97,11 @@ public class FragmentPinStateList extends Fragment {
     private final ClickCallbackPinState mPinStateClickCallback = new ClickCallbackPinState() {
         @Override
         public void onClick(View v, PinState pinState) {
-            Snackbar.make(v, "State from " + pinState.getLastUpdate(),
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            Snackbar.make(v, "lastUpdate " + dateFormat.format(pinState.getLastUpdate()) +
+                            " (" + pinState.getStateLifeDuration() + ")" +
+                            "\nwas: " + pinState.getOldStateText(),
                     Snackbar.LENGTH_LONG).show();
         }
     };

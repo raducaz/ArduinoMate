@@ -1,4 +1,5 @@
 package com.gmail.raducaz.arduinomate.remote;
+import android.os.Handler;
 import android.util.Log;
 
 import com.gmail.raducaz.arduinomate.ArduinoMateApp;
@@ -31,6 +32,7 @@ public class StateFromControllerConsumerService implements Runnable {
     private Connection connection;
     private String exchangeName;
     private DataRepository mRepository;
+    private Handler mUpdateHandler;
 
     private static StateFromControllerConsumerService sInstance;
     private boolean isRunning;

@@ -23,7 +23,7 @@ public class DataGenerator {
         settings.setIsController(true);
         settings.setPermitRemoteControl(false);
         settings.setIsTestingMode(false);
-        settings.setAmqUri("amqps://lttjuzsi:DmSKzf8YzaNI-xip9TZAxdLfLg402CVF@bulldog.rmq.cloudamqp.com/lttjuzsi");
+        settings.setAmqUri("amqps://ypwemwny:52DF1s5SaLsW4dBqTQAAonJWNQCQIC3B@cow.rmq2.cloudamqp.com/ypwemwny");
 
         return settings;
     }
@@ -61,6 +61,15 @@ public class DataGenerator {
         device.setName("Default1");
         device.setDescription("Default");
         device.setId(3);
+        devices.add(device);
+
+        device = new DeviceEntity();
+        device.setIp("192.168.1.10");
+        device.setMac("00:15:B7:4B:1D:56");
+        device.setPort(80);
+        device.setName("DVR");
+        device.setDescription("DVR");
+        device.setId(4);
         devices.add(device);
 
 //        List<ProductEntity> products = new ArrayList<>(FIRST.length * SECOND.length);
@@ -176,11 +185,19 @@ public class DataGenerator {
         functions.add(function);
 
         device = devices.get(3);
-
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
         function.setName("Default1Refresh");
         function.setDescription("Default " + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        device = devices.get(4);
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("DvrOnOff");
+        function.setDescription("Sends the magic package to wake on LAN " + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

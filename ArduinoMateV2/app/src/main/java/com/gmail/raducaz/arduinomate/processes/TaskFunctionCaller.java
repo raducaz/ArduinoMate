@@ -135,6 +135,9 @@ public class TaskFunctionCaller implements Runnable {
                     case "Default1Refresh":
                         new ProcessDefault1Refresh(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                         break;
+                    case "DvrOnOff":
+                        new ProcessDvrOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                        break;
                     default:
                 }
             }

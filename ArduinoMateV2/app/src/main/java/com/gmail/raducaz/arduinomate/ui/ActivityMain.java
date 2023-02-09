@@ -175,25 +175,25 @@ public class ActivityMain extends AppCompatActivity {
         }
 
 
-        if (ContextCompat.checkSelfPermission(
-                this.getApplicationContext(), Manifest.permission.CALL_PHONE) ==
-                PackageManager.PERMISSION_GRANTED) {
-            // You can use the API that requires the permission.
-
-        }
-//        else if (shouldShowRequestPermissionRationale(...)) {
-//            // In an educational UI, explain to the user why your app requires this
-//            // permission for a specific feature to behave as expected. In this UI,
-//            // include a "cancel" or "no thanks" button that allows the user to
-//            // continue using your app without granting the permission.
-//            showInContextUI(...);
+//        if (ContextCompat.checkSelfPermission(
+//                this.getApplicationContext(), Manifest.permission.CALL_PHONE) ==
+//                PackageManager.PERMISSION_GRANTED) {
+//            // You can use the API that requires the permission.
+//
 //        }
-        else {
-            // You can directly ask for the permission.
-            // The registered ActivityResultCallback gets the result of this request.
-            requestPermissionLauncher.launch(
-                    Manifest.permission.CALL_PHONE);
-        }
+////        else if (shouldShowRequestPermissionRationale(...)) {
+////            // In an educational UI, explain to the user why your app requires this
+////            // permission for a specific feature to behave as expected. In this UI,
+////            // include a "cancel" or "no thanks" button that allows the user to
+////            // continue using your app without granting the permission.
+////            showInContextUI(...);
+////        }
+//        else {
+//            // You can directly ask for the permission.
+//            // The registered ActivityResultCallback gets the result of this request.
+//            requestPermissionLauncher.launch(
+//                    Manifest.permission.CALL_PHONE);
+//        }
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

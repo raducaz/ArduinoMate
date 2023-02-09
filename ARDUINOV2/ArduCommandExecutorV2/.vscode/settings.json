@@ -2,5 +2,9 @@
     "terminal.integrated.env.linux": {
         "PATH": "/home/radu/.platformio/penv/bin:/home/radu/.platformio/penv:/sbin:/bin:/usr/bin:/usr/local/bin:/Users/radu/bin",
         "PLATFORMIO_CALLER": "vscode"
+    },
+    "terminal.integrated.env.windows": {
+        "PATH": "C:\\Users\\diana\\.platformio\\penv\\Scripts;C:\\Users\\diana\\.platformio\\penv;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\ProgramData\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Git\\cmd;C:\\Program Files\\TortoiseGit\\bin;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Users\\diana\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Program Files\\Android\\Android Studio\\sdk\\platform-tools;;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\ProgramData\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Git\\cmd;C:\\Program Files\\TortoiseGit\\bin;C:\\Program Files\\Microsoft VS Code\\bin;C:\\Users\\diana\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Program Files\\Android\\Android Studio\\sdk\\platform-tools;",
+        "PLATFORMIO_CALLER": "vscode"
     }
 }

@@ -1,5 +1,19 @@
 #include <globals.h>
 
+#ifdef DEFAULT   
+    //--------DEVICE SPECIFIC DEFAULT---------------------------
+    byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x72 };
+    const byte ip[] = { 192, 168, 1, 110 }; //This needs to match the name configured on Android App
+    int arduinoPort = 8090; //This needs to match the name configured on Android App
+    char arduinoName[] = "Default1"; //This needs to match the name configured on Android App
+    //--------DEVICE SPECIFIC---------------------------
+    byte serverIp[] = { 192, 168, 1, 219 }; // Android device IP
+    byte gateway[] = { 192, 168, 1, 1 };
+    byte dns[] = { 192, 168, 1, 1 };
+
+    const byte SenzorMagnetic1 = 3;
+#endif
+
 #ifdef GEN     
     //--------DEVICE SPECIFIC GENERATOR---------------------------
     byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x72 };
@@ -7,7 +21,7 @@
     int arduinoPort = 8080; //This needs to match the name configured on Android App
     char arduinoName[] = "Generator"; //This needs to match the name configured on Android App
     //--------DEVICE SPECIFIC---------------------------
-    byte serverIp[] = { 192, 168, 1, 10 }; // Android device IP
+    byte serverIp[] = { 192, 168, 1, 219 }; // Android device IP
     byte gateway[] = { 192, 168, 1, 1 };
     byte dns[] = { 192, 168, 1, 1 };
 
@@ -139,6 +153,9 @@ void setupPins()
         pinMode(PrizaDreapta, OUTPUT);
         pinMode(PrizaStanga, OUTPUT);
         pinMode(CurrentSensor, INPUT);
+    #endif
+    #ifdef DEFAULT
+        pinMode(SenzorMagnetic1, INPUT_PULLUP);
     #endif
     #ifdef TEST 
         pinMode(Priza8, OUTPUT);

@@ -55,6 +55,14 @@ public class DataGenerator {
         device.setId(2);
         devices.add(device);
 
+        device = new DeviceEntity();
+        device.setIp("192.168.1.110");
+        device.setPort(8090);
+        device.setName("Default1");
+        device.setDescription("Default");
+        device.setId(3);
+        devices.add(device);
+
 //        List<ProductEntity> products = new ArrayList<>(FIRST.length * SECOND.length);
 //        Random rnd = new Random();
 //        for (int i = 0; i < FIRST.length; i++) {
@@ -163,6 +171,16 @@ public class DataGenerator {
         function.setDeviceId(device.getId());
         function.setName("BoilerOnOff");
         function.setDescription("Start/Stop generator for Boiler circuit " + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        device = devices.get(3);
+
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("Default1Refresh");
+        function.setDescription("Default " + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

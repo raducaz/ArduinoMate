@@ -24,7 +24,7 @@
 #include <appendCommand.h>
 
 #ifdef HASTEMP
-  #define DHTTYPE DHT11   // DHT 22  (AM2302), AM2321
+  #define DHTTYPE DHT22 // DHT11  ---(AM2302), AM2321
   DHT dht(TemperatureSensor, DHTTYPE);
 #endif
 #ifdef HASCURRENT

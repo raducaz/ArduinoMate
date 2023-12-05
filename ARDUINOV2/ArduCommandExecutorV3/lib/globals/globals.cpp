@@ -1,6 +1,6 @@
 #include <globals.h>
 
-#ifdef DEFAULT   
+#ifdef DEFAULT1   // DO NOT USER DEFAULT as is seen as active by default
     //--------DEVICE SPECIFIC DEFAULT---------------------------
     byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x72 };
     const byte ip[] = { 192, 168, 1, 110 }; //This needs to match the name configured on Android App
@@ -71,14 +71,33 @@
     const byte PrizaStanga = 5; // controleaza releul pentru priza stanga (fara senzor de curent) 
     const byte CurrentSensor = A1;
 #endif
+#ifdef SOCKET     
+    //--------DEVICE SPECIFIC GENERATOR---------------------------
+    byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x73 };
+    const byte ip[] = { 192, 168, 1, 110 }; //This needs to match the name configured on Android App
+    int arduinoPort = 8083; //This needs to match the name configured on Android App
+    char arduinoName[] = "SocketX4"; //This needs to match the name configured on Android App
+    //--------DEVICE SPECIFIC---------------------------
+    byte serverIp[] = { 192, 168, 1, 20 }; // Android device IP
+    byte gateway[] = { 192, 168, 1, 1 };
+    byte dns[] = { 192, 168, 1, 1 };
+
+    const byte Priza8 = 8; 
+    const byte Priza7 = 7; 
+    const byte Priza6 = 6; 
+    const byte Priza5 = 5; // Not yet connected
+    const byte Priza4 = 3; 
+    const byte Priza3 = 2; 
+
+#endif
 #ifdef TEST     
     //--------DEVICE SPECIFIC GENERATOR---------------------------
     byte mac[] = { 0x78, 0x24, 0xaf, 0x3a, 0xa6, 0x71 };
-    const byte ip[] = { 192, 168, 1, 101 }; //This needs to match the name configured on Android App
+    const byte ip[] = { 192, 168, 1, 110 }; //This needs to match the name configured on Android App
     int arduinoPort = 8081; //This needs to match the name configured on Android App
-    char arduinoName[] = "Tap"; //This needs to match the name configured on Android App
+    char arduinoName[] = "Test"; //This needs to match the name configured on Android App
     //--------DEVICE SPECIFIC---------------------------
-    byte serverIp[] = { 192, 168, 1, 13 }; // Android device IP
+    byte serverIp[] = { 192, 168, 1, 33 }; // Android device IP
     byte gateway[] = { 192, 168, 1, 1 };
     byte dns[] = { 192, 168, 1, 1 };
 
@@ -154,7 +173,7 @@ void setupPins()
         pinMode(PrizaStanga, OUTPUT);
         pinMode(CurrentSensor, INPUT);
     #endif
-    #ifdef DEFAULT
+    #ifdef DEFAULT1
         pinMode(SenzorMagnetic1, INPUT_PULLUP);
     #endif
     #ifdef TEST 
@@ -176,6 +195,16 @@ void setupPins()
         // pinMode(PresostatProbeSender, OUTPUT);
         // pinMode(PresostatProbeReceiver, INPUT_PULLUP); //Sets it to HIGH
         // pinMode(CurrentSensor, INPUT);
+    #endif
+
+    #ifdef SOCKET 
+        pinMode(Priza8, OUTPUT);
+        pinMode(Priza7, OUTPUT);
+        pinMode(Priza6, OUTPUT);
+        pinMode(Priza5, OUTPUT);
+        pinMode(Priza4, OUTPUT);
+        pinMode(Priza3, OUTPUT);
+
     #endif
 }
 void initializePins()
@@ -206,6 +235,14 @@ void initializePins()
         digitalWrite(Priza3, HIGH); // decuplat
         digitalWrite(Priza4, HIGH); 
         digitalWrite(TapProbeSender, HIGH); // This will be our ground when probing, until then let it HIGH
+    #endif
+    #ifdef SOCKET
+        digitalWrite(Priza8, HIGH); 
+        digitalWrite(Priza7, HIGH); 
+        digitalWrite(Priza6, HIGH); 
+        digitalWrite(Priza5, HIGH); 
+        digitalWrite(Priza3, HIGH); // decuplat
+        digitalWrite(Priza4, HIGH); 
     #endif
     #ifdef BOIL
         digitalWrite(PrizaDreapta, HIGH); // Decuplat

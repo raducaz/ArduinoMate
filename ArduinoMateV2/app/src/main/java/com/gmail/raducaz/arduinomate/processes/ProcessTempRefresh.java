@@ -1,35 +1,35 @@
 package com.gmail.raducaz.arduinomate.processes;
 
 import com.gmail.raducaz.arduinomate.DataRepository;
-import com.gmail.raducaz.arduinomate.commands.DeviceGeneratorFunctions;
+import com.gmail.raducaz.arduinomate.commands.DeviceGenericFunctions;
 import com.gmail.raducaz.arduinomate.db.entity.FunctionEntity;
 import com.gmail.raducaz.arduinomate.service.FunctionCallStateEnum;
 import com.gmail.raducaz.arduinomate.service.FunctionResultStateEnum;
 
 import java.util.Calendar;
 
-public class ProcessDefault1Refresh extends Process {
+public class ProcessTempRefresh extends Process {
 
-    public ProcessDefault1Refresh(DataRepository dataRepository, String deviceName)
+    public ProcessTempRefresh(DataRepository dataRepository, String deviceName)
     {
-        super(dataRepository, deviceName, "Default1Refresh");
+        super(dataRepository, deviceName, "TempRefresh");
     }
-    public ProcessDefault1Refresh(DataRepository dataRepository, long deviceId)
+    public ProcessTempRefresh(DataRepository dataRepository, long deviceId)
     {
-        super(dataRepository, deviceId, "Default1Refresh");
+        super(dataRepository, deviceId, "ProcessTempRefresh");
     }
 
     @Override
     protected boolean on(boolean isOnDemand) throws Exception {
-        DeviceGeneratorFunctions deviceFunctions = new DeviceGeneratorFunctions(dataRepository, "Default1");
+        DeviceGenericFunctions deviceFunctions = new DeviceGenericFunctions(dataRepository, "SocketX4");
 
-        FunctionEntity default1Refresh = dataRepository.loadFunctionSync(deviceEntity.getId(),"Default1Refresh");
+        FunctionEntity tempRefresh = dataRepository.loadFunctionSync(deviceEntity.getId(),"TempRefresh");
 
         logInfo("Getting temperature");
         double temperature = deviceFunctions.getCurrentTemperature();
 
         logInfo("Temp is " + temperature);
-        FunctionEntity f = dataRepository.loadFunctionSync(deviceEntity.getId(),"Default1Refresh");
+        FunctionEntity f = dataRepository.loadFunctionSync(deviceEntity.getId(),"TempRefresh");
         f.setResultState(FunctionResultStateEnum.OFF.getId());
         f.setCallState(FunctionCallStateEnum.READY.getId());
         f.setDescription("Temperature: " + temperature);

@@ -23,7 +23,7 @@ public class DataGenerator {
         settings.setIsController(true);
         settings.setPermitRemoteControl(false);
         settings.setIsTestingMode(false);
-        settings.setAmqUri("amqps://lttjuzsi:DmSKzf8YzaNI-xip9TZAxdLfLg402CVF@bulldog.rmq.cloudamqp.com/lttjuzsi");
+        settings.setAmqUri("amqps://ypwemwny:52DF1s5SaLsW4dBqTQAAonJWNQCQIC3B@cow.rmq2.cloudamqp.com/ypwemwny");
 
         return settings;
     }
@@ -57,10 +57,19 @@ public class DataGenerator {
 
         device = new DeviceEntity();
         device.setIp("192.168.1.110");
-        device.setPort(8090);
-        device.setName("Default1");
-        device.setDescription("Default");
+        device.setPort(8083);
+        device.setName("SocketX4");
+        device.setDescription("4 prize si temp senzor");
         device.setId(3);
+        devices.add(device);
+
+        device = new DeviceEntity();
+        device.setIp("192.168.1.10");
+        device.setMac("00:15:B7:4B:1D:56");
+        device.setPort(80);
+        device.setName("DVR");
+        device.setDescription("DVR");
+        device.setId(4);
         devices.add(device);
 
 //        List<ProductEntity> products = new ArrayList<>(FIRST.length * SECOND.length);
@@ -84,103 +93,119 @@ public class DataGenerator {
         List<FunctionEntity> functions = new ArrayList<>();
 
         Device device = devices.get(0);
-        FunctionEntity function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("GeneratorOnOff");
-        function.setDescription("Start/Stop Generator " + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("PowerOnOff");
-        function.setDescription("Start/Stop 220V supply" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("PumpOnOff");
-        function.setDescription("Start/Stop generator and 220V supply to " + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("SocOnOff");
-        function.setDescription("Used for initial generator start");
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("IgnitionOnOff");
-        function.setDescription("Used for initial generator start");
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
+//        FunctionEntity function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("GeneratorOnOff");
+//        function.setDescription("Start/Stop Generator " + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("PowerOnOff");
+//        function.setDescription("Start/Stop 220V supply" + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("PumpOnOff");
+//        function.setDescription("Start/Stop generator and 220V supply to " + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("SocOnOff");
+//        function.setDescription("Used for initial generator start");
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("IgnitionOnOff");
+//        function.setDescription("Used for initial generator start");
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
 
         device = devices.get(1);
 
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("WaterSupplyTapOnOff");
-        function.setDescription("WaterSupplyTapOnOff" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("RightIrrigationOnOff");
-        function.setDescription("RightIrrigationOnOff" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("LeftIrrigationOnOff");
-        function.setDescription("LeftIrrigationOnOff" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("HouseWaterOnOff");
-        function.setDescription("HouseWaterOnOff" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
-
-        function = new FunctionEntity();
-        function.setDeviceId(device.getId());
-        function.setName("GardenWaterOnOff");
-        function.setDescription("GardenWaterOnOff" + device.getName());
-        function.setDateSample(new Date(System.currentTimeMillis()
-                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
-        functions.add(function);
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("WaterSupplyTapOnOff");
+//        function.setDescription("WaterSupplyTapOnOff" + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("RightIrrigationOnOff");
+//        function.setDescription("RightIrrigationOnOff" + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("LeftIrrigationOnOff");
+//        function.setDescription("LeftIrrigationOnOff" + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("HouseWaterOnOff");
+//        function.setDescription("HouseWaterOnOff" + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+//
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("GardenWaterOnOff");
+//        function.setDescription("GardenWaterOnOff" + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
 
         device = devices.get(2);
-        function = new FunctionEntity();
+//        function = new FunctionEntity();
+//        function.setDeviceId(device.getId());
+//        function.setName("BoilerOnOff");
+//        function.setDescription("Start/Stop generator for Boiler circuit " + device.getName());
+//        function.setDateSample(new Date(System.currentTimeMillis()
+//                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+//        functions.add(function);
+
+        device = devices.get(3);
+        FunctionEntity function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("BoilerOnOff");
-        function.setDescription("Start/Stop generator for Boiler circuit " + device.getName());
+        function.setName("TempRefresh");
+        function.setDescription("Temp sensor refresh " + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);
 
-        device = devices.get(3);
-
         function = new FunctionEntity();
         function.setDeviceId(device.getId());
-        function.setName("Default1Refresh");
-        function.setDescription("Default " + device.getName());
+        function.setName("Socket6");
+        function.setDescription("Socket6 " + device.getName());
+        function.setDateSample(new Date(System.currentTimeMillis()
+                - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
+        functions.add(function);
+
+        device = devices.get(4);
+        function = new FunctionEntity();
+        function.setDeviceId(device.getId());
+        function.setName("DvrOnOff");
+        function.setDescription("Sends the magic package to wake on LAN " + device.getName());
         function.setDateSample(new Date(System.currentTimeMillis()
                 - TimeUnit.DAYS.toMillis(5) + TimeUnit.HOURS.toMillis(0)));
         functions.add(function);

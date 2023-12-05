@@ -17,6 +17,7 @@ public class DeviceEntity implements Device, Serializable {
     @PrimaryKey
     private long id;
     private String ip;
+    private String mac;
     private int port;
     private String name;
     private String description;
@@ -28,6 +29,14 @@ public class DeviceEntity implements Device, Serializable {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    @Override
+    public String getMac() {
+        return mac;
+    }
+    public void setMac(String mac) {
+        this.mac = mac;
     }
 
     @Override

@@ -1,9 +1,9 @@
+#include <Arduino.h>
+
 #ifndef globals_h
 #define globals_h
 
-#include <Arduino.h>
-
-//#define DEBUG /*if defined, enables debug prints*/
+#define DEBUG /*if defined, enables debug prints*/
 
 // #define GEN
 #define HASTEMP
@@ -12,7 +12,8 @@
 // if defined listen and uses ethernet shield
 #define LISTENETHERNET
 
-// #define TAP
+//#define DEFAULT1
+ #define SOCKET
 
 //#define TEST /* define this to upload to testing device*/
 

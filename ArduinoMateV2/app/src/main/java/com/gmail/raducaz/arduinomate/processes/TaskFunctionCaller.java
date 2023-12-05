@@ -132,8 +132,14 @@ public class TaskFunctionCaller implements Runnable {
                     case "BoilerOnOff":
                         new ProcessBoilerOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                         break;
-                    case "Default1Refresh":
-                        new ProcessDefault1Refresh(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                    case "TempRefresh":
+                        new ProcessTempRefresh(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                        break;
+                    case "Socket6":
+                        new ProcessSocket6OnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
+                        break;
+                    case "DvrOnOff":
+                        new ProcessDvrOnOff(mRepository, deviceName).execute(isAutoExecution, isOnDemand, desiredFunctionResult, reasonDetails);
                         break;
                     default:
                 }

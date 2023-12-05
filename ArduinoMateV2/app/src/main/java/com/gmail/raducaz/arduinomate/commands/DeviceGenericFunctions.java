@@ -38,4 +38,22 @@ public class DeviceGenericFunctions {
             return false;
         }
     }
+
+    public double getCurrentTemperature()
+    {
+        try {
+            // Check AC current - if high then it's on
+            String command = "[F2]";
+            String result = arduinoCommander.SendCommand(command);
+            double temp = 0;
+            temp = new Parser(result).getDouble("F2");
+
+            return temp;
+        }
+        catch (Exception exc)
+        {
+            Log.e("getTemperature", exc.getMessage());
+            return -50;
+        }
+    }
 }

@@ -30,6 +30,7 @@ android {
     dataBinding {
         enabled = true
     }
+    namespace 'com.gmail.raducaz.arduinomate'
 
 }
 
